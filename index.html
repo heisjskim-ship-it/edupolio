@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>에듀포트 - 학교생활 진로 포트폴리오</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js (A4 PDF 다운로드 라이브러리) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @media print { .no-print { display: none !important; } .print-card-break { page-break-inside: avoid; } body { background-color: white; color: black; } }
@@ -14,11 +15,13 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
 
+    <!-- 전역 로딩 오버레이 -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white/80 z-50 flex flex-col justify-center items-center hidden">
         <div class="loader mb-4"></div>
         <p class="text-slate-600 font-bold tracking-tight">데이터 동기화 및 렌더링을 시작하고 있습니다...</p>
     </div>
 
+    <!-- [1] 게이트웨이 인증 화면 -->
     <div id="authView" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-slate-100">
             <div class="text-center mb-8">
@@ -27,6 +30,7 @@
                 <p class="text-slate-500 mt-2 text-sm">3개년 연속 성장 포트폴리오 관리 플랫폼</p>
             </div>
 
+            <!-- 로그인 패널 -->
             <form id="loginForm" class="space-y-4">
                 <h2 class="text-xl font-bold text-slate-800">서비스 로그인</h2>
                 <div>
@@ -43,6 +47,7 @@
                 </p>
             </form>
 
+            <!-- 회원가입 신청 패널 -->
             <form id="signupForm" class="space-y-4 hidden">
                 <h2 class="text-xl font-bold text-slate-800">플랫폼 가입 신청</h2>
                 <div class="grid grid-cols-2 gap-3 mb-2">
@@ -83,6 +88,7 @@
         </div>
     </div>
 
+    <!-- [2] 학습자(학생용) 포탈 -->
     <div id="studentView" class="hidden min-h-screen pb-16">
         <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 no-print shadow-sm">
             <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -146,6 +152,7 @@
         </main>
     </div>
 
+    <!-- [3] 지도 교사용 관리 포탈 -->
     <div id="teacherView" class="hidden min-h-screen pb-12">
         <nav class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
             <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -181,6 +188,7 @@
         </main>
     </div>
 
+    <!-- [4] 학교 행사 생성 모달 -->
     <div id="eventModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md">
             <h2 class="text-xl font-bold text-slate-800 mb-4">🏫 교내 행사 활동 연동 등록</h2>
@@ -205,8 +213,10 @@
         </div>
     </div>
 
+    <!-- 연동 스크립트 엔진 -->
     <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+        // ✅ 1. ESM 모듈 임포트 오류 해결을 위해 올바른 묶음(+esm 형식) 주소로 변경했습니다.
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
         // =========================================================================
         // 🔴 아래 두 줄에 주소와 복사하신 sb- 키를 정확하게 넣어주세요!
@@ -232,6 +242,16 @@
             if (viewName === 'auth') document.getElementById('authView').classList.remove('hidden');
             else if (viewName === 'student') document.getElementById('studentView').classList.remove('hidden');
             else if (viewName === 'teacher') document.getElementById('teacherView').classList.remove('hidden');
+        }
+
+        // 브라우저 캐시 잔여 세션 데이터 충돌을 완전 방지하는 복구 클리어 함수
+        function forceClearLocalSession() {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sb-')) {
+                    localStorage.removeItem(key);
+                }
+            }
         }
 
         // 화면 제어 및 토글 리스너 바인딩
@@ -282,10 +302,10 @@
                 });
                 if (error) alert(`가입 실패: ${error.message}`);
                 else {
-                    alert("회원가입이 승인되었습니다. 로그인을 진행해 주세요.");
+                    alert("회원가입 신청이 안전하게 완료되었습니다! 로그인을 진행하세요.");
                     document.getElementById('showLoginBtn').click();
                 }
-            } catch (err) { alert("서버 통신 오류"); }
+            } catch (err) { alert("서버와의 통신에 실패했습니다."); }
             finally { hideLoading(); }
         });
 
@@ -297,33 +317,58 @@
             const password = document.getElementById('loginPassword').value;
             try {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) alert(`로그인 실패: ${error.message}`);
-            } catch (err) { alert("네트워크 연결 실패"); }
-            finally { hideLoading(); }
+                if (error) {
+                    alert(`로그인 실패: ${error.message}`);
+                    hideLoading();
+                }
+            } catch (err) { 
+                alert("네트워크 연결에 실패했습니다."); 
+                hideLoading();
+            }
         });
 
         document.querySelectorAll('.logoutBtn').forEach(btn => {
             btn.onclick = async () => {
                 showLoading();
-                await supabase.auth.signOut();
+                try {
+                    await supabase.auth.signOut();
+                } catch(e) {}
+                forceClearLocalSession();
                 window.location.reload();
             }
         });
 
-        // Auth 상태 청취기 수립
+        // ✅ 2. Auth 상태 수신기 최적화 (프로필 정보 소실 또는 인증 에러 시 무한 리턴 차단)
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 showLoading();
                 currentUser = session.user;
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-                if (profile) {
+                try {
+                    const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                    if (error || !profile) {
+                        console.error("Profile Fetch Error: ", error);
+                        alert("⚠️ 계정 정보를 확인할 수 없습니다. (인증 계정은 생성되었으나 DB 연동 오류 상태입니다.)\n이메일 주소 및 Supabase SQL 설정 상태를 체크해 주세요.");
+                        forceClearLocalSession();
+                        try { await supabase.auth.signOut(); } catch(e){}
+                        window.location.reload();
+                        return;
+                    }
+
                     currentUserProfile = profile;
-                    if (profile.role === 'student') initStudentDashboard();
-                    else initTeacherDashboard();
+                    if (profile.role === 'student') {
+                        initStudentDashboard();
+                    } else {
+                        initTeacherDashboard();
+                    }
+                } catch (e) {
+                    console.error("Session Processing Error: ", e);
+                    forceClearLocalSession();
+                } finally {
+                    hideLoading();
                 }
-                hideLoading();
             } else {
                 switchView('auth');
+                hideLoading();
             }
         });
 

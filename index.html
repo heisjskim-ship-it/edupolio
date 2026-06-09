@@ -46,8 +46,8 @@
     <!-- 토스트 알림 -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none flex flex-col items-end"></div>
 
-    <!-- 확인 모달 -->
-    <div id="confirmModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <!-- 확인 모달 (z-[9999]: 모든 모달 위에 항상 표시) -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/70 z-[9999] flex items-center justify-center p-4 hidden backdrop-blur-sm">
         <div class="bg-white p-7 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-100">
             <h3 class="text-lg font-black text-slate-900 mb-2" id="confirmTitle">확인</h3>
             <p id="confirmModalMessage" class="text-sm text-slate-500 mb-6 leading-relaxed"></p>
@@ -708,19 +708,52 @@
             const feedEl = $('homeTimelineFeed');
             const evEl = $('homeEventsList');
 
+            // 포트폴리오 최근 6건 조회 (JOIN 없이 단독 쿼리 → RLS 우회)
             try {
-                const { data } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(6);
-                if (!data || data.length === 0) {
+                const { data: pfData, error: pfErr } = await supabase
+                    .from('portfolios')
+                    .select('student_uid, grade, area, activity_name, content, updated_at, created_at')
+                    .order('updated_at', { ascending: false })
+                    .limit(6);
+
+                if (pfErr || !pfData || pfData.length === 0) {
                     feedEl.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">최근 업데이트가 없습니다.</p>';
                 } else {
-                    feedEl.innerHTML = data.map(item => {
-                        const d = new Date(item.updated_at || item.created_at);
+                    // 학생 UID 목록으로 프로필 일괄 조회 (비인증 상태에서도 접근 가능한 경우 시도)
+                    const uids = [...new Set(pfData.map(p => p.student_uid))];
+                    let profileMap = {};
+                    try {
+                        const { data: profileData } = await supabase
+                            .from('profiles')
+                            .select('id, name, student_id')
+                            .in('id', uids);
+                        if (profileData) {
+                            profileData.forEach(p => { profileMap[p.id] = p; });
+                        }
+                    } catch { /* 프로필 조회 실패 시 익명으로 표시 */ }
+
+                    feedEl.innerHTML = pfData.map(item => {
+                        const d = new Date(item.updated_at || item.created_at || Date.now());
                         const fmt = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
-                        return `<div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1 hover:bg-slate-800/60 transition"><div class="flex items-center justify-between text-[9px]"><span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span><span class="text-slate-500">${fmt}</span></div><h4 class="text-xs font-bold text-slate-200 truncate">${item.activity_name}</h4><p class="text-[10px] text-slate-400 truncate">${formatContentSummary(item.content)}</p><div class="text-[9px] text-slate-500 flex justify-between pt-1 border-t border-slate-800/50"><span>작성자: ${blindName(item.profiles?.name)}</span><span class="text-emerald-400">실시간 연동 ✓</span></div></div>`;
+                        const profile = profileMap[item.student_uid];
+                        const displayName = profile ? blindName(profile.name) : '학생';
+                        return `<div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1 hover:bg-slate-800/60 transition">
+                            <div class="flex items-center justify-between text-[9px]">
+                                <span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span>
+                                <span class="text-slate-500">${fmt}</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-200 truncate">${item.activity_name}</h4>
+                            <p class="text-[10px] text-slate-400 truncate">${formatContentSummary(item.content)}</p>
+                            <div class="text-[9px] text-slate-500 flex justify-between pt-1 border-t border-slate-800/50">
+                                <span>작성자: ${displayName}</span>
+                                <span class="text-emerald-400">실시간 연동 ✓</span>
+                            </div>
+                        </div>`;
                     }).join('');
                 }
-            } catch {
-                feedEl.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">데이터 불러오기 실패</p>';
+            } catch (err) {
+                feedEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-10">데이터 불러오기 실패</p>`;
+                console.error('loadHomeLiveBoard error:', err);
             }
 
             try {
@@ -1665,21 +1698,32 @@
             e.preventDefault();
             const uid = $('adminEditUserId').value;
             const role = $('adminEditRole').value;
-            const data = {
+            // email은 Supabase Auth와 분리된 필드로, profiles 테이블에서는 name/role/학적 정보만 업데이트
+            const updateData = {
                 name: $('adminEditName').value.trim(),
-                email: $('adminEditEmail').value.trim(),
                 role,
-                admission_year: role==='student' ? parseInt($('adminEditYear').value)||null : null,
-                student_id: role==='student' ? $('adminEditStudentId').value.trim()||null : null
+                admission_year: role === 'student' ? (parseInt($('adminEditYear').value) || null) : null,
+                student_id: role === 'student' ? ($('adminEditStudentId').value.trim() || null) : null
             };
             showLoading('반영 중...');
             try {
-                const { error } = await supabase.from('profiles').update(data).eq('id', uid);
+                const { error } = await supabase.from('profiles').update(updateData).eq('id', uid);
                 if (error) throw error;
-                showToast('수정 완료', 'success');
+
+                // 로컬 캐시에도 즉시 반영
+                const idx = cachedAllUsersForAdmin.findIndex(u => u.id === uid);
+                if (idx !== -1) {
+                    cachedAllUsersForAdmin[idx] = { ...cachedAllUsersForAdmin[idx], ...updateData };
+                }
+
+                showToast('수정이 완료되었습니다.', 'success');
                 $('adminEditModal').classList.add('hidden');
-                await loadAllProfilesForAdmin();
-            } catch (err) { showToast('수정 실패: ' + err.message, 'error'); }
+                renderAdminUserTable(cachedAllUsersForAdmin); // 즉시 화면 갱신
+                await loadAllProfilesForAdmin(); // 서버에서 최신 데이터 재동기화
+            } catch (err) {
+                showToast('수정 실패: ' + err.message, 'error');
+                console.error('Admin edit error:', err);
+            }
             finally { hideLoading(); }
         });
 

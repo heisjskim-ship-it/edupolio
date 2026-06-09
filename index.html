@@ -1,786 +1,497 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>에듀포트 - 학교생활 진로 포트폴리오</title>
     <!-- Tailwind CSS (디자인) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- html2pdf.js (PDF 다운로드 라이브러리) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    
     <style>
-      /* PDF 인쇄 시 깔끔하게 나오도록 스타일 조정 */
-      @media print {
-        .no-print {
-          display: none !important;
+        /* PDF 인쇄 시 깔끔하게 나오도록 스타일 조정 */
+        @media print {
+            .no-print { display: none !important; }
+            .print-break-inside-avoid { page-break-inside: avoid; }
+            body { background-color: white; }
         }
-        .print-break-inside-avoid {
-          page-break-inside: avoid;
+        /* 로딩 스피너 애니메이션 */
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6;
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
         }
-        body {
-          background-color: white;
-        }
-      }
-      /* 로딩 스피너 애니메이션 */
-      .loader {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3b82f6;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
-  </head>
-  <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
     <!-- 전역 로딩 오버레이 -->
-    <div
-      id="loadingOverlay"
-      class="fixed inset-0 bg-white/80 z-50 flex flex-col justify-center items-center hidden"
-    >
-      <div class="loader mb-4"></div>
-      <p class="text-slate-600 font-medium">데이터를 처리 중입니다...</p>
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/80 z-50 flex flex-col justify-center items-center hidden">
+        <div class="loader mb-4"></div>
+        <p class="text-slate-600 font-medium">데이터를 처리 중입니다...</p>
     </div>
 
     <!-- ========================================== -->
     <!-- 1. 인증 화면 (로그인 / 회원가입) -->
     <!-- ========================================== -->
-    <div
-      id="authView"
-      class="min-h-screen flex items-center justify-center p-4"
-    >
-      <div
-        class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100"
-      >
-        <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-blue-600 mb-2">EduPort</h1>
-          <p class="text-slate-500">학교생활 진로 포트폴리오 관리 시스템</p>
+    <div id="authView" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-blue-600 mb-2">EduPort</h1>
+                <p class="text-slate-500">학교생활 진로 포트폴리오 관리 시스템</p>
+            </div>
+
+            <!-- 로그인 폼 -->
+            <form id="loginForm" class="space-y-4">
+                <h2 class="text-xl font-semibold mb-4">로그인</h2>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">이메일</label>
+                    <input type="email" id="loginEmail" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">비밀번호</label>
+                    <input type="password" id="loginPassword" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">로그인</button>
+                <p class="text-center text-sm text-slate-500 mt-4">
+                    계정이 없으신가요? <a href="#" id="showSignupBtn" class="text-blue-600 font-semibold hover:underline">회원가입</a>
+                </p>
+            </form>
+
+            <!-- 회원가입 폼 (기본적으로 숨김) -->
+            <form id="signupForm" class="space-y-4 hidden">
+                <h2 class="text-xl font-semibold mb-4">회원가입</h2>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <button type="button" id="roleStudentBtn" class="py-2 border-2 border-blue-600 text-blue-600 bg-blue-50 font-bold rounded-lg">학생</button>
+                    <button type="button" id="roleTeacherBtn" class="py-2 border-2 border-slate-200 text-slate-500 rounded-lg">교사</button>
+                </div>
+                <input type="hidden" id="signupRole" value="student">
+                
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">이름 (실명)</label>
+                    <input type="text" id="signupName" class="w-full p-3 border border-slate-300 rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">이메일</label>
+                    <input type="email" id="signupEmail" class="w-full p-3 border border-slate-300 rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">비밀번호 (6자리 이상)</label>
+                    <input type="password" id="signupPassword" class="w-full p-3 border border-slate-300 rounded-lg" required minlength="6">
+                </div>
+                
+                <!-- 학생 전용 추가 입력란 -->
+                <div id="studentOnlyFields" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">입학년도</label>
+                        <input type="number" id="signupYear" class="w-full p-3 border border-slate-300 rounded-lg" placeholder="예: 2024">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">학번</label>
+                        <input type="text" id="signupStudentId" class="w-full p-3 border border-slate-300 rounded-lg" placeholder="예: 10101">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition">가입 완료하기</button>
+                <p class="text-center text-sm text-slate-500 mt-4">
+                    이미 계정이 있으신가요? <a href="#" id="showLoginBtn" class="text-blue-600 font-semibold hover:underline">로그인</a>
+                </p>
+            </form>
         </div>
-
-        <!-- 로그인 폼 -->
-        <form id="loginForm" class="space-y-4">
-          <h2 class="text-xl font-semibold mb-4">로그인</h2>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1"
-              >이메일</label
-            >
-            <input
-              type="email"
-              id="loginEmail"
-              class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              required
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1"
-              >비밀번호</label
-            >
-            <input
-              type="password"
-              id="loginPassword"
-              class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition"
-          >
-            로그인
-          </button>
-          <p class="text-center text-sm text-slate-500 mt-4">
-            계정이 없으신가요?
-            <a
-              href="#"
-              id="showSignupBtn"
-              class="text-blue-600 font-semibold hover:underline"
-              >회원가입</a
-            >
-          </p>
-        </form>
-
-        <!-- 회원가입 폼 (기본적으로 숨김) -->
-        <form id="signupForm" class="space-y-4 hidden">
-          <h2 class="text-xl font-semibold mb-4">회원가입</h2>
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <button
-              type="button"
-              id="roleStudentBtn"
-              class="py-2 border-2 border-blue-600 text-blue-600 bg-blue-50 font-bold rounded-lg"
-            >
-              학생
-            </button>
-            <button
-              type="button"
-              id="roleTeacherBtn"
-              class="py-2 border-2 border-slate-200 text-slate-500 rounded-lg"
-            >
-              교사
-            </button>
-          </div>
-          <input type="hidden" id="signupRole" value="student" />
-
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1"
-              >이름 (실명)</label
-            >
-            <input
-              type="text"
-              id="signupName"
-              class="w-full p-3 border border-slate-300 rounded-lg"
-              required
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1"
-              >이메일</label
-            >
-            <input
-              type="email"
-              id="signupEmail"
-              class="w-full p-3 border border-slate-300 rounded-lg"
-              required
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1"
-              >비밀번호 (6자리 이상)</label
-            >
-            <input
-              type="password"
-              id="signupPassword"
-              class="w-full p-3 border border-slate-300 rounded-lg"
-              required
-              minlength="6"
-            />
-          </div>
-
-          <!-- 학생 전용 추가 입력란 -->
-          <div id="studentOnlyFields" class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1"
-                >입학년도</label
-              >
-              <input
-                type="number"
-                id="signupYear"
-                class="w-full p-3 border border-slate-300 rounded-lg"
-                placeholder="예: 2024"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1"
-                >학번</label
-              >
-              <input
-                type="text"
-                id="signupStudentId"
-                class="w-full p-3 border border-slate-300 rounded-lg"
-                placeholder="예: 10101"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition"
-          >
-            가입 완료하기
-          </button>
-          <p class="text-center text-sm text-slate-500 mt-4">
-            이미 계정이 있으신가요?
-            <a
-              href="#"
-              id="showLoginBtn"
-              class="text-blue-600 font-semibold hover:underline"
-              >로그인</a
-            >
-          </p>
-        </form>
-      </div>
     </div>
+
 
     <!-- ========================================== -->
     <!-- 2. 학생용 대시보드 -->
     <!-- ========================================== -->
     <div id="studentView" class="hidden min-h-screen">
-      <!-- 네비게이션 바 -->
-      <nav
-        class="bg-white border-b border-slate-200 sticky top-0 z-40 no-print"
-      >
-        <div
-          class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between"
-        >
-          <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold text-blue-600">EduPort (학생용)</h1>
-            <span
-              id="studentNavInfo"
-              class="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full"
-            ></span>
-          </div>
-          <div class="flex gap-3">
-            <button
-              id="downloadPdfBtn"
-              class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition"
-            >
-              📄 A4 PDF 다운로드
-            </button>
-            <button
-              class="logoutBtn text-slate-500 hover:text-red-500 text-sm font-medium transition"
-            >
-              로그아웃
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <main class="max-w-5xl mx-auto px-4 py-8">
-        <!-- 3개년 학년 탭 (인쇄 시 숨김) -->
-        <div class="flex border-b border-slate-200 mb-8 no-print">
-          <button
-            class="grade-tab active-tab w-1/3 py-3 text-center font-bold text-blue-600 border-b-2 border-blue-600"
-            data-grade="1"
-          >
-            1학년 기록
-          </button>
-          <button
-            class="grade-tab w-1/3 py-3 text-center font-medium text-slate-500 hover:text-blue-600 transition"
-            data-grade="2"
-          >
-            2학년 기록
-          </button>
-          <button
-            class="grade-tab w-1/3 py-3 text-center font-medium text-slate-500 hover:text-blue-600 transition"
-            data-grade="3"
-          >
-            3학년 기록
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <!-- 왼쪽: 활동 입력 폼 (인쇄 시 숨김) -->
-          <div class="lg:col-span-1 no-print">
-            <div
-              class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 sticky top-24"
-            >
-              <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                ✍️ 새 활동 기록하기
-              </h3>
-              <form id="portfolioForm" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                  <select
-                    id="pfSemester"
-                    class="w-full p-2 border border-slate-300 rounded bg-slate-50"
-                    required
-                  >
-                    <option value="1">1학기</option>
-                    <option value="2">2학기</option>
-                  </select>
-                  <select
-                    id="pfArea"
-                    class="w-full p-2 border border-slate-300 rounded bg-slate-50"
-                    required
-                  >
-                    <option value="교과">교과 (세특)</option>
-                    <option value="자율">자율활동</option>
-                    <option value="동아리">동아리활동</option>
-                    <option value="진로">진로활동</option>
-                  </select>
+        <!-- 네비게이션 바 -->
+        <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 no-print">
+            <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-xl font-bold text-blue-600">EduPort (학생용)</h1>
+                    <span id="studentNavInfo" class="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full"></span>
                 </div>
-                <input
-                  type="text"
-                  id="pfActivityName"
-                  class="w-full p-3 border border-slate-300 rounded focus:border-blue-500 outline-none"
-                  placeholder="과목명 또는 활동명"
-                  required
-                />
-                <textarea
-                  id="pfContent"
-                  rows="4"
-                  class="w-full p-3 border border-slate-300 rounded focus:border-blue-500 outline-none"
-                  placeholder="활동 내용 (주요 탐구 및 참여 내용)"
-                  required
-                ></textarea>
-                <textarea
-                  id="pfSelfEval"
-                  rows="3"
-                  class="w-full p-3 border border-slate-300 rounded focus:border-blue-500 outline-none bg-blue-50"
-                  placeholder="학생 자기평가 (배운 점, 느낀 점, 성장한 점)"
-                  required
-                ></textarea>
-                <button
-                  type="submit"
-                  class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700"
-                >
-                  저장하기
-                </button>
-              </form>
+                <div class="flex gap-3">
+                    <button id="downloadPdfBtn" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition">📄 A4 PDF 다운로드</button>
+                    <button class="logoutBtn text-slate-500 hover:text-red-500 text-sm font-medium transition">로그아웃</button>
+                </div>
             </div>
-          </div>
+        </nav>
 
-          <!-- 오른쪽: 포트폴리오 리스트 (이 부분이 PDF로 인쇄됨) -->
-          <div class="lg:col-span-2" id="pdfPrintArea">
-            <div
-              class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[500px]"
-            >
-              <!-- PDF용 헤더 (웹에서는 숨김, 인쇄 시 보임) -->
-              <div
-                class="hidden print:block text-center mb-8 border-b-2 border-slate-800 pb-4"
-              >
-                <h1 class="text-2xl font-bold mb-2">
-                  학교생활 진로 포트폴리오
-                </h1>
-                <p class="text-lg" id="pdfStudentInfo">학생 정보 출력 영역</p>
-              </div>
-
-              <h2
-                class="text-2xl font-bold mb-6 pb-2 border-b-2 border-slate-100 flex justify-between items-center"
-              >
-                <span id="currentGradeTitle">1학년 활동 내역</span>
-              </h2>
-
-              <div id="portfolioList" class="space-y-6">
-                <!-- JS를 통해 활동 카드가 여기에 삽입됩니다. -->
-                <p class="text-slate-400 text-center py-10">
-                  등록된 활동이 없습니다.
-                </p>
-              </div>
+        <main class="max-w-5xl mx-auto px-4 py-8">
+            <!-- 3개년 학년 탭 (인쇄 시 숨김) -->
+            <div class="flex border-b border-slate-200 mb-8 no-print">
+                <button class="grade-tab active-tab w-1/3 py-3 text-center font-bold text-blue-600 border-b-2 border-blue-600" data-grade="1">1학년 기록</button>
+                <button class="grade-tab w-1/3 py-3 text-center font-medium text-slate-500 hover:text-blue-600 transition" data-grade="2">2학년 기록</button>
+                <button class="grade-tab w-1/3 py-3 text-center font-medium text-slate-500 hover:text-blue-600 transition" data-grade="3">3학년 기록</button>
             </div>
-          </div>
-        </div>
-      </main>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- 왼쪽: 활동 입력 폼 (인쇄 시 숨김) -->
+                <div class="lg:col-span-1 no-print">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 sticky top-24">
+                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">✍️ 새 활동 기록하기</h3>
+                        <form id="portfolioForm" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <select id="pfSemester" class="w-full p-2 border border-slate-300 rounded bg-slate-50" required>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                                <select id="pfArea" class="w-full p-2 border border-slate-300 rounded bg-slate-50" required>
+                                    <option value="교과">교과 (세특)</option>
+                                    <option value="자율">자율활동</option>
+                                    <option value="동아리">동아리활동</option>
+                                    <option value="진로">진로활동</option>
+                                </select>
+                            </div>
+                            <input type="text" id="pfActivityName" class="w-full p-3 border border-slate-300 rounded focus:border-blue-500 outline-none" placeholder="과목명 또는 활동명" required>
+                            <textarea id="pfContent" rows="4" class="w-full p-3 border border-slate-300 rounded focus:border-blue-500 outline-none" placeholder="활동 내용 (주요 탐구 및 참여 내용)" required></textarea>
+                            <textarea id="pfSelfEval" rows="3" class="w-full p-3 border border-slate-300 rounded focus:border-blue-500 outline-none bg-blue-50" placeholder="학생 자기평가 (배운 점, 느낀 점, 성장한 점)" required></textarea>
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700">저장하기</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 포트폴리오 리스트 (이 부분이 PDF로 인쇄됨) -->
+                <div class="lg:col-span-2" id="pdfPrintArea">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[500px]">
+                        <!-- PDF용 헤더 (웹에서는 숨김, 인쇄 시 보임) -->
+                        <div class="hidden print:block text-center mb-8 border-b-2 border-slate-800 pb-4">
+                            <h1 class="text-2xl font-bold mb-2">학교생활 진로 포트폴리오</h1>
+                            <p class="text-lg" id="pdfStudentInfo">학생 정보 출력 영역</p>
+                        </div>
+                        
+                        <h2 class="text-2xl font-bold mb-6 pb-2 border-b-2 border-slate-100 flex justify-between items-center">
+                            <span id="currentGradeTitle">1학년 활동 내역</span>
+                        </h2>
+                        
+                        <div id="portfolioList" class="space-y-6">
+                            <!-- JS를 통해 활동 카드가 여기에 삽입됩니다. -->
+                            <p class="text-slate-400 text-center py-10">등록된 활동이 없습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
+
 
     <!-- ========================================== -->
     <!-- 3. 교사용 대시보드 -->
     <!-- ========================================== -->
     <div id="teacherView" class="hidden min-h-screen">
-      <nav
-        class="bg-slate-800 text-white border-b border-slate-700 sticky top-0 z-40"
-      >
-        <div
-          class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between"
-        >
-          <h1 class="text-xl font-bold flex items-center gap-2">
-            👨‍🏫 EduPort 관리자 (교사용)
-          </h1>
-          <div class="flex items-center gap-4">
-            <span id="teacherNavInfo" class="text-sm text-slate-300"></span>
-            <button
-              class="logoutBtn text-slate-300 hover:text-white text-sm font-medium"
-            >
-              로그아웃
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <main
-        class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8"
-      >
-        <!-- 왼쪽: 학생 리스트 및 필터 -->
-        <div
-          class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] overflow-y-auto"
-        >
-          <h2 class="font-bold text-lg mb-4">학생 목록</h2>
-          <div class="mb-4 flex gap-2">
-            <input
-              type="number"
-              id="filterYear"
-              class="w-1/2 p-2 border rounded"
-              placeholder="입학년도"
-            />
-            <input
-              type="text"
-              id="filterName"
-              class="w-1/2 p-2 border rounded"
-              placeholder="이름 검색"
-            />
-          </div>
-          <ul id="studentListContainer" class="space-y-2">
-            <!-- 학생 목록이 여기에 삽입됨 -->
-          </ul>
-        </div>
-
-        <!-- 오른쪽: 선택한 학생의 포트폴리오 상세 및 피드백 작성 -->
-        <div
-          class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] overflow-y-auto hidden"
-          id="teacherDetailView"
-        >
-          <div class="flex justify-between items-end border-b pb-4 mb-6">
-            <div>
-              <h2
-                class="text-2xl font-bold text-slate-800"
-                id="detailStudentName"
-              >
-                학생 이름
-              </h2>
-              <p class="text-slate-500" id="detailStudentInfo">
-                학번 | 입학년도
-              </p>
+        <nav class="bg-slate-800 text-white border-b border-slate-700 sticky top-0 z-40">
+            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+                <h1 class="text-xl font-bold flex items-center gap-2">👨‍🏫 EduPort 관리자 (교사용)</h1>
+                <div class="flex items-center gap-4">
+                    <span id="teacherNavInfo" class="text-sm text-slate-300"></span>
+                    <button class="logoutBtn text-slate-300 hover:text-white text-sm font-medium">로그아웃</button>
+                </div>
             </div>
-          </div>
+        </nav>
 
-          <div id="teacherPortfolioList" class="space-y-8">
-            <!-- 학생의 포트폴리오 항목 + 교사 피드백 입력 폼이 삽입됨 -->
-          </div>
-        </div>
+        <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- 왼쪽: 학생 리스트 및 필터 -->
+            <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] overflow-y-auto">
+                <h2 class="font-bold text-lg mb-4">학생 목록</h2>
+                <div class="mb-4 flex gap-2">
+                    <input type="number" id="filterYear" class="w-1/2 p-2 border rounded" placeholder="입학년도">
+                    <input type="text" id="filterName" class="w-1/2 p-2 border rounded" placeholder="이름 검색">
+                </div>
+                <ul id="studentListContainer" class="space-y-2">
+                    <!-- 학생 목록이 여기에 삽입됨 -->
+                </ul>
+            </div>
 
-        <div
-          class="md:col-span-2 flex items-center justify-center bg-slate-100 rounded-2xl border border-dashed border-slate-300 h-[calc(100vh-8rem)]"
-          id="teacherEmptyView"
-        >
-          <p class="text-slate-500 font-medium">
-            왼쪽에서 학생을 선택해주세요.
-          </p>
-        </div>
-      </main>
+            <!-- 오른쪽: 선택한 학생의 포트폴리오 상세 및 피드백 작성 -->
+            <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] overflow-y-auto hidden" id="teacherDetailView">
+                <div class="flex justify-between items-end border-b pb-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800" id="detailStudentName">학생 이름</h2>
+                        <p class="text-slate-500" id="detailStudentInfo">학번 | 입학년도</p>
+                    </div>
+                </div>
+
+                <div id="teacherPortfolioList" class="space-y-8">
+                    <!-- 학생의 포트폴리오 항목 + 교사 피드백 입력 폼이 삽입됨 -->
+                </div>
+            </div>
+            
+            <div class="md:col-span-2 flex items-center justify-center bg-slate-100 rounded-2xl border border-dashed border-slate-300 h-[calc(100vh-8rem)]" id="teacherEmptyView">
+                <p class="text-slate-500 font-medium">왼쪽에서 학생을 선택해주세요.</p>
+            </div>
+        </main>
     </div>
+
 
     <!-- ========================================== -->
     <!-- Supabase 및 핵심 자바스크립트 로직 -->
     <!-- ========================================== -->
     <script type="module">
-      // [1] Supabase JS 모듈 불러오기 (ESM 방식)
-      import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/+esm';
+        // [1] Supabase JS 모듈 불러오기 (ESM 방식)
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/+esm'
 
-      // =========================================================================
-      // 🔴 아래 두 줄의 따옴표('') 안에 본인 프로젝트의 URL과 ANON_KEY를 복사해 넣으세요!
-      // =========================================================================
-      const SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co';
-      const SUPABASE_ANON_KEY =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
+        // =========================================================================
+        // 🔴 아래 두 줄의 따옴표('') 안에 본인 프로젝트의 URL과 ANON_KEY를 복사해 넣으세요!
+        // =========================================================================
+        const SUPABASE_URL = 'https://nysawmnglyshjswdthzk.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2F3bW5nbHlzaGpzY290aHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTgzMTkyMjksImV4cCI6MjAzMzg5NTIyOX0.1234567890abcdefghijklmnopqrstuvwxyz';
 
-      // 만약 키를 입력하지 않았다면 경고창 띄우기
-      if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        alert(
-          '⚠️ 코드 내에 SUPABASE_URL과 SUPABASE_ANON_KEY가 비어있습니다. Supabase 대시보드에서 복사하여 채워주세요.'
-        );
-      }
-
-      // Supabase 클라이언트 초기화
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      // 전역 상태 관리
-      let currentUser = null;
-      let currentUserProfile = null;
-      let currentStudentGrade = 1; // 학생 탭용
-      let selectedStudentUid = null; // 교사용
-
-      // =========================================================================
-      // 유틸리티 함수
-      // =========================================================================
-      const showLoading = () =>
-        document.getElementById('loadingOverlay').classList.remove('hidden');
-      const hideLoading = () =>
-        document.getElementById('loadingOverlay').classList.add('hidden');
-
-      // 화면 전환 로직
-      function switchView(viewName) {
-        document.getElementById('authView').classList.add('hidden');
-        document.getElementById('studentView').classList.add('hidden');
-        document.getElementById('teacherView').classList.add('hidden');
-
-        if (viewName === 'auth')
-          document.getElementById('authView').classList.remove('hidden');
-        else if (viewName === 'student')
-          document.getElementById('studentView').classList.remove('hidden');
-        else if (viewName === 'teacher')
-          document.getElementById('teacherView').classList.remove('hidden');
-      }
-
-      // =========================================================================
-      // [2] 인증(Auth) 및 세션 관리 로직
-      // =========================================================================
-
-      // 로그인/가입 폼 토글
-      document.getElementById('showSignupBtn').onclick = (e) => {
-        e.preventDefault();
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('signupForm').classList.remove('hidden');
-      };
-      document.getElementById('showLoginBtn').onclick = (e) => {
-        e.preventDefault();
-        document.getElementById('signupForm').classList.add('hidden');
-        document.getElementById('loginForm').classList.remove('hidden');
-      };
-
-      // 가입 시 역할(학생/교사) 선택 UI
-      const roleStudentBtn = document.getElementById('roleStudentBtn');
-      const roleTeacherBtn = document.getElementById('roleTeacherBtn');
-      const studentOnlyFields = document.getElementById('studentOnlyFields');
-      const signupRole = document.getElementById('signupRole');
-
-      roleStudentBtn.onclick = () => {
-        signupRole.value = 'student';
-        roleStudentBtn.className =
-          'py-2 border-2 border-blue-600 text-blue-600 bg-blue-50 font-bold rounded-lg';
-        roleTeacherBtn.className =
-          'py-2 border-2 border-slate-200 text-slate-500 rounded-lg';
-        studentOnlyFields.classList.remove('hidden');
-      };
-      roleTeacherBtn.onclick = () => {
-        signupRole.value = 'teacher';
-        roleTeacherBtn.className =
-          'py-2 border-2 border-blue-600 text-blue-600 bg-blue-50 font-bold rounded-lg';
-        roleStudentBtn.className =
-          'py-2 border-2 border-slate-200 text-slate-500 rounded-lg';
-        studentOnlyFields.classList.add('hidden');
-      };
-
-      // 회원가입 제출 로직
-      document
-        .getElementById('signupForm')
-        .addEventListener('submit', async (e) => {
-          e.preventDefault();
-          showLoading();
-          const email = document.getElementById('signupEmail').value;
-          const password = document.getElementById('signupPassword').value;
-          const name = document.getElementById('signupName').value;
-          const role = document.getElementById('signupRole').value;
-          const admission_year =
-            role === 'student'
-              ? document.getElementById('signupYear').value
-              : null;
-          const student_id =
-            role === 'student'
-              ? document.getElementById('signupStudentId').value
-              : null;
-
-          // 1. Supabase Auth에 계정 생성
-          const { data: authData, error: authError } =
-            await supabase.auth.signUp({ email, password });
-
-          if (authError) {
-            alert(`가입 실패: ${authError.message}`);
-            hideLoading();
-            return;
-          }
-
-          // 2. 가입 성공 시 Profiles 테이블에 추가 정보 저장
-          if (authData.user) {
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .insert([
-                {
-                  id: authData.user.id,
-                  name: name,
-                  email: email,
-                  role: role,
-                  admission_year: admission_year,
-                  student_id: student_id,
-                },
-              ]);
-
-            if (profileError) {
-              alert(
-                '프로필 저장 실패. (SQL Editor에 INSERT 정책을 추가했는지 확인하세요!)'
-              );
-              console.error(profileError);
-            } else {
-              alert('회원가입이 완료되었습니다!');
-              document.getElementById('showLoginBtn').click(); // 로그인 화면으로 이동
-            }
-          }
-          hideLoading();
-        });
-
-      // 로그인 제출 로직
-      document
-        .getElementById('loginForm')
-        .addEventListener('submit', async (e) => {
-          e.preventDefault();
-          showLoading();
-          const email = document.getElementById('loginEmail').value;
-          const password = document.getElementById('loginPassword').value;
-
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          if (error) {
-            alert('이메일이나 비밀번호가 틀렸습니다.');
-            hideLoading();
-            return;
-          }
-          // 로그인이 성공하면 onAuthStateChange 이벤트가 발생하여 화면이 자동으로 넘어갑니다.
-          hideLoading();
-        });
-
-      // 로그아웃 로직 (모든 로그아웃 버튼에 적용)
-      document.querySelectorAll('.logoutBtn').forEach((btn) => {
-        btn.onclick = async () => {
-          await supabase.auth.signOut();
-          window.location.reload(); // 깔끔하게 새로고침
-        };
-      });
-
-      // ★ 앱 시작 시 세션 상태 감지 (가장 중요) ★
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session) {
-          currentUser = session.user;
-          // 사용자 프로필 정보 가져오기 (역할 확인)
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single();
-          currentUserProfile = profile;
-
-          if (profile.role === 'student') {
-            initStudentDashboard();
-          } else if (profile.role === 'teacher') {
-            initTeacherDashboard();
-          }
-        } else {
-          currentUser = null;
-          currentUserProfile = null;
-          switchView('auth');
+        // 만약 키를 입력하지 않았다면 경고창 띄우기
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+            alert("⚠️ 코드 내에 SUPABASE_URL과 SUPABASE_ANON_KEY가 비어있습니다. Supabase 대시보드에서 복사하여 채워주세요.");
         }
-      });
 
-      // =========================================================================
-      // [3] 학생용 기능 로직 (Student)
-      // =========================================================================
-      function initStudentDashboard() {
-        switchView('student');
-        // 상단 정보 세팅
-        document.getElementById(
-          'studentNavInfo'
-        ).innerText = `${currentUserProfile.admission_year}년 입학 | ${currentUserProfile.student_id} | ${currentUserProfile.name}`;
-        document.getElementById(
-          'pdfStudentInfo'
-        ).innerText = `학번: ${currentUserProfile.student_id} | 이름: ${currentUserProfile.name}`;
+        // Supabase 클라이언트 초기화
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 데이터 로드
-        loadStudentPortfolios(currentStudentGrade);
+        // 전역 상태 관리
+        let currentUser = null;
+        let currentUserProfile = null;
+        let currentStudentGrade = 1; // 학생 탭용
+        let selectedStudentUid = null; // 교사용
 
-        // 학년 탭 클릭 이벤트
-        document.querySelectorAll('.grade-tab').forEach((tab) => {
-          tab.onclick = (e) => {
-            document.querySelectorAll('.grade-tab').forEach((t) => {
-              t.classList.remove(
-                'active-tab',
-                'font-bold',
-                'text-blue-600',
-                'border-b-2',
-                'border-blue-600'
-              );
-              t.classList.add('font-medium', 'text-slate-500');
-            });
-            const target = e.target;
-            target.classList.remove('font-medium', 'text-slate-500');
-            target.classList.add(
-              'active-tab',
-              'font-bold',
-              'text-blue-600',
-              'border-b-2',
-              'border-blue-600'
-            );
+        // =========================================================================
+        // 유틸리티 함수
+        // =========================================================================
+        const showLoading = () => document.getElementById('loadingOverlay').classList.remove('hidden');
+        const hideLoading = () => document.getElementById('loadingOverlay').classList.add('hidden');
+        
+        // 화면 전환 로직
+        function switchView(viewName) {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('studentView').classList.add('hidden');
+            document.getElementById('teacherView').classList.add('hidden');
+            
+            if (viewName === 'auth') document.getElementById('authView').classList.remove('hidden');
+            else if (viewName === 'student') document.getElementById('studentView').classList.remove('hidden');
+            else if (viewName === 'teacher') document.getElementById('teacherView').classList.remove('hidden');
+        }
 
-            currentStudentGrade = parseInt(target.dataset.grade);
-            document.getElementById(
-              'currentGradeTitle'
-            ).innerText = `${currentStudentGrade}학년 활동 내역`;
+        // =========================================================================
+        // [2] 인증(Auth) 및 세션 관리 로직
+        // =========================================================================
+        
+        // 로그인/가입 폼 토글
+        document.getElementById('showSignupBtn').onclick = (e) => {
+            e.preventDefault(); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('signupForm').classList.remove('hidden');
+        };
+        document.getElementById('showLoginBtn').onclick = (e) => {
+            e.preventDefault(); document.getElementById('signupForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden');
+        };
+
+        // 가입 시 역할(학생/교사) 선택 UI
+        const roleStudentBtn = document.getElementById('roleStudentBtn');
+        const roleTeacherBtn = document.getElementById('roleTeacherBtn');
+        const studentOnlyFields = document.getElementById('studentOnlyFields');
+        const signupRole = document.getElementById('signupRole');
+
+        roleStudentBtn.onclick = () => {
+            signupRole.value = 'student';
+            roleStudentBtn.className = "py-2 border-2 border-blue-600 text-blue-600 bg-blue-50 font-bold rounded-lg";
+            roleTeacherBtn.className = "py-2 border-2 border-slate-200 text-slate-500 rounded-lg";
+            studentOnlyFields.classList.remove('hidden');
+        };
+        roleTeacherBtn.onclick = () => {
+            signupRole.value = 'teacher';
+            roleTeacherBtn.className = "py-2 border-2 border-blue-600 text-blue-600 bg-blue-50 font-bold rounded-lg";
+            roleStudentBtn.className = "py-2 border-2 border-slate-200 text-slate-500 rounded-lg";
+            studentOnlyFields.classList.add('hidden');
+        };
+
+        // 회원가입 제출 로직
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const name = document.getElementById('signupName').value;
+            const role = document.getElementById('signupRole').value;
+            const admission_year = role === 'student' ? document.getElementById('signupYear').value : null;
+            const student_id = role === 'student' ? document.getElementById('signupStudentId').value : null;
+
+            // 1. Supabase Auth에 계정 생성
+            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+            
+            if (authError) { alert(`가입 실패: ${authError.message}`); hideLoading(); return; }
+
+            // 2. 가입 성공 시 Profiles 테이블에 추가 정보 저장
+            if (authData.user) {
+                const { error: profileError } = await supabase.from('profiles').insert([{
+                    id: authData.user.id,
+                    name: name,
+                    email: email,
+                    role: role,
+                    admission_year: admission_year,
+                    student_id: student_id
+                }]);
+
+                if (profileError) {
+                    alert("프로필 저장 실패. (SQL Editor에 INSERT 정책을 추가했는지 확인하세요!)");
+                    console.error(profileError);
+                } else {
+                    alert("회원가입이 완료되었습니다!");
+                    document.getElementById('showLoginBtn').click(); // 로그인 화면으로 이동
+                }
+            }
+            hideLoading();
+        });
+
+        // 로그인 제출 로직
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) { alert("이메일이나 비밀번호가 틀렸습니다."); hideLoading(); return; }
+            // 로그인이 성공하면 onAuthStateChange 이벤트가 발생하여 화면이 자동으로 넘어갑니다.
+            hideLoading();
+        });
+
+        // 로그아웃 로직 (모든 로그아웃 버튼에 적용)
+        document.querySelectorAll('.logoutBtn').forEach(btn => {
+            btn.onclick = async () => {
+                await supabase.auth.signOut();
+                window.location.reload(); // 깔끔하게 새로고침
+            }
+        });
+
+        // ★ 앱 시작 시 세션 상태 감지 (가장 중요) ★
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (session) {
+                currentUser = session.user;
+                // 사용자 프로필 정보 가져오기 (역할 확인)
+                const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                
+                // 프로필 정보가 없거나 에러가 났을 때 무한 로딩 방지 처리
+                if (error || !profile) {
+                    console.error("프로필 불러오기 에러:", error);
+                    alert("프로필 정보를 찾을 수 없습니다.\n(데이터베이스 오류 혹은 이전 가입 시 프로필이 생성되지 않은 계정입니다.)\n확인을 누르면 로그아웃됩니다. 다른 이메일로 다시 회원가입해주세요.");
+                    await supabase.auth.signOut();
+                    hideLoading();
+                    return;
+                }
+
+                currentUserProfile = profile;
+                
+                if (profile.role === 'student') {
+                    initStudentDashboard();
+                } else if (profile.role === 'teacher') {
+                    initTeacherDashboard();
+                }
+                
+                hideLoading(); // 정상적으로 대시보드가 열리면 로딩 화면 숨기기
+            } else {
+                currentUser = null;
+                currentUserProfile = null;
+                switchView('auth');
+                hideLoading();
+            }
+        });
+
+
+        // =========================================================================
+        // [3] 학생용 기능 로직 (Student)
+        // =========================================================================
+        function initStudentDashboard() {
+            switchView('student');
+            // 상단 정보 세팅
+            document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year}년 입학 | ${currentUserProfile.student_id} | ${currentUserProfile.name}`;
+            document.getElementById('pdfStudentInfo').innerText = `학번: ${currentUserProfile.student_id} | 이름: ${currentUserProfile.name}`;
+            
+            // 데이터 로드
             loadStudentPortfolios(currentStudentGrade);
-          };
+
+            // 학년 탭 클릭 이벤트
+            document.querySelectorAll('.grade-tab').forEach(tab => {
+                tab.onclick = (e) => {
+                    document.querySelectorAll('.grade-tab').forEach(t => {
+                        t.classList.remove('active-tab', 'font-bold', 'text-blue-600', 'border-b-2', 'border-blue-600');
+                        t.classList.add('font-medium', 'text-slate-500');
+                    });
+                    const target = e.target;
+                    target.classList.remove('font-medium', 'text-slate-500');
+                    target.classList.add('active-tab', 'font-bold', 'text-blue-600', 'border-b-2', 'border-blue-600');
+                    
+                    currentStudentGrade = parseInt(target.dataset.grade);
+                    document.getElementById('currentGradeTitle').innerText = `${currentStudentGrade}학년 활동 내역`;
+                    loadStudentPortfolios(currentStudentGrade);
+                }
+            });
+        }
+
+        // 포트폴리오 작성 (Insert)
+        document.getElementById('portfolioForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const data = {
+                student_uid: currentUser.id,
+                grade: currentStudentGrade,
+                semester: document.getElementById('pfSemester').value,
+                area: document.getElementById('pfArea').value,
+                activity_name: document.getElementById('pfActivityName').value,
+                content: document.getElementById('pfContent').value,
+                self_evaluation: document.getElementById('pfSelfEval').value
+            };
+
+            const { error } = await supabase.from('portfolios').insert([data]);
+            if (error) alert("저장 실패");
+            else {
+                alert("활동이 저장되었습니다!");
+                document.getElementById('portfolioForm').reset();
+                loadStudentPortfolios(currentStudentGrade); // 리스트 새로고침
+            }
+            hideLoading();
         });
-      }
 
-      // 포트폴리오 작성 (Insert)
-      document
-        .getElementById('portfolioForm')
-        .addEventListener('submit', async (e) => {
-          e.preventDefault();
-          showLoading();
-          const data = {
-            student_uid: currentUser.id,
-            grade: currentStudentGrade,
-            semester: document.getElementById('pfSemester').value,
-            area: document.getElementById('pfArea').value,
-            activity_name: document.getElementById('pfActivityName').value,
-            content: document.getElementById('pfContent').value,
-            self_evaluation: document.getElementById('pfSelfEval').value,
-          };
+        // 포트폴리오 불러오기 (Read)
+        async function loadStudentPortfolios(grade) {
+            const listContainer = document.getElementById('portfolioList');
+            listContainer.innerHTML = '<p class="text-center text-slate-400 py-4">불러오는 중...</p>';
 
-          const { error } = await supabase.from('portfolios').insert([data]);
-          if (error) alert('저장 실패');
-          else {
-            alert('활동이 저장되었습니다!');
-            document.getElementById('portfolioForm').reset();
-            loadStudentPortfolios(currentStudentGrade); // 리스트 새로고침
-          }
-          hideLoading();
-        });
-
-      // 포트폴리오 불러오기 (Read)
-      async function loadStudentPortfolios(grade) {
-        const listContainer = document.getElementById('portfolioList');
-        listContainer.innerHTML =
-          '<p class="text-center text-slate-400 py-4">불러오는 중...</p>';
-
-        // 포트폴리오 목록과, 그에 달린 교사 피드백을 동시에(JOIN) 가져옵니다.
-        const { data, error } = await supabase
-          .from('portfolios')
-          .select(
-            `
+            // 포트폴리오 목록과, 그에 달린 교사 피드백을 동시에(JOIN) 가져옵니다.
+            const { data, error } = await supabase
+                .from('portfolios')
+                .select(`
                     *,
                     feedbacks ( feedback_content, created_at, profiles(name) )
-                `
-          )
-          .eq('student_uid', currentUser.id)
-          .eq('grade', grade)
-          .order('semester', { ascending: true })
-          .order('created_at', { ascending: false });
+                `)
+                .eq('student_uid', currentUser.id)
+                .eq('grade', grade)
+                .order('semester', { ascending: true })
+                .order('created_at', { ascending: false });
 
-        if (error) {
-          listContainer.innerHTML =
-            '<p class="text-red-500 text-center">데이터를 불러오는 중 오류가 발생했습니다.</p>';
-          return;
-        }
+            if (error) { listContainer.innerHTML = '<p class="text-red-500 text-center">데이터를 불러오는 중 오류가 발생했습니다.</p>'; return; }
+            
+            if (data.length === 0) {
+                listContainer.innerHTML = `<p class="text-slate-400 text-center py-10">등록된 ${grade}학년 활동이 없습니다.</p>`;
+                return;
+            }
 
-        if (data.length === 0) {
-          listContainer.innerHTML = `<p class="text-slate-400 text-center py-10">등록된 ${grade}학년 활동이 없습니다.</p>`;
-          return;
-        }
+            let html = '';
+            data.forEach(item => {
+                // 영역별 색상 뱃지
+                const areaColor = item.area === '교과' ? 'bg-blue-100 text-blue-700' : 
+                                  item.area === '동아리' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700';
 
-        let html = '';
-        data.forEach((item) => {
-          // 영역별 색상 뱃지
-          const areaColor =
-            item.area === '교과'
-              ? 'bg-blue-100 text-blue-700'
-              : item.area === '동아리'
-              ? 'bg-green-100 text-green-700'
-              : 'bg-purple-100 text-purple-700';
-
-          // 교사 피드백이 있는지 확인
-          let feedbackHtml = '';
-          if (item.feedbacks && item.feedbacks.length > 0) {
-            item.feedbacks.forEach((fb) => {
-              feedbackHtml += `
+                // 교사 피드백이 있는지 확인
+                let feedbackHtml = '';
+                if (item.feedbacks && item.feedbacks.length > 0) {
+                    item.feedbacks.forEach(fb => {
+                        feedbackHtml += `
                             <div class="mt-4 p-4 bg-slate-50 border-l-4 border-slate-800 rounded-r-lg">
-                                <p class="text-sm font-bold text-slate-800 mb-1">👨‍🏫 교사 피드백 (${
-                                  fb.profiles?.name || '선생님'
-                                })</p>
-                                <p class="text-sm text-slate-600">${
-                                  fb.feedback_content
-                                }</p>
+                                <p class="text-sm font-bold text-slate-800 mb-1">👨‍🏫 교사 피드백 (${fb.profiles?.name || '선생님'})</p>
+                                <p class="text-sm text-slate-600">${fb.feedback_content}</p>
                             </div>
                         `;
-            });
-          }
+                    });
+                }
 
-          html += `
+                html += `
                     <div class="border border-slate-200 rounded-xl p-5 print-break-inside-avoid">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="px-2 py-1 rounded text-xs font-bold ${areaColor}">${item.area}</span>
@@ -800,118 +511,100 @@
                         ${feedbackHtml}
                     </div>
                 `;
-        });
-        listContainer.innerHTML = html;
-      }
-
-      // PDF 다운로드 기능
-      document.getElementById('downloadPdfBtn').onclick = () => {
-        const element = document.getElementById('pdfPrintArea');
-        const opt = {
-          margin: 10,
-          filename: `${currentUserProfile.name}_${currentStudentGrade}학년_포트폴리오.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        };
-
-        // html2pdf 라이브러리 실행
-        html2pdf().set(opt).from(element).save();
-      };
-
-      // =========================================================================
-      // [4] 교사용 기능 로직 (Teacher)
-      // =========================================================================
-      function initTeacherDashboard() {
-        switchView('teacher');
-        document.getElementById(
-          'teacherNavInfo'
-        ).innerText = `${currentUserProfile.name} 선생님 환영합니다.`;
-        loadStudentList();
-
-        // 검색 필터 이벤트
-        document
-          .getElementById('filterYear')
-          .addEventListener('input', loadStudentList);
-        document
-          .getElementById('filterName')
-          .addEventListener('input', loadStudentList);
-      }
-
-      // 학생 목록 불러오기
-      async function loadStudentList() {
-        const yearFilter = document.getElementById('filterYear').value;
-        const nameFilter = document.getElementById('filterName').value;
-        const listContainer = document.getElementById('studentListContainer');
-
-        let query = supabase
-          .from('profiles')
-          .select('*')
-          .eq('role', 'student')
-          .order('admission_year', { ascending: false });
-
-        if (yearFilter) query = query.eq('admission_year', yearFilter);
-        if (nameFilter) query = query.ilike('name', `%${nameFilter}%`);
-
-        const { data, error } = await query;
-        if (error) {
-          listContainer.innerHTML =
-            '<li class="text-red-500">목록을 불러오지 못했습니다.</li>';
-          return;
+            });
+            listContainer.innerHTML = html;
         }
 
-        let html = '';
-        data.forEach((student) => {
-          html += `
+        // PDF 다운로드 기능
+        document.getElementById('downloadPdfBtn').onclick = () => {
+            const element = document.getElementById('pdfPrintArea');
+            const opt = {
+                margin:       10,
+                filename:     `${currentUserProfile.name}_${currentStudentGrade}학년_포트폴리오.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // html2pdf 라이브러리 실행
+            html2pdf().set(opt).from(element).save();
+        };
+
+
+        // =========================================================================
+        // [4] 교사용 기능 로직 (Teacher)
+        // =========================================================================
+        function initTeacherDashboard() {
+            switchView('teacher');
+            document.getElementById('teacherNavInfo').innerText = `${currentUserProfile.name} 선생님 환영합니다.`;
+            loadStudentList();
+            
+            // 검색 필터 이벤트
+            document.getElementById('filterYear').addEventListener('input', loadStudentList);
+            document.getElementById('filterName').addEventListener('input', loadStudentList);
+        }
+
+        // 학생 목록 불러오기
+        async function loadStudentList() {
+            const yearFilter = document.getElementById('filterYear').value;
+            const nameFilter = document.getElementById('filterName').value;
+            const listContainer = document.getElementById('studentListContainer');
+            
+            let query = supabase.from('profiles').select('*').eq('role', 'student').order('admission_year', { ascending: false });
+            
+            if (yearFilter) query = query.eq('admission_year', yearFilter);
+            if (nameFilter) query = query.ilike('name', `%${nameFilter}%`);
+
+            const { data, error } = await query;
+            if (error) { listContainer.innerHTML = '<li class="text-red-500">목록을 불러오지 못했습니다.</li>'; return; }
+
+            let html = '';
+            data.forEach(student => {
+                html += `
                     <li class="p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50 transition student-item" data-uid="${student.id}" data-name="${student.name}" data-info="${student.student_id} | ${student.admission_year}년">
                         <div class="font-bold text-slate-800">${student.name}</div>
                         <div class="text-xs text-slate-500">학번: ${student.student_id}</div>
                     </li>
                 `;
-        });
-        listContainer.innerHTML = html;
+            });
+            listContainer.innerHTML = html;
 
-        // 학생 클릭 시 상세 정보 열기
-        document.querySelectorAll('.student-item').forEach((el) => {
-          el.onclick = () =>
-            openStudentDetail(el.dataset.uid, el.dataset.name, el.dataset.info);
-        });
-      }
-
-      // 특정 학생 포트폴리오 및 피드백 폼 열기
-      async function openStudentDetail(uid, name, info) {
-        selectedStudentUid = uid;
-        document.getElementById('teacherEmptyView').classList.add('hidden');
-        document.getElementById('teacherDetailView').classList.remove('hidden');
-        document.getElementById('detailStudentName').innerText = name;
-        document.getElementById('detailStudentInfo').innerText = info;
-
-        const listContainer = document.getElementById('teacherPortfolioList');
-        listContainer.innerHTML = '<p>불러오는 중...</p>';
-
-        // 해당 학생의 전 학년(1~3) 포트폴리오를 가져옴
-        const { data, error } = await supabase
-          .from('portfolios')
-          .select(`*, feedbacks ( id, feedback_content, teacher_uid )`)
-          .eq('student_uid', uid)
-          .order('grade', { ascending: true })
-          .order('semester', { ascending: true });
-
-        if (error || data.length === 0) {
-          listContainer.innerHTML =
-            '<p class="text-slate-500">학생이 등록한 포트폴리오가 없습니다.</p>';
-          return;
+            // 학생 클릭 시 상세 정보 열기
+            document.querySelectorAll('.student-item').forEach(el => {
+                el.onclick = () => openStudentDetail(el.dataset.uid, el.dataset.name, el.dataset.info);
+            });
         }
 
-        let html = '';
-        data.forEach((item) => {
-          // 이미 선생님이 쓴 피드백이 있는지 확인
-          const existingFeedback =
-            item.feedbacks && item.feedbacks.length > 0
-              ? item.feedbacks[0].feedback_content
-              : '';
+        // 특정 학생 포트폴리오 및 피드백 폼 열기
+        async function openStudentDetail(uid, name, info) {
+            selectedStudentUid = uid;
+            document.getElementById('teacherEmptyView').classList.add('hidden');
+            document.getElementById('teacherDetailView').classList.remove('hidden');
+            document.getElementById('detailStudentName').innerText = name;
+            document.getElementById('detailStudentInfo').innerText = info;
 
-          html += `
+            const listContainer = document.getElementById('teacherPortfolioList');
+            listContainer.innerHTML = '<p>불러오는 중...</p>';
+
+            // 해당 학생의 전 학년(1~3) 포트폴리오를 가져옴
+            const { data, error } = await supabase
+                .from('portfolios')
+                .select(`*, feedbacks ( id, feedback_content, teacher_uid )`)
+                .eq('student_uid', uid)
+                .order('grade', { ascending: true })
+                .order('semester', { ascending: true });
+
+            if (error || data.length === 0) {
+                listContainer.innerHTML = '<p class="text-slate-500">학생이 등록한 포트폴리오가 없습니다.</p>';
+                return;
+            }
+
+            let html = '';
+            data.forEach(item => {
+                // 이미 선생님이 쓴 피드백이 있는지 확인
+                const existingFeedback = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : '';
+                
+                html += `
                     <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex gap-2">
@@ -931,37 +624,31 @@
                         </div>
                     </div>
                 `;
-        });
-        listContainer.innerHTML = html;
-      }
+            });
+            listContainer.innerHTML = html;
+        }
 
-      // 교사 피드백 저장 (전역 함수로 등록해야 onClick에서 쓸 수 있음)
-      window.saveFeedback = async (portfolioId) => {
-        const content = document.getElementById(
-          `feedback_input_${portfolioId}`
-        ).value;
-        if (!content.trim()) return alert('피드백 내용을 입력해주세요.');
+        // 교사 피드백 저장 (전역 함수로 등록해야 onClick에서 쓸 수 있음)
+        window.saveFeedback = async (portfolioId) => {
+            const content = document.getElementById(`feedback_input_${portfolioId}`).value;
+            if (!content.trim()) return alert("피드백 내용을 입력해주세요.");
 
-        showLoading();
-        // 기존 피드백이 있는지 확인 후 Insert 또는 Update를 해야하지만,
-        // 편의상 새로운 피드백을 추가하거나 에러 처리하도록 단순화합니다.
-        // Supabase의 upsert를 사용하면 편합니다.
-        const { error } = await supabase.from('feedbacks').insert([
-          {
-            portfolio_id: portfolioId,
-            teacher_uid: currentUser.id,
-            feedback_content: content,
-          },
-        ]);
+            showLoading();
+            // 기존 피드백이 있는지 확인 후 Insert 또는 Update를 해야하지만, 
+            // 편의상 새로운 피드백을 추가하거나 에러 처리하도록 단순화합니다.
+            // Supabase의 upsert를 사용하면 편합니다.
+            const { error } = await supabase.from('feedbacks').insert([{
+                portfolio_id: portfolioId,
+                teacher_uid: currentUser.id,
+                feedback_content: content
+            }]);
 
-        if (error)
-          alert(
-            '피드백 저장 중 오류가 발생했습니다. (이미 저장된 피드백이 있다면 관리자에게 문의하세요)'
-          );
-        else alert('피드백이 성공적으로 저장되었습니다!');
+            if (error) alert("피드백 저장 중 오류가 발생했습니다. (이미 저장된 피드백이 있다면 관리자에게 문의하세요)");
+            else alert("피드백이 성공적으로 저장되었습니다!");
+            
+            hideLoading();
+        };
 
-        hideLoading();
-      };
     </script>
-  </body>
+</body>
 </html>

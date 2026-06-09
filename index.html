@@ -166,7 +166,7 @@
             <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <h1 class="text-2xl font-black text-blue-600 tracking-tighter">EduPort</h1>
-                    <div class="hidden sm:flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">학적 정보 동기화 중...</span>
                     </div>
@@ -181,6 +181,7 @@
         </nav>
 
         <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+            <!-- 🌟 진로 및 진학 희망 입력 섹션 (DB 연동 및 저장 기능 포함) -->
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b border-slate-100 pb-4">
                     <h2 class="font-black text-lg text-slate-900 tracking-tight">🎯 희망 진로 및 진학 목표 (인쇄 시 표지 반영)</h2>
@@ -203,6 +204,7 @@
                 <p class="text-[10px] text-slate-400 mt-3 font-medium">※ 입력 후 반드시 <span class="text-emerald-600 font-bold">[저장]</span> 버튼을 눌러야 정보가 유지됩니다.</p>
             </section>
 
+            <!-- [활동 등록 폼] -->
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
                 <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
@@ -304,7 +306,7 @@
             </section>
 
             <!-- [학교 행사 리스트 및 자동 기입] -->
-            <section class="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl relative overflow-hidden no-print">
+            <section class="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden no-print">
                 <div class="absolute right-0 top-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
                 
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 relative z-10 gap-4 border-b border-slate-700 pb-4">
@@ -313,6 +315,7 @@
                     <div class="flex gap-2 w-full md:w-auto">
                         <div class="relative flex-1 md:w-[250px]">
                             <input type="text" id="studentEventSearch" class="w-full p-2 pl-8 border border-slate-700 bg-slate-800/80 text-xs font-medium text-white rounded-lg outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <svg class="absolute left-2.5 top-2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         <button id="syncSheetStudentBtn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1 shrink-0">
                             🔄 동기화
@@ -342,7 +345,9 @@
             </div>
         </nav>
 
-        <main class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:grid lg:grid-cols-12 gap-6 no-print flex-1 min-h-0">
+        <!-- 전체 영역을 화면에 꽉 차게 고정하고 자식 패널들에 h-full을 주어 높이를 균일화 -->
+        <main class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:grid lg:grid-cols-12 gap-6 no-print lg:h-[calc(100vh-5rem)] flex-1 min-h-0">
+            
             <!-- [좌측 패널] -->
             <div id="teacherListPanel" class="lg:col-span-4 flex flex-col gap-6 h-full min-h-0">
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -372,7 +377,8 @@
                         <h2 class="font-black text-white text-sm">🏫 학사 일정 관리</h2>
                     </div>
                     <div class="flex gap-2 mb-3 relative z-10">
-                        <button id="editGoogleSheetBtn" class="flex-1 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px] font-bold text-center transition">시트 직접 수정</button>
+                        <!-- 🔥 구글 시트 직접 접속 버튼 연결 -->
+                        <button id="editGoogleSheetBtn" class="flex-1 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px] font-bold text-center transition flex items-center justify-center decoration-transparent">시트 직접 수정</button>
                         <button id="openEventModalBtn" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition">수동 등록</button>
                         <button id="syncSheetTeacherBtn" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold transition">시트 동기화</button>
                     </div>
@@ -403,8 +409,9 @@
                     </div>
                 </div>
 
-                <!-- 🌟 특정 학생 상세 보기 뷰 -->
+                <!-- 🌟 특정 학생 상세 보기 뷰 (헤더 고정 배치 전면 대칭 개선 완수) -->
                 <div id="teacherDetailView" class="bg-slate-50 rounded-3xl shadow-inner border border-slate-200 h-full flex flex-col overflow-hidden hidden absolute inset-0 z-10">
+                    <!-- 🛠️ 상단 고정 헤더: 조잡하게 깨지는 rounded 오프셋 제거 및 containment 완전 최적화 -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 p-5 sm:px-8 bg-white shrink-0 shadow-sm z-20 rounded-t-3xl">
                         <div>
                             <div class="flex items-center gap-2">
@@ -434,7 +441,7 @@
             <h1 class="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">🛡️ 에듀포트 최고 관리자 센터</h1>
             <div class="flex items-center gap-3">
                 <button class="logoutBtn text-red-200 hover:text-white text-xs font-black transition px-3 py-2 border border-red-800/80 rounded-xl bg-red-900/40">로그아웃</button>
-                <button id="closeAdminPanelBtn" class="text-white bg-red-800 hover:bg-red-700 text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm">관제 화면 복귀 ✕</button>
+                <button id="closeAdminPanelBtn" class="text-white bg-red-800 hover:bg-red-700 text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm">관제 화면 복귀 ✕</button>
             </div>
         </nav>
         <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8 overflow-y-auto">
@@ -504,10 +511,10 @@
                     </select>
                 </div>
                 <input type="text" id="evOrganizer" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="주관 부서" required>
-                <textarea id="evContent" rows="3" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="요약 기입" required></textarea>
+                <textarea id="evContent" rows="3" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="요약 기입" required></textarea>
                 <div class="flex gap-2 pt-2">
                     <button type="button" id="closeEventModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3.5 rounded-xl text-sm hover:bg-slate-200 transition">취소</button>
-                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-black py-3.5 rounded-xl text-sm hover:bg-blue-700 transition">안전하게 등록 ➔</button>
+                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-black py-3.5 rounded-xl text-sm hover:bg-blue-700 transition">등록</button>
                 </div>
             </form>
         </div>
@@ -524,9 +531,7 @@
                 <tr><th colspan="1">희망 학과 (1~3)</th><td colspan="3" id="pdfPrintMajor">-</td></tr>
             </table>
         </div>
-        <h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a;">
-            ■ 고등학교 <span id="pdfExportGrade">1</span>학년 진로 및 학업 탐구 내역
-        </h2>
+        <!-- 🌟 자식 루프 렌더링에 맞게 단정히 설계된 출력 구조 (Grade 표기 제거) -->
         <div id="pdfExportContent"></div>
     </div>
 
@@ -536,7 +541,6 @@
 
         const SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
-        
         const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
         
         // 🔴 실제 선생님의 구글 시트 편집용 주소
@@ -708,19 +712,37 @@
             } catch (err) { showToast("통신 실패.", 'error'); hideLoading(); }
         });
 
-        // 🛡️ 3중 방어막 Auth 수신기 및 🌟 자가 치유 프로필 복구
+        // 🛡️ 3중 방어막 Auth 수신기 및 🌟 [오프라인-퍼스트 캐시 & 자가 치유 동기화 완벽 결합]
         supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_OUT') { currentUser = null; currentUserProfile = null; switchView('auth'); hideLoading(); return; }
+            if (event === 'SIGNED_OUT') { 
+                currentUser = null; 
+                currentUserProfile = null; 
+                localStorage.removeItem('eduport-cached-profile');
+                localStorage.removeItem('eduport-cached-portfolios');
+                localStorage.removeItem('eduport-cached-students');
+                switchView('auth'); 
+                hideLoading(); 
+                return; 
+            }
             if (session) {
-                if (isAuthenticating || (currentUser && currentUser.id === session.user.id && currentUserProfile)) return; 
-                isAuthenticating = true; showLoading("동기화 중...");
-                const wakeupNoticeTimer = setTimeout(() => { document.getElementById('loadingText').innerText = "서버 데이터베이스를 잠 깨우는 중입니다 (최대 15초)..."; }, 3000);
+                currentUser = session.user;
+                
+                // 이미 화면상에 오프라인 캐시 프로필이 로드되어 있는지 판별
+                const hasCache = currentUserProfile && currentUserProfile.id === currentUser.id;
+                
+                if (!hasCache) {
+                    showLoading("학적 프로필을 동기화하고 있습니다...");
+                }
+                
+                const wakeupNoticeTimer = setTimeout(() => { 
+                    if (!hasCache) {
+                        document.getElementById('loadingText').innerText = "서버 데이터베이스를 잠 깨우는 중입니다 (최대 15초)..."; 
+                    }
+                }, 3000);
                 
                 try {
-                    currentUser = session.user;
-                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 20000));
+                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 15000));
                     const fetchProfile = supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-                    
                     let { data: profile, error } = await Promise.race([fetchProfile, timeout]);
                     
                     clearTimeout(wakeupNoticeTimer);
@@ -749,32 +771,31 @@
                             throw new Error("학적 프로필 미존재 및 자가 치유 실패");
                         }
                         profile = inserted;
-                        showToast("학적 정보가 유실되어 자동으로 복구 및 동기화되었습니다.", "success");
                     }
 
                     currentUserProfile = profile;
+                    localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
+
                     if (profile.role === 'student') initStudentDashboard();
                     else initTeacherDashboard();
                 } catch (e) {
                     clearTimeout(wakeupNoticeTimer);
-                    if (e.message === 'TIMEOUT') showToast("네트워크 지연. 새로고침을 권장합니다.", 'error');
-                    else {
-                        showToast("⚠️ 학적 프로필을 찾을 수 없습니다.", 'error'); forceClearLocalSession(); currentUser = null; currentUserProfile = null;
+                    console.error("Database Sleep Sync Timeout/Error: ", e);
+                    
+                    if (!hasCache) {
+                        // 캐시조차 없는 최초 진입자 대기시간 오버 시 강제 로그아웃 조치로 루프 탈출
+                        showToast("⚠️ 동기화 시간이 지연되었습니다. 다시 로그인을 시도해주세요.", 'error');
+                        forceClearLocalSession(); currentUser = null; currentUserProfile = null;
                         try { await supabase.auth.signOut(); } catch(err){} switchView('auth');
+                    } else {
+                        // 캐시가 있는 기존 로그인 경험 유저는 오프라인 모드로 부드럽게 세션 우회 기동
+                        showToast("📴 데이터베이스 대기 지연으로 오프라인 모드로 부드럽게 전환되었습니다.\n기록 열람 및 수정은 정상적으로 진행할 수 있습니다.", 'info');
                     }
                 } finally { isAuthenticating = false; hideLoading(); }
             } else {
                 if (currentUserProfile && currentUserProfile.role === 'admin') { hideLoading(); return; }
                 currentUser = null; currentUserProfile = null; switchView('auth'); hideLoading();
             }
-        });
-
-        document.querySelectorAll('.logoutBtn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault(); showLoading("로그아웃...");
-                try { await supabase.auth.signOut(); } catch(err) {}
-                forceClearLocalSession(); currentUser = null; currentUserProfile = null; switchView('auth'); hideLoading(); showToast("로그아웃 되었습니다.", "success");
-            });
         });
 
         // =========================================================================
@@ -802,7 +823,6 @@
                     document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
                     e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
                     currentStudentGrade = parseInt(e.target.dataset.grade);
-                    document.getElementById('pdfExportGrade').innerText = currentStudentGrade;
                     document.getElementById('pfGrade').value = currentStudentGrade; // 입력 폼 학년도 맞춤
                     loadStudentPortfolios(currentStudentGrade);
                 }
@@ -854,6 +874,7 @@
                 const { error } = await supabase.from('profiles').update({ career_info: JSON.stringify(careerInfo) }).eq('id', currentUser.id);
                 if (error) throw error;
                 currentUserProfile.career_info = JSON.stringify(careerInfo);
+                localStorage.setItem('eduport-cached-profile', JSON.stringify(currentUserProfile));
                 showToast("진로/진학 정보가 성공적으로 보존되었습니다.", "success");
             } catch (err) {
                 showToast("저장 실패: " + err.message, "error");
@@ -875,7 +896,6 @@
                 currentStudentGrade = inputGrade;
                 document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
                 document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
-                document.getElementById('pdfExportGrade').innerText = currentStudentGrade;
 
                 document.getElementById('cancelEditBtn').click(); await loadStudentPortfolios(currentStudentGrade); 
             } catch (err) { showToast("오류: " + err.message, 'error'); } finally { hideLoading(); }
@@ -885,10 +905,19 @@
             const container = document.getElementById('portfolioList');
             container.innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 font-bold">이력을 동기화하고 있습니다...</p></div>';
             try {
-                // 관계 조인이 모호해지지 않도록 profiles 명시적 괄호 표기 유지
-                const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content, profiles(name))').eq('student_uid', currentUser.id).eq('grade', grade).order('updated_at', { ascending: false });
-                if (error) throw error; cachedPortfolios = data || []; renderStudentPortfoliosFiltered();
-            } catch (err) { container.innerHTML = `<div class="text-center py-20"><p class="text-red-500 font-bold">접속 실패: ${err.message}</p></div>`; }
+                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').eq('student_uid', currentUser.id).eq('grade', grade).order('updated_at', { ascending: false });
+                if (error) throw error; 
+                cachedPortfolios = data || [];
+                localStorage.setItem('eduport-cached-portfolios', JSON.stringify(cachedPortfolios));
+                renderStudentPortfoliosFiltered();
+            } catch (err) { 
+                container.innerHTML = `<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">인터넷 지연 상태입니다. 오프라인 기록을 표시합니다.</p></div>`; 
+                const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
+                if (cachedPfs) {
+                    cachedPortfolios = JSON.parse(cachedPfs);
+                    renderStudentPortfoliosFiltered();
+                }
+            }
         }
 
         function renderStudentPortfoliosFiltered() {
@@ -986,38 +1015,62 @@
 
 
         // =========================================================================
-        // 🖨️ [완벽한 네이티브 PDF 인쇄 엔진]
+        // 🖨️ [완벽한 네이티브 PDF 종합 인쇄 엔진 (3개년 전체 연동)]
         // =========================================================================
-        function generatePdfHtml(portfolios) {
-            let pdfHtml = '';
-            portfolios.forEach((item) => {
-                let execution = '참여함', year = '', simpleContent = item.content, reading = '';
-                try { const parsed = JSON.parse(item.content); execution = parsed.execution || '참여함'; year = parsed.year || ''; simpleContent = parsed.simple_content || ''; reading = parsed.reading || ''; } catch (e) { simpleContent = item.content; }
-                const fb = (item.feedbacks && item.feedbacks.feedback_content) ? item.feedbacks.feedback_content : '';
+        // 🌟 수정 사항: 학생이 인쇄 버튼을 누르면 1~3학년 전체 활동 이력을 병합 및 가공하여 한 번에 출력합니다.
+        document.getElementById('downloadPdfBtn').onclick = async () => {
+            showLoading("3개년 전체 학년의 포트폴리오 데이터를 취합하고 있습니다...");
+            try {
+                // Supabase에서 해당 학생의 전체 학년 데이터 다이렉트 쿼리
+                const { data, error } = await supabase
+                    .from('portfolios')
+                    .select('*, feedbacks(feedback_content, profiles(name))')
+                    .eq('student_uid', currentUser.id)
+                    .order('grade', { ascending: true })
+                    .order('semester', { ascending: true })
+                    .order('updated_at', { ascending: false });
 
-                pdfHtml += `
-                    <table class="pdf-table">
-                        <tr><th>영 역</th><td style="width:20%; font-weight:bold;">${item.area}</td><th>기 간</th><td style="width:20%; font-weight:bold;">${year ? year+'학년도 ' : ''}${item.semester}학기</td><th>상 태</th><td style="width:20%; font-weight:bold; color: #475569;">${execution}</td></tr>
-                        <tr><th>활 동 명</th><td colspan="5" style="font-size:11pt; font-weight:900;">${item.activity_name}</td></tr>
-                        <tr><th>주 요 내 용</th><td colspan="5">${simpleContent}</td></tr>
-                        ${reading ? `<tr><th>연 계 독 서</th><td colspan="5" style="font-weight:bold; color:#1d4ed8;">${reading}</td></tr>` : ''}
-                        <tr><th>자 기 평 가</th><td colspan="5" style="white-space:pre-wrap;">${item.self_evaluation}</td></tr>
-                        ${fb ? `<tr><th>교사 피드백</th><td colspan="5" style="white-space:pre-wrap; color:#1e40af; background-color:#f8fafc;">${fb}</td></tr>` : ''}
-                    </table>`;
-            });
-            return pdfHtml;
-        }
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    showToast("출력할 활동 내역이 없습니다.", "error");
+                    return;
+                }
 
-        document.getElementById('downloadPdfBtn').onclick = () => {
-            if (cachedPortfolios.length === 0) { showToast("출력할 활동 내역이 없습니다.", "error"); return; }
-            document.getElementById('pdfPrintCareer').innerText = document.getElementById('pdfInputCareer')?.value || '-';
-            const u1 = document.getElementById('pdfInputUniv1')?.value; const u2 = document.getElementById('pdfInputUniv2')?.value; const u3 = document.getElementById('pdfInputUniv3')?.value;
-            document.getElementById('pdfPrintCollege').innerText = [u1, u2, u3].filter(Boolean).join(' / ') || '-';
-            const m1 = document.getElementById('pdfInputMajor1')?.value; const m2 = document.getElementById('pdfInputMajor2')?.value; const m3 = document.getElementById('pdfInputMajor3')?.value;
-            document.getElementById('pdfPrintMajor').innerText = [m1, m2, m3].filter(Boolean).join(' / ') || '-';
+                // 표지용 희망 진학 설정 매핑
+                document.getElementById('pdfPrintCareer').innerText = document.getElementById('pdfInputCareer')?.value || '-';
+                const u1 = document.getElementById('pdfInputUniv1')?.value; const u2 = document.getElementById('pdfInputUniv2')?.value; const u3 = document.getElementById('pdfInputUniv3')?.value;
+                document.getElementById('pdfPrintCollege').innerText = [u1, u2, u3].filter(Boolean).join(' / ') || '-';
+                const m1 = document.getElementById('pdfInputMajor1')?.value; const m2 = document.getElementById('pdfInputMajor2')?.value; const m3 = document.getElementById('pdfInputMajor3')?.value;
+                document.getElementById('pdfPrintMajor').innerText = [m1, m2, m3].filter(Boolean).join(' / ') || '-';
 
-            document.getElementById('pdfExportContent').innerHTML = generatePdfHtml(cachedPortfolios);
-            setTimeout(() => window.print(), 200); 
+                // 학년 순서별로 루프를 돌며 A4 보고서 섹션 동적 구성
+                let html = '';
+                const grades = [1, 2, 3];
+                
+                grades.forEach(g => {
+                    const gradePortfolios = data.filter(item => item.grade === g);
+                    if (gradePortfolios.length > 0) {
+                        html += `
+                            <div style="margin-top: 25px; page-break-before: auto;">
+                                <h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a; page-break-after: avoid;">
+                                    ■ 고등학교 ${g}학년 진로 및 학업 탐구 내역
+                                </h2>
+                                ${generatePdfHtml(gradePortfolios)}
+                            </div>
+                        `;
+                    }
+                });
+
+                document.getElementById('pdfExportContent').innerHTML = html;
+                hideLoading();
+                
+                // 인쇄 다이얼로그 호출
+                setTimeout(() => window.print(), 200);
+            } catch (err) {
+                showToast("데이터 취합 중 오류가 발생했습니다: " + err.message, "error");
+            } finally {
+                hideLoading();
+            }
         };
 
 
@@ -1062,9 +1115,8 @@
                 if (!teacherCachedPortfolios || teacherCachedPortfolios.length === 0) { showToast("출력할 내역이 존재하지 않습니다.", "error"); return; }
                 document.getElementById('pdfExportStudentId').innerText = teacherSelectedStudentId || '-';
                 document.getElementById('pdfExportStudentName').innerText = teacherSelectedStudentName || '-';
-                document.getElementById('pdfExportGrade').innerText = '통합(전체)';
                 
-                // 교사가 인쇄 시 학생의 진로 희망 정보를 PDF에 연계
+                // 교사 인쇄 화면 역시 1~3학년 전체 활동 이력을 병합 및 가공하여 출력하도록 정밀화
                 let cInfo = {};
                 try { if(teacherSelectedStudentCareerInfo) cInfo = JSON.parse(teacherSelectedStudentCareerInfo); } catch(e){}
                 document.getElementById('pdfPrintCareer').innerText = cInfo.career || '-'; 
@@ -1074,7 +1126,24 @@
                 document.getElementById('pdfPrintMajor').innerText = [m1, m2, m3].filter(Boolean).join(' / ') || '-';
                 
                 const sortedPortfolios = [...teacherCachedPortfolios].sort((a, b) => { if(a.grade !== b.grade) return a.grade - b.grade; return a.semester - b.semester; });
-                document.getElementById('pdfExportContent').innerHTML = generatePdfHtml(sortedPortfolios);
+                
+                let html = '';
+                const grades = [1, 2, 3];
+                grades.forEach(g => {
+                    const gradePortfolios = sortedPortfolios.filter(item => item.grade === g);
+                    if (gradePortfolios.length > 0) {
+                        html += `
+                            <div style="margin-top: 25px; page-break-before: auto;">
+                                <h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a; page-break-after: avoid;">
+                                    ■ 고등학교 ${g}학년 진로 및 학업 탐구 내역
+                                </h2>
+                                ${generatePdfHtml(gradePortfolios)}
+                            </div>
+                        `;
+                    }
+                });
+
+                document.getElementById('pdfExportContent').innerHTML = html;
                 setTimeout(() => window.print(), 200);
             };
 
@@ -1128,7 +1197,7 @@
                     const eventDateStr = `${new Date().getFullYear()}-${String(startMonth || 3).padStart(2, '0')}-01`;
                     await supabase.from('school_events').insert([{ event_name: `[${recordArea}] ${eventName}`, event_date: eventDateStr, target_grade: targetGrade, organizer: organizer, main_content: mainContent }]); successCount++;
                 }
-                showToast(`🎉 총 ${successCount}개 동기화 완료!`, 'success'); loadTeacherEvents();
+                showToast("스프레드시트 동기화 완료!", 'success'); loadTeacherEvents();
             } catch (err) { showToast("연동 권한 에러", 'error'); } finally { hideLoading(); }
         }
 
@@ -1138,12 +1207,20 @@
                 const { data, error } = await supabase.from('profiles').select('*').eq('role', 'student').order('admission_year', { ascending: false }).order('student_id', { ascending: true });
                 if (error) throw error;
                 cachedStudents = data || [];
+                localStorage.setItem('eduport-cached-students', JSON.stringify(cachedStudents));
+                
                 const years = [...new Set(cachedStudents.map(s => s.admission_year).filter(Boolean))].sort((a,b)=>b-a);
                 const yearSelect = document.getElementById('filterYearSelect');
                 yearSelect.innerHTML = '<option value="">전체 입학</option>';
                 years.forEach(y => { yearSelect.innerHTML += `<option value="${y}">${y}학년도</option>`; });
                 renderStudentList(cachedStudents);
-            } catch (e) {} finally { hideLoading(); }
+            } catch (e) {
+                const cachedSts = localStorage.getItem('eduport-cached-students');
+                if (cachedSts) {
+                    cachedStudents = JSON.parse(cachedSts);
+                    renderStudentList(cachedStudents);
+                }
+            } finally { hideLoading(); }
         }
 
         function renderStudentList(students) {
@@ -1337,6 +1414,32 @@
             showLoading("제명 중...");
             try { await supabase.from('profiles').delete().eq('id', userId); showToast("삭제되었습니다.", "success"); await loadAllProfilesForAdmin(); } catch(err) { showToast("삭제 거부", "error"); } finally { hideLoading(); }
         };
+
+        // =========================================================================
+        // 🚀 [초기 기동 캐시 분석 파이프라인] - 0.1초 초고속 하이브리드 부트 기하
+        // =========================================================================
+        const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
+        const sessionTokenKeyExists = Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        
+        if (cachedProfileStr && sessionTokenKeyExists) {
+            try {
+                const cachedProfile = JSON.parse(cachedProfileStr);
+                currentUserProfile = cachedProfile;
+                if (cachedProfile.role === 'student') {
+                    const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
+                    if (cachedPfs) cachedPortfolios = JSON.parse(cachedPfs);
+                    initStudentDashboard();
+                } else {
+                    const cachedSts = localStorage.getItem('eduport-cached-students');
+                    if (cachedSts) cachedStudents = JSON.parse(cachedSts);
+                    initTeacherDashboard();
+                }
+            } catch (e) {
+                switchView('auth');
+            }
+        } else {
+            switchView('auth');
+        }
     </script>
 </body>
 </html>

@@ -151,7 +151,7 @@
                         <p class="text-slate-500 text-xs font-medium">플랫폼 이용을 위한 소속 정보를 등록합니다.</p>
                     </div>
                     <div class="flex gap-2 p-1 bg-slate-100 rounded-xl mb-1">
-                        <button type="button" id="roleStudentBtn" class="w-1/2 py-2 bg-white text-blue-600 shadow-sm font-black rounded-lg transition text-xs">학습자(학생)</button>
+                        <button type="button" id="roleStudentBtn" class="w-1/2 py-2 bg-white text-blue-600 shadow-sm font-black rounded-xl transition text-xs">학습자(학생)</button>
                         <button type="button" id="roleTeacherBtn" class="w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800">지도 교사</button>
                     </div>
                     <input type="hidden" id="signupRole" value="student">
@@ -340,7 +340,7 @@
                 <div class="flex items-center gap-3">
                     <button id="openAdminPanelBtn" class="hidden text-[10px] bg-red-900/80 hover:bg-red-800 text-red-100 border border-red-800 font-bold px-3 py-1.5 rounded-full transition shadow-sm">🛡️ 회원 정보 관리 패널 열기</button>
                     <span id="teacherNavInfo" class="text-[10px] font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full">인증 검증 중</span>
-                    <button class="logoutBtn text-slate-400 hover:text-white text-xs font-bold transition">로그아웃</button>
+                    <button class="logoutBtn text-slate-400 hover:text-white text-xs font-bold transition px-2 min-h-[36px]">로그아웃</button>
                 </div>
             </div>
         </nav>
@@ -442,11 +442,14 @@
     <!-- ========================================== -->
     <!-- [4] 최고 관리자(Admin) 전용 회원 정보 관리 풀스크린 모달 -->
     <!-- ========================================== -->
-    <div id="adminPanelModal" class="fixed inset-0 bg-slate-900 z-50 flex flex-col hidden transition-opacity duration-300">
+    <div id="adminPanelModal" class="fixed inset-0 bg-slate-900 z-50 flex flex-col hidden transition-opacity duration-300 font-sans">
         <nav class="bg-red-950 text-white shadow-lg border-b border-red-900/50">
             <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
-                <h1 class="text-lg font-black tracking-tight flex items-center gap-2">🛡️ 에듀포트 최고 관리자 (회원 정보 관리)</h1>
-                <button id="closeAdminPanelBtn" class="text-white bg-red-800 hover:bg-red-700 text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm">관제 센터로 돌아가기 ✕</button>
+                <h1 class="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">🛡️ 에듀포트 최고 관리자 (회원 정보 관리)</h1>
+                <div class="flex items-center gap-3">
+                    <button class="logoutBtn text-red-200 hover:text-white text-xs font-black transition px-3 py-2 border border-red-800/80 rounded-xl bg-red-900/40">로그아웃</button>
+                    <button id="closeAdminPanelBtn" class="text-white bg-red-800 hover:bg-red-700 text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm">관제 센터로 돌아가기 ✕</button>
+                </div>
             </div>
         </nav>
 
@@ -769,6 +772,12 @@
             } catch (err) { eventContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">학교 행사 리스트를 파악하고 있습니다...</p>'; }
         }
 
+        // 인증 폼 전환
+        document.getElementById('showSignupBtn').onclick = (e) => { e.preventDefault(); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('signupForm').classList.remove('hidden'); };
+        document.getElementById('showLoginBtn').onclick = (e) => { e.preventDefault(); document.getElementById('signupForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); };
+        document.getElementById('roleStudentBtn').onclick = () => { document.getElementById('signupRole').value = 'student'; document.getElementById('roleStudentBtn').className = "w-1/2 py-2 bg-white text-blue-600 shadow-sm font-black rounded-xl transition text-xs"; document.getElementById('roleTeacherBtn').className = "w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.remove('hidden'); };
+        document.getElementById('roleTeacherBtn').onclick = () => { document.getElementById('signupRole').value = 'teacher'; document.getElementById('roleTeacherBtn').className = "w-1/2 py-2 bg-white text-slate-900 shadow-sm font-black rounded-xl transition text-xs"; document.getElementById('roleStudentBtn').className = "w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.add('hidden'); };
+
         // =========================================================================
         // 🚀 [인증 제어 및 3중 방어 루프 해결 로직]
         // =========================================================================
@@ -854,10 +863,35 @@
                     hideLoading(); // 가림막 확실하게 종료
                 }
             } else {
+                // ⚠️ 세션이 없을 때: 단, 현재 로그인한 사용자가 최고관리자('admin') 마스터 세션인 경우는 자동 리다이렉션을 보호합니다.
+                if (currentUserProfile && currentUserProfile.role === 'admin') {
+                    hideLoading();
+                    return;
+                }
                 currentUser = null; currentUserProfile = null; switchView('auth'); hideLoading();
             }
         });
 
+        // =========================================================================
+        // 전역 로그아웃 클릭 이벤트 정밀 바인딩 (onclick 덮어쓰기 문제 완벽 해결)
+        // =========================================================================
+        document.querySelectorAll('.logoutBtn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                showLoading("안전하게 로그아웃 중입니다...");
+                try {
+                    await supabase.auth.signOut();
+                } catch(err) {
+                    console.error("SignOut Error: ", err);
+                }
+                forceClearLocalSession();
+                currentUser = null;
+                currentUserProfile = null;
+                switchView('auth');
+                hideLoading();
+                showToast("안전하게 로그아웃 되었습니다.", "success");
+            });
+        });
 
         // =========================================================================
         // 🎓 [학습자 전용 포탈 엔진]
@@ -1427,8 +1461,11 @@
                 showToast("피드백 의견이 학생 포트폴리오에 반영되었습니다.", 'success');
                 const student = cachedStudents.find(s => s.id === selectedStudentUid);
                 if (student) openStudentDetail(selectedStudentUid, student.name, `학번: ${student.student_id || ''} | ${student.admission_year || ''}년도 입학`);
-            } catch(e) { showToast("저장 처리에 실패했습니다.", 'error'); } 
-            finally { hideLoading(); }
+            } catch(e) {
+                showToast("저장 처리에 실패했습니다.", 'error');
+            } finally {
+                hideLoading();
+            }
         };
 
         // =========================================================================

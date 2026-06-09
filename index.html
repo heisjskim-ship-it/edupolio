@@ -8,7 +8,11 @@
     <!-- html2pdf.js (A4 PDF 다운로드 라이브러리) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @media print { .no-print { display: none !important; } .print-card-break { page-break-inside: avoid; } body { background-color: white; color: black; } }
+        @media print { 
+            .no-print { display: none !important; } 
+            .print-card-break { page-break-inside: avoid; } 
+            body { background-color: white; color: black; } 
+        }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%; width: 44px; height: 44px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         /* 스크롤바 숨기기 스타일 */
@@ -180,7 +184,7 @@
                     <span id="studentNavInfo" class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full hidden sm:inline-block">조회 중...</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="downloadPdfBtn" class="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition min-h-[38px]">📄 생기부 인쇄 (PDF)</button>
+                    <button id="downloadPdfBtn" class="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition min-h-[38px]">📄 포트폴리오 인쇄 (PDF)</button>
                     <button class="logoutBtn text-slate-400 hover:text-red-500 text-xs font-bold transition px-2 min-h-[38px]">로그아웃</button>
                 </div>
             </div>
@@ -192,26 +196,86 @@
                 <button class="grade-tab flex-1 min-w-[120px] py-3 text-center font-medium text-slate-400 hover:text-blue-600 transition" data-grade="2">고등학교 2학년</button>
                 <button class="grade-tab flex-1 min-w-[120px] py-3 text-center font-medium text-slate-400 hover:text-blue-600 transition" data-grade="3">고등학교 3학년</button>
             </div>
+
+            <!-- 학생용 검색 필터바 (추가됨) -->
+            <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 no-print">
+                <div class="relative flex-1">
+                    <input type="text" id="studentSearchInput" class="w-full p-2.5 pl-9 border border-slate-200 text-sm rounded-xl outline-none focus:border-blue-500 transition" placeholder="과목명, 활동명, 내용, 자기평가 등 검색...">
+                    <span class="absolute left-3 top-3.5 text-slate-400 text-xs">🔍</span>
+                </div>
+                <select id="studentAreaFilter" class="p-2.5 border border-slate-200 text-sm rounded-xl bg-white outline-none">
+                    <option value="">전체 영역</option>
+                    <option value="교과">교과 (세특)</option>
+                    <option value="자율">자율활동</option>
+                    <option value="동아리">동아리활동</option>
+                    <option value="진로">진로활동</option>
+                </select>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 <div class="lg:col-span-1 space-y-6 no-print">
                     <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">✍️ 새로운 활동 추가 및 기록</h3>
                         <form id="portfolioForm" class="space-y-4">
-                            <div class="grid grid-cols-2 gap-3">
-                                <select id="pfSemester" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 text-base md:text-sm font-semibold min-h-[44px]" required>
-                                    <option value="1">1학기</option>
-                                    <option value="2">2학기</option>
-                                </select>
-                                <select id="pfArea" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 text-base md:text-sm font-semibold min-h-[44px]" required>
-                                    <option value="교과">교과 (세특)</option>
-                                    <option value="자율">자율활동</option>
-                                    <option value="동아리">동아리활동</option>
-                                    <option value="진로">진로활동</option>
+                            <!-- 실행 구분 추가 (계획함 or 참여함) -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">실행 구분</label>
+                                <select id="pfExecution" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 text-base md:text-sm font-semibold min-h-[44px]" required>
+                                    <option value="참여함">참여함 (이미 완료한 탐구)</option>
+                                    <option value="계획함">계획함 (향후 진행 예정인 탐구)</option>
                                 </select>
                             </div>
-                            <input type="text" id="pfActivityName" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm font-medium min-h-[44px]" placeholder="과목명 또는 비교과 활동 대표명" required>
-                            <textarea id="pfContent" rows="4" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm leading-relaxed" placeholder="활동 참여 동기, 주요 학습 탐구 내용 기록" required></textarea>
-                            <textarea id="pfSelfEval" rows="3" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm leading-relaxed bg-blue-50/30" placeholder="자기성찰 평가 서술" required></textarea>
+
+                            <!-- 기간 (학년도 & 학기) -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">학년도</label>
+                                    <input type="number" id="pfYearInput" class="w-full p-2.5 border border-slate-200 rounded-xl text-base md:text-sm font-medium min-h-[44px]" placeholder="예: 2026" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">학기</label>
+                                    <select id="pfSemester" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 text-base md:text-sm font-semibold min-h-[44px]" required>
+                                        <option value="1">1학기</option>
+                                        <option value="2">2학기</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 학생부 기록 영역 & 행사/동아리/과목명 -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">기록 영역</label>
+                                    <select id="pfArea" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 text-base md:text-sm font-semibold min-h-[44px]" required>
+                                        <option value="교과">교과 (세특)</option>
+                                        <option value="자율">자율활동</option>
+                                        <option value="동아리">동아리활동</option>
+                                        <option value="진로">진로활동</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">과목/동아리/행사명</label>
+                                    <input type="text" id="pfActivityName" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm font-medium min-h-[44px]" placeholder="예: 물리학Ⅰ, 창체동아리 등" required>
+                                </div>
+                            </div>
+
+                            <!-- 활동 내용 (한 줄로 간단히) -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">활동 내용 (한 줄 요약)</label>
+                                <input type="text" id="pfSimpleContent" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm font-medium min-h-[44px]" placeholder="핵심 내용만 한 줄로 간략히 요약 입력" required>
+                            </div>
+
+                            <!-- 독서 연계 기록 (책 제목 및 저자) -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">연계 독서 기록 (선택)</label>
+                                <input type="text" id="pfReading" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm font-medium min-h-[44px]" placeholder="예: 과학의 역사(저자명) - 없을 경우 비워둠">
+                            </div>
+
+                            <!-- 자기 평가 -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">자기 성찰 및 평가</label>
+                                <textarea id="pfSelfEval" rows="3" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm leading-relaxed bg-blue-50/30" placeholder="성장한 점, 배운 점 중심 서술형 입력" required></textarea>
+                            </div>
+
                             <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 transition min-h-[48px] text-sm">포트폴리오 등록</button>
                         </form>
                     </div>
@@ -229,12 +293,29 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- [A4 인쇄 출력 영역 및 디자인 최적화] -->
                 <div class="lg:col-span-2" id="pdfPrintArea">
-                    <div class="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-slate-200 min-h-[500px] sm:min-h-[600px]">
-                        <div class="hidden print:block text-center mb-8 border-b-2 border-slate-900 pb-5">
-                            <h1 class="text-3xl font-black text-slate-900 mb-2">학생 생활 진로 발달사 종합 기록부</h1>
-                            <p class="text-sm font-semibold text-slate-500" id="pdfStudentInfo">소속 정보 추출 중...</p>
+                    <div class="bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-slate-200 min-h-[500px] sm:min-h-[600px]">
+                        
+                        <!-- 🎓 학술 보고서 스타일의 프로페셔널한 인쇄 헤더 설정 (print:block) -->
+                        <div class="hidden print:block mb-8 text-center pb-6 border-b-4 border-double border-slate-950">
+                            <h1 class="text-3xl font-black text-slate-950 tracking-widest mb-4">포 트 폴 리 오</h1>
+                            
+                            <table class="w-full max-w-sm mx-auto border border-slate-300 text-xs">
+                                <tbody>
+                                    <tr class="border-b border-slate-300">
+                                        <td class="bg-slate-100 px-4 py-2 font-bold text-center border-r border-slate-300 w-1/3">학 번</td>
+                                        <td id="pdfStudentIdText" class="px-4 py-2 text-slate-800 text-center font-semibold">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-slate-100 px-4 py-2 font-bold text-center border-r border-slate-300 w-1/3">성 명</td>
+                                        <td id="pdfStudentNameText" class="px-4 py-2 text-slate-800 text-center font-semibold">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+
                         <h2 class="text-xl sm:text-2xl font-black text-slate-800 mb-6 pb-3 border-b border-slate-100" id="currentGradeTitle">고등학교 1학년 활동 내역</h2>
                         <div id="portfolioList" class="space-y-6"></div>
                     </div>
@@ -255,7 +336,7 @@
             </div>
         </nav>
         <main class="max-w-7xl mx-auto px-4 py-6 sm:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
-            <!-- [교사용] 좌측 사이드바 - 담당 학생 목록 (모바일 최적화 스위칭 대응 id 부여) -->
+            <!-- [교사용] 좌측 사이드바 - 담당 학생 목록 -->
             <div id="teacherListPanel" class="lg:col-span-4 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] flex flex-col">
                 <div class="mb-4">
                     <h2 class="font-extrabold text-slate-800 text-lg flex items-center justify-between">
@@ -265,7 +346,7 @@
                     <p class="text-slate-400 text-xs mt-1">학년, 이름, 학번으로 상세 조회가 가능합니다.</p>
                 </div>
                 
-                <!-- 학생 통합 상세 검색바 (iOS input 확대 방지용 text-base 클래스 연계) -->
+                <!-- 학생 통합 상세 검색바 -->
                 <div class="mb-4 space-y-2">
                     <div class="relative">
                         <input type="text" id="teacherStudentSearch" class="w-full p-2.5 pl-9 border border-slate-200 text-base md:text-xs rounded-xl outline-none focus:border-blue-500 transition min-h-[44px]" placeholder="학생 실명 또는 학번(5자리) 검색">
@@ -297,7 +378,7 @@
                 </div>
             </div>
 
-            <!-- [교사용] 우측 대시보드 메인 영역 (모바일 최적화 스위칭 대응 id 부여) -->
+            <!-- [교사용] 우측 대시보드 메인 영역 -->
             <div id="teacherContentPanel" class="lg:col-span-8 space-y-6">
                 <!-- 최신 실시간 업데이트 피드 타임라인 위젯 (아무도 선택하지 않았을 때 보임) -->
                 <div id="teacherDashboardOverview" class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] flex flex-col">
@@ -375,7 +456,7 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // 구글 스프레드시트 배포 배포된 CSV 파일 URL 주소 
-        const GOOGLE_SHEET_CSV_URL = ''; 
+        const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
 
         let currentUser = null;
         let currentUserProfile = null;
@@ -384,6 +465,7 @@
         
         // 실시간 필터 캐시 데이터베이스
         let cachedStudents = []; 
+        let cachedPortfolios = []; // 학생용 포트폴리오 로컬 캐시
 
         const showLoading = (text = "데이터 동기화 및 렌더링을 시작하고 있습니다...") => {
             document.getElementById('loadingText').innerText = text;
@@ -481,6 +563,19 @@
             return name.charAt(0) + '*'.repeat(len - 2) + name.charAt(len - 1);
         }
 
+        // JSON 또는 일반 텍스트 포맷 헬퍼 (타임라인 등 연동)
+        function formatContentSummary(contentStr) {
+            try {
+                const parsed = JSON.parse(contentStr);
+                let text = `[활동 요약] ${parsed.simple_content || ''}`;
+                if (parsed.execution) text += ` | 실행: ${parsed.execution}`;
+                if (parsed.reading) text += ` | 📚 연계 독서: ${parsed.reading}`;
+                return text;
+            } catch(e) {
+                return contentStr;
+            }
+        }
+
         // =========================================================================
         // 🔒 [비로그인 홈 화면] 실시간 라이브 보드 정보 수집
         // =========================================================================
@@ -505,6 +600,7 @@
                         const maskedName = blindName(rawName);
                         const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at);
                         const formatUpdate = `${String(updateDate.getMonth()+1).padStart(2, '0')}/${String(updateDate.getDate()).padStart(2, '0')} ${String(updateDate.getHours()).padStart(2, '0')}:${String(updateDate.getMinutes()).padStart(2, '0')}`;
+                        const displaySummary = formatContentSummary(item.content);
 
                         html += `
                             <div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1.5 transition hover:bg-slate-800/40">
@@ -513,9 +609,10 @@
                                     <span class="text-slate-500">${formatUpdate}</span>
                                 </div>
                                 <h4 class="text-xs font-bold text-slate-200 truncate">${item.activity_name}</h4>
-                                <div class="text-[10px] text-slate-400 flex justify-between">
+                                <p class="text-[10px] text-slate-400 truncate leading-relaxed">${displaySummary}</p>
+                                <div class="text-[10px] text-slate-400 flex justify-between pt-1 border-t border-slate-800/50">
                                     <span>작성자: ${maskedName}</span>
-                                    <span class="text-emerald-500 font-medium">활동 연동 성공 ✓</span>
+                                    <span class="text-emerald-500 font-medium">기록 완료 ✓</span>
                                 </div>
                             </div>`;
                     });
@@ -556,61 +653,7 @@
             }
         }
 
-        // 회원가입 비즈니스 로직
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showLoading("가입 정보를 승인 및 등록하는 중입니다...");
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const name = document.getElementById('signupName').value;
-            const role = signupRole.value;
-            const admission_year = role === 'student' ? document.getElementById('signupYear').value : null;
-            const student_id = role === 'student' ? document.getElementById('signupStudentId').value : null;
-
-            try {
-                const { data, error } = await supabase.auth.signUp({
-                    email, password,
-                    options: { data: { name, role, admission_year: admission_year ? parseInt(admission_year) : null, student_id } }
-                });
-                if (error) showToast(`가입 실패: ${error.message}`, 'error');
-                else {
-                    showToast("회원가입 신청이 안전하게 완료되었습니다!\n로그인을 진행해 주세요.", 'success');
-                    document.getElementById('showLoginBtn').click();
-                }
-            } catch (err) { showToast("서버와의 통신에 실패했습니다.", 'error'); }
-            finally { hideLoading(); }
-        });
-
-        // 로그인 비즈니스 로직
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showLoading("사용자 식별을 처리하고 있습니다...");
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            try {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) {
-                    showToast(`로그인 실패: ${error.message}`, 'error');
-                    hideLoading();
-                }
-            } catch (err) { 
-                showToast("네트워크 연결에 실패했습니다.", 'error'); 
-                hideLoading();
-            }
-        });
-
-        document.querySelectorAll('.logoutBtn').forEach(btn => {
-            btn.onclick = async () => {
-                showLoading();
-                try {
-                    await supabase.auth.signOut();
-                } catch(e) {}
-                forceClearLocalSession();
-                window.location.reload();
-            }
-        });
-
-        // Auth 상태 수신기 최적화
+        // Auth 상태 수신기 (무한 로딩 차단 및 로컬 스토리지 상태 일치화)
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 showLoading("프로필 소속 권한을 인증하고 있습니다...");
@@ -619,10 +662,11 @@
                     const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
                     if (error || !profile) {
                         console.error("Profile Fetch Error: ", error);
-                        showToast("⚠️ 프로필 정보를 확인할 수 없습니다. SQL 설정을 먼저 점검하세요.", 'error');
+                        showToast("⚠️ 프로필 소속 정보를 찾을 수 없습니다. 새로운 계정으로 가입해 주세요.", 'error');
                         forceClearLocalSession();
                         try { await supabase.auth.signOut(); } catch(e){}
-                        window.location.reload();
+                        switchView('auth');
+                        hideLoading();
                         return;
                     }
 
@@ -635,6 +679,7 @@
                 } catch (e) {
                     console.error("Session Processing Error: ", e);
                     forceClearLocalSession();
+                    switchView('auth');
                 } finally {
                     hideLoading();
                 }
@@ -650,10 +695,18 @@
         function initStudentDashboard() {
             switchView('student');
             document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year || ''}년 입학 | ${currentUserProfile.student_id || ''} | ${currentUserProfile.name}`;
-            document.getElementById('pdfStudentInfo').innerText = `학번: ${currentUserProfile.student_id || ''} | 이름: ${currentUserProfile.name}`;
+            
+            // 🎓 전문 보고서 헤더에 학생 정보 선제 세팅
+            document.getElementById('pdfStudentIdText').innerText = currentUserProfile.student_id || '-';
+            document.getElementById('pdfStudentNameText').innerText = currentUserProfile.name || '-';
+
+            // 입력란 기본 학년도 주입
+            document.getElementById('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
+
             loadStudentPortfolios(currentStudentGrade);
             loadSchoolEventsForStudents();
 
+            // 탭 클릭 제어
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
                     document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3 text-center font-medium text-slate-400");
@@ -664,28 +717,49 @@
                 }
             });
             
+            // 학생용 구글 스프레드시트 수집 리스너 바인딩
             document.getElementById('syncSheetStudentBtn').onclick = () => {
                 syncGoogleSheetEvents();
             };
+
+            // 검색 & 필터 체인지 리스너 (추가됨)
+            document.getElementById('studentSearchInput').addEventListener('input', renderStudentPortfoliosFiltered);
+            document.getElementById('studentAreaFilter').addEventListener('change', renderStudentPortfoliosFiltered);
         }
 
+        // 포트폴리오 등록 로직
         document.getElementById('portfolioForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading("새 탐구 활동 포트폴리오를 등재하고 있습니다...");
+            
+            // 복잡한 세부 필드들을 JSON 형태의 TEXT 구조로 설계하여 content 열에 병합합니다. (호환성 보장)
+            const contentData = {
+                execution: document.getElementById('pfExecution').value,
+                year: document.getElementById('pfYearInput').value,
+                simple_content: document.getElementById('pfSimpleContent').value,
+                reading: document.getElementById('pfReading').value
+            };
+
             const data = {
-                student_uid: currentUser.id, grade: currentStudentGrade,
+                student_uid: currentUser.id, 
+                grade: currentStudentGrade,
                 semester: parseInt(document.getElementById('pfSemester').value),
                 area: document.getElementById('pfArea').value,
                 activity_name: document.getElementById('pfActivityName').value,
-                content: document.getElementById('pfContent').value,
+                content: JSON.stringify(contentData), // 직렬화 저장
                 self_evaluation: document.getElementById('pfSelfEval').value,
                 updated_at: new Date().toISOString()
             };
+
             const { error } = await supabase.from('portfolios').insert([data]);
             if (error) showToast(error.message, 'error');
             else { 
                 showToast("포트폴리오가 정상 등록되었습니다!", 'success');
+                // 폼 초기화 (단 학년도는 유지)
+                const savedYear = document.getElementById('pfYearInput').value;
                 document.getElementById('portfolioForm').reset(); 
+                document.getElementById('pfYearInput').value = savedYear;
+
                 loadStudentPortfolios(currentStudentGrade); 
             }
             hideLoading();
@@ -693,41 +767,107 @@
 
         async function loadStudentPortfolios(grade) {
             const container = document.getElementById('portfolioList');
+            container.innerHTML = '<p class="text-center text-slate-400 py-6">활동 현황을 동기화하고 있습니다...</p>';
             
-            const { data, error } = await supabase
-                .from('portfolios')
-                .select('*, feedbacks(feedback_content, profiles(name))')
-                .eq('student_uid', currentUser.id)
-                .eq('grade', grade)
-                .order('updated_at', { ascending: false });
+            try {
+                const { data, error } = await supabase
+                    .from('portfolios')
+                    .select('*, feedbacks(feedback_content, profiles(name))')
+                    .eq('student_uid', currentUser.id)
+                    .eq('grade', grade)
+                    .order('updated_at', { ascending: false });
 
-            if (error) {
-                container.innerHTML = '<p class="text-red-500 text-center py-4">동기화 도중 데이터 로드 오류가 발견되었습니다.</p>';
-                return;
+                if (error) {
+                    container.innerHTML = '<p class="text-red-500 text-center py-4">동기화 도중 데이터 로드 오류가 발견되었습니다.</p>';
+                    return;
+                }
+
+                cachedPortfolios = data || [];
+                renderStudentPortfoliosFiltered();
+            } catch (err) {
+                container.innerHTML = '<p class="text-red-500 text-center py-4">서버 접속 실패</p>';
+            }
+        }
+
+        // 실시간 필터링 및 고화질 렌더링 뷰 (추가 및 개선됨)
+        function renderStudentPortfoliosFiltered() {
+            const container = document.getElementById('portfolioList');
+            const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim();
+            const areaFilter = document.getElementById('studentAreaFilter').value;
+
+            let filtered = cachedPortfolios;
+            if (areaFilter) {
+                filtered = filtered.filter(item => item.area === areaFilter);
+            }
+            if (keyword) {
+                filtered = filtered.filter(item => {
+                    let textToSearch = (item.activity_name || '') + ' ' + (item.self_evaluation || '');
+                    try {
+                        const parsed = JSON.parse(item.content);
+                        textToSearch += ' ' + (parsed.simple_content || '') + ' ' + (parsed.reading || '') + ' ' + (parsed.execution || '');
+                    } catch(e) {
+                        textToSearch += ' ' + (item.content || '');
+                    }
+                    return textToSearch.toLowerCase().includes(keyword);
+                });
             }
 
-            if (!data || data.length === 0) { 
-                container.innerHTML = '<p class="text-slate-400 text-center py-12">등록된 내역이 없습니다.</p>'; 
+            if (filtered.length === 0) { 
+                container.innerHTML = '<p class="text-slate-400 text-center py-12">조건에 부합하는 포트폴리오 내역이 없습니다.</p>'; 
                 return; 
             }
 
             let html = '';
-            data.forEach(item => {
+            filtered.forEach(item => {
+                let execution = '참여함';
+                let year = '';
+                let simpleContent = item.content;
+                let reading = '';
+
+                try {
+                    const parsed = JSON.parse(item.content);
+                    execution = parsed.execution || '참여함';
+                    year = parsed.year || '';
+                    simpleContent = parsed.simple_content || '';
+                    reading = parsed.reading || '';
+                } catch (e) {
+                    simpleContent = item.content;
+                }
+
                 const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at);
                 const formatUpdate = `${updateDate.getFullYear()}-${String(updateDate.getMonth()+1).padStart(2, '0')}-${String(updateDate.getDate()).padStart(2, '0')} ${String(updateDate.getHours()).padStart(2, '0')}:${String(updateDate.getMinutes()).padStart(2, '0')}`;
 
                 html += `
-                    <div class="border border-slate-200 rounded-2xl p-4 sm:p-6 relative mb-4">
+                    <div class="border border-slate-200 bg-white rounded-2xl p-5 relative mb-4 print-card-break shadow-sm hover:border-slate-300 transition">
                         <button onclick="deleteActivity('${item.id}')" class="absolute top-6 right-6 text-xs text-slate-300 hover:text-red-500 no-print transition">기록 삭제</button>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">${item.area}</span>
-                            <span class="text-xs text-slate-400 font-medium">${item.semester}학기</span>
-                            <span class="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded ml-auto no-print">마지막 업데이트: ${formatUpdate}</span>
+                        
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold">${item.area}</span>
+                            <span class="text-xs font-bold text-slate-400">${item.semester}학기</span>
+                            <span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-0.5 rounded ml-auto no-print">마지막 업데이트: ${formatUpdate}</span>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black mt-2 mb-2 leading-tight">${item.activity_name}</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 mb-2 leading-relaxed">${item.content}</p>
-                        <p class="text-xs sm:text-sm bg-blue-50/50 p-3 sm:p-3.5 rounded-xl border border-blue-50 text-slate-700 leading-relaxed">${item.self_evaluation}</p>
-                        ${item.feedbacks ? `<div class="mt-3 p-3 bg-slate-100 rounded-xl text-xs whitespace-pre-wrap leading-relaxed"><strong>👨‍🏫 교사 지도 피드백:</strong> ${item.feedbacks.feedback_content}</div>` : ''}
+                        
+                        <h3 class="text-base sm:text-lg font-black mt-2 mb-3 leading-tight text-slate-900">${item.activity_name}</h3>
+                        
+                        <!-- 🎓 보고서 디자인에 최적화된 격자형 상세 정보 테이블 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs bg-slate-50 p-4 rounded-xl border border-slate-100/70">
+                            <div><span class="text-slate-400 font-medium">실행 구분:</span> <span class="text-slate-800 font-bold">${execution}</span></div>
+                            <div><span class="text-slate-400 font-medium">활동 기간:</span> <span class="text-slate-800 font-bold">${year ? year + '학년도' : '-'}</span></div>
+                            <div class="sm:col-span-2"><span class="text-slate-400 font-medium">활동 내용:</span> <span class="text-slate-800 font-medium leading-relaxed">${simpleContent}</span></div>
+                            ${reading ? `<div class="sm:col-span-2"><span class="text-slate-400 font-medium">📚 독서 연계:</span> <span class="text-blue-600 font-semibold">${reading}</span></div>` : ''}
+                        </div>
+
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">자기 성찰 평가</p>
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${item.self_evaluation}</p>
+                        </div>
+                        
+                        ${item.feedbacks && item.feedbacks.feedback_content ? `
+                            <div class="mt-4 p-4 bg-slate-100/70 border-l-4 border-slate-800 rounded-r-2xl">
+                                <p class="text-[10px] font-bold text-slate-850 mb-1">👨‍🏫 교사 지도 피드백 (${item.feedbacks.profiles?.name || '지도교사'})</p>
+                                <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">${item.feedbacks.feedback_content}</p>
+                            </div>
+                        ` : ''}
                     </div>`;
             });
             container.innerHTML = html;
@@ -760,6 +900,27 @@
             });
             container.innerHTML = html;
         }
+
+        document.getElementById('downloadPdfBtn').onclick = () => {
+            const element = document.getElementById('pdfPrintArea');
+            const opt = { 
+                margin: 12, 
+                filename: `에듀포트_포트폴리오_${currentUserProfile.name}.pdf`, 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2.2, useCORS: true }, 
+                jsPDF: { format: 'a4', orientation: 'portrait' } 
+            };
+            
+            html2pdf().set(opt).from(element).save()
+            .then(() => {
+                console.log("PDF 출력 완수");
+                hideLoading();
+            })
+            .catch((err) => {
+                console.error("PDF 출력 과정 오류:", err);
+                hideLoading();
+            });
+        };
 
         // =========================================================================
         // [지도 교사 전용 관리 허브 엔진]
@@ -980,6 +1141,7 @@
                 data.forEach(item => {
                     const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at);
                     const formatUpdate = `${updateDate.getFullYear()}-${String(updateDate.getMonth()+1).padStart(2, '0')}-${String(updateDate.getDate()).padStart(2, '0')} ${String(updateDate.getHours()).padStart(2, '0')}:${String(updateDate.getMinutes()).padStart(2, '0')}`;
+                    const displaySummary = formatContentSummary(item.content);
 
                     html += `
                         <div class="p-4 border border-slate-100 bg-slate-50/50 rounded-2xl flex flex-col gap-2 relative">
@@ -990,7 +1152,7 @@
                                 <span class="text-[9px] text-slate-400 ml-auto">${formatUpdate}</span>
                             </div>
                             <h4 class="text-sm font-black text-slate-800">${item.activity_name}</h4>
-                            <p class="text-xs text-slate-500 truncate leading-relaxed">${item.content}</p>
+                            <p class="text-xs text-slate-500 truncate leading-relaxed">${displaySummary}</p>
                             <div class="text-[10px] text-blue-600 font-bold mt-1 cursor-pointer select-none self-end hover:underline" onclick="showDirectStudentDetail('${item.student_uid}')">
                                 학생 포트폴리오 전체 관제 ➔
                             </div>
@@ -1032,6 +1194,21 @@
                 const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at);
                 const formatUpdate = `${updateDate.getFullYear()}-${String(updateDate.getMonth()+1).padStart(2, '0')}-${String(updateDate.getDate()).padStart(2, '0')} ${String(updateDate.getHours()).padStart(2, '0')}:${String(updateDate.getMinutes()).padStart(2, '0')}`;
 
+                let execution = '참여함';
+                let year = '';
+                let simpleContent = item.content;
+                let reading = '';
+
+                try {
+                    const parsed = JSON.parse(item.content);
+                    execution = parsed.execution || '참여함';
+                    year = parsed.year || '';
+                    simpleContent = parsed.simple_content || '';
+                    reading = parsed.reading || '';
+                } catch (e) {
+                    simpleContent = item.content;
+                }
+
                 html += `
                     <div class="border p-4 sm:p-5 rounded-2xl bg-slate-50/50">
                         <div class="flex flex-wrap items-center gap-2 mb-3">
@@ -1040,8 +1217,15 @@
                             <span class="text-[9px] text-slate-400 ml-auto">포트폴리오 갱신 시각: ${formatUpdate}</span>
                         </div>
                         <h3 class="font-extrabold text-slate-850 text-base mb-2 leading-tight">${item.activity_name}</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-3 p-3 bg-white rounded-xl border border-slate-100"><strong>탐구 상세 내용:</strong><br>${item.content}</p>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4 p-3 bg-blue-50/20 rounded-xl border border-blue-50/40"><strong>자기 성찰 평가:</strong><br>${item.self_evaluation}</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs bg-white p-3 rounded-xl border border-slate-150">
+                            <div><span class="text-slate-400">실행 구분:</span> <span class="text-slate-800 font-bold">${execution}</span></div>
+                            <div><span class="text-slate-400">활동 기간:</span> <span class="text-slate-800 font-bold">${year ? year + '학년도' : '-'}</span></div>
+                            <div class="sm:col-span-2"><span class="text-slate-400">활동 요약:</span> <span class="text-slate-800 font-medium">${simpleContent}</span></div>
+                            ${reading ? `<div class="sm:col-span-2"><span class="text-slate-400">📚 독서 연계:</span> <span class="text-blue-600 font-semibold">${reading}</span></div>` : ''}
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4 p-3 bg-blue-50/20 rounded-xl border border-blue-50/40"><strong>자기 성찰 평가:</strong><br>${item.self_evaluation}</p>
                         
                         <div class="mt-4 pt-4 border-t border-slate-200/50">
                             <textarea id="fb_${item.id}" class="w-full p-3 border border-slate-200 text-base md:text-xs rounded-xl outline-none focus:border-blue-500 transition leading-relaxed bg-white" rows="2" placeholder="이 진로 활동에 교사의 종합적 피드백 의견을 남겨주세요...">${fb || ''}</textarea>

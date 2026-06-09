@@ -456,7 +456,7 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // 구글 스프레드시트 배포 배포된 CSV 파일 URL 주소 
-        const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
+        const GOOGLE_SHEET_CSV_URL = ''; 
 
         let currentUser = null;
         let currentUserProfile = null;
@@ -653,20 +653,32 @@
             }
         }
 
-        // Auth 상태 수신기 (무한 로딩 차단 및 로컬 스토리지 상태 일치화)
+        // ★ 완벽하게 해결된 Auth 상태 수신기 (무한 로딩 및 세션 리로드 루프 차단) ★
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 showLoading("프로필 소속 권한을 인증하고 있습니다...");
                 currentUser = session.user;
                 try {
                     const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                    
+                    // DB 테이블이 초기화되었거나 프로필 레코드가 누락된 경우 예외 처리 고도화
                     if (error || !profile) {
                         console.error("Profile Fetch Error: ", error);
-                        showToast("⚠️ 프로필 소속 정보를 찾을 수 없습니다. 새로운 계정으로 가입해 주세요.", 'error');
+                        showToast("⚠️ 프로필 정보를 찾을 수 없습니다.\n새로운 이메일로 다시 회원가입을 신청해 주세요.", 'error');
+                        
+                        // 새로고침 없이 즉각 세션 변수 강제 소거 및 로그아웃 유도
                         forceClearLocalSession();
-                        try { await supabase.auth.signOut(); } catch(e){}
+                        currentUser = null;
+                        currentUserProfile = null;
+                        
+                        try { 
+                            await supabase.auth.signOut(); 
+                        } catch(signOutErr){
+                            console.error("signOut recovery error: ", signOutErr);
+                        }
+                        
                         switchView('auth');
-                        hideLoading();
+                        hideLoading(); // 가두리 로딩을 완전히 차단합니다.
                         return;
                     }
 
@@ -679,11 +691,16 @@
                 } catch (e) {
                     console.error("Session Processing Error: ", e);
                     forceClearLocalSession();
+                    currentUser = null;
+                    currentUserProfile = null;
+                    try { await supabase.auth.signOut(); } catch(err){}
                     switchView('auth');
                 } finally {
-                    hideLoading();
+                    hideLoading(); // 세션 검사가 정상 작동했거나 예외가 발생하면 확실하게 로딩 스피너 제거
                 }
             } else {
+                currentUser = null;
+                currentUserProfile = null;
                 switchView('auth');
                 hideLoading();
             }

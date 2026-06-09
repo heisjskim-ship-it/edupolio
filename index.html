@@ -6,7 +6,14 @@
     <title>에듀포트 - 학교생활 진로 포트폴리오</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js (A4 고화질 PDF 렌더링 엔진) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* 웹 UI 인쇄 방지 및 PDF 전용 레이아웃 분리 */
+        @media print { 
+            .no-print { display: none !important; } 
+            body { background-color: white !important; } 
+        }
         /* 로딩 스피너 애니메이션 */
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%; width: 44px; height: 44px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -274,51 +281,66 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="pt-2 flex justify-end gap-3">
                         <button type="button" id="cancelEditBtn" class="hidden px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition">수정 취소</button>
-                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black tracking-wide py-3.5 px-8 rounded-xl hover:bg-blue-700 transition text-sm">포트폴리오 영구 등록 ➔</button>
+                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black tracking-wide py-3.5 px-8 rounded-xl hover:bg-blue-700 active:scale-[0.98] transition shadow-md shadow-blue-600/20 text-sm">포트폴리오 영구 등록 ➔</button>
                     </div>
                 </form>
             </section>
 
-            <!-- [포트폴리오 리스트] -->
+            <!-- [포트폴리오 압축 리스트] -->
             <section class="space-y-5 no-print">
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="font-black text-lg text-slate-800 tracking-tight">📑 등록된 포트폴리오 종합 내역</h3>
                 </div>
+
+                <!-- 학년 제어 및 분류 검색바 -->
                 <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-3 justify-between items-center">
                     <div class="flex overflow-x-auto whitespace-nowrap w-full md:w-auto no-scrollbar gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
                         <button class="grade-tab active-tab px-6 py-2.5 text-center font-black text-xs text-blue-600 bg-white rounded-lg shadow-sm transition" data-grade="1">1학년</button>
                         <button class="grade-tab px-6 py-2.5 text-center font-bold text-xs text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="2">2학년</button>
                         <button class="grade-tab px-6 py-2.5 text-center font-bold text-xs text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="3">3학년</button>
                     </div>
+                    
                     <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                         <select id="studentAreaFilter" class="px-4 py-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
-                            <option value="">전체 영역</option><option value="교과">교과 활동</option><option value="자율">자율 활동</option><option value="동아리">동아리 활동</option><option value="진로">진로 활동</option>
+                            <option value="">전체 영역</option>
+                            <option value="교과">교과 활동</option>
+                            <option value="자율">자율 활동</option>
+                            <option value="동아리">동아리 활동</option>
+                            <option value="진로">진로 활동</option>
                         </select>
                         <div class="relative w-full sm:w-[250px]">
-                            <input type="text" id="studentSearchInput" class="w-full p-2.5 pl-9 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition" placeholder="내용, 도서명 검색">
+                            <input type="text" id="studentSearchInput" class="w-full p-2.5 pl-9 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition" placeholder="내용, 도서명 등 검색">
                             <svg class="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
                 </div>
+
                 <div id="portfolioList" class="flex flex-col gap-3">
                     <div class="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm"><p class="text-slate-400 text-sm font-bold">동기화 중...</p></div>
                 </div>
             </section>
 
-            <!-- [학교 행사 자동 기입] -->
+            <!-- [학교 행사 리스트 및 자동 기입] -->
             <section class="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl relative overflow-hidden no-print">
                 <div class="absolute right-0 top-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
+                
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 relative z-10 gap-4 border-b border-slate-700 pb-4">
                     <h3 class="font-black text-lg text-white flex items-center gap-2">🏫 학교 행사 리스트</h3>
+                    
                     <div class="flex gap-2 w-full md:w-auto">
                         <div class="relative flex-1 md:w-[250px]">
                             <input type="text" id="studentEventSearch" class="w-full p-2 pl-8 border border-slate-700 bg-slate-800/80 text-xs font-medium text-white rounded-lg outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <svg class="absolute left-2.5 top-2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
-                        <button id="syncSheetStudentBtn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition">🔄 동기화</button>
+                        <button id="syncSheetStudentBtn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1 shrink-0">
+                            🔄 동기화
+                        </button>
                     </div>
                 </div>
+                
                 <div id="studentEventsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 relative z-10">
                     <p class="text-xs text-slate-500 py-4">일정을 불러오고 있습니다...</p>
                 </div>
@@ -375,7 +397,8 @@
                         <h2 class="font-black text-white text-sm">🏫 학사 일정 관리</h2>
                     </div>
                     <div class="flex gap-2 mb-3 relative z-10">
-                        <a href="https://docs.google.com/spreadsheets/d/1B9ZqM9C-D_lV_hN8z9N_aXzN_xY_jU_H/edit" target="_blank" class="flex-1 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px] font-bold text-center transition flex items-center justify-center decoration-transparent">시트 직접 수정</a>
+                        <!-- 🔥 시트 직접 수정 버튼 연결 완벽 대응 (클릭 이벤트 적용) -->
+                        <button id="editGoogleSheetBtn" class="flex-1 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px] font-bold text-center transition flex items-center justify-center decoration-transparent">시트 직접 수정</button>
                         <button id="openEventModalBtn" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition">수동 등록</button>
                         <button id="syncSheetTeacherBtn" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold transition">시트 동기화</button>
                     </div>
@@ -500,15 +523,15 @@
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-100">
             <h2 class="text-2xl font-black text-slate-900 mb-6 tracking-tight">🏫 행사 수동 등록</h2>
             <form id="eventForm" class="space-y-4">
-                <input type="text" id="evName" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="행사명" required>
+                <input type="text" id="evName" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="행사명" required>
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="evDate" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
-                    <select id="evTarget" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    <input type="date" id="evDate" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                    <select id="evTarget" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition">
                         <option value="0">공통</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                     </select>
                 </div>
-                <input type="text" id="evOrganizer" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="주관 부서" required>
-                <textarea id="evContent" rows="3" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="요약 기입" required></textarea>
+                <input type="text" id="evOrganizer" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="주관 부서" required>
+                <textarea id="evContent" rows="3" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="요약 기입" required></textarea>
                 <div class="flex gap-2 pt-2">
                     <button type="button" id="closeEventModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3.5 rounded-xl text-sm hover:bg-slate-200 transition">취소</button>
                     <button type="submit" class="w-2/3 bg-blue-600 text-white font-black py-3.5 rounded-xl text-sm hover:bg-blue-700 transition">등록</button>
@@ -540,7 +563,12 @@
 
         const SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
+        
+        // CSV 배포 주소
         const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
+        
+        // 🔴 [수정 부분] 실제 선생님의 구글 시트 편집용 주소 (https://docs.google.com/spreadsheets/d/.../edit 형식)
+        const GOOGLE_SHEET_EDIT_URL = 'https://docs.google.com/spreadsheets/d/1dOpzZP_TG2wslL8LzT0DFCoz5YIEPPHQ/edit?usp=sharing&ouid=109071059180505445413&rtpof=true&sd=true'; 
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -952,6 +980,15 @@
             };
 
             document.getElementById('syncSheetTeacherBtn').onclick = () => syncGoogleSheetEvents();
+            
+            // 🔴 [에러 수정 완료] 선생님 시트 직접 접속 버튼 이벤트 부착
+            document.getElementById('editGoogleSheetBtn').onclick = () => {
+                if(GOOGLE_SHEET_EDIT_URL) {
+                    window.open(GOOGLE_SHEET_EDIT_URL, '_blank');
+                } else {
+                    showToast("⚠️ 소스코드 상단의 GOOGLE_SHEET_EDIT_URL에 실제 구글 시트 편집 주소를 입력해주세요.", "error");
+                }
+            };
             
             document.getElementById('teacherDownloadPdfBtn').onclick = () => {
                 if (!teacherCachedPortfolios || teacherCachedPortfolios.length === 0) { showToast("출력할 내역이 존재하지 않습니다.", "error"); return; }

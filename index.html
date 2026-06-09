@@ -326,51 +326,78 @@
     <!-- ============================================================ -->
     <!-- [3] 교사 관제 센터 -->
     <!-- ============================================================ -->
-    <div id="teacherView" class="hidden h-screen bg-slate-100 flex-col overflow-hidden relative">
-        <nav class="bg-slate-900 text-white border-b border-slate-800 z-40 shadow-md no-print shrink-0 h-16">
-            <div class="max-w-7xl mx-auto px-5 h-full flex items-center justify-between">
-                <h1 class="text-base sm:text-xl font-black tracking-tight">👨‍🏫 에듀포트 교사용 관제 센터</h1>
-                <div class="flex items-center gap-3">
-                    <button id="openAdminPanelBtn" class="hidden text-[10px] bg-red-900/80 hover:bg-red-800 text-red-100 border border-red-800 font-bold px-3 py-1.5 rounded-full transition shadow-sm">🛡️ 회원 관리</button>
-                    <span id="teacherNavInfo" class="text-[10px] font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full">인증 검증 중</span>
-                    <button class="logoutBtn text-slate-400 hover:text-white text-xs font-bold transition px-2 min-h-[36px]">로그아웃</button>
+    <div id="teacherView" class="hidden bg-slate-100 flex-col relative" style="height:100dvh; overflow:hidden;">
+        <nav class="bg-slate-900 text-white border-b border-slate-800 z-40 shadow-md no-print shrink-0" style="height:56px;">
+            <div class="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+                <h1 class="text-sm sm:text-xl font-black tracking-tight">👨‍🏫 에듀포트 관제 센터</h1>
+                <div class="flex items-center gap-2">
+                    <button id="openAdminPanelBtn" class="hidden text-[10px] bg-red-900/80 hover:bg-red-800 text-red-100 border border-red-800 font-bold px-2.5 py-1.5 rounded-full transition">🛡️ 회원관리</button>
+                    <span id="teacherNavInfo" class="text-[10px] font-bold text-slate-400 bg-slate-800 px-2.5 py-1.5 rounded-full truncate max-w-[120px] sm:max-w-none">인증 중</span>
+                    <button class="logoutBtn text-slate-400 hover:text-white text-xs font-bold transition px-2 py-2">로그아웃</button>
                 </div>
             </div>
         </nav>
 
-        <!-- 모바일 탭 바 -->
-        <div id="mobileTabSelector" class="flex lg:hidden bg-white border-b border-slate-200 shrink-0 h-12 z-30">
+        <!-- 모바일 탭 바: 높이 고정 48px -->
+        <div id="mobileTabSelector" class="flex lg:hidden bg-white border-b border-slate-200 shrink-0 z-30" style="height:48px;">
             <button id="tabBtnList" class="flex-1 text-xs font-black text-blue-600 border-b-4 border-blue-600 transition-all">👥 학생 명부</button>
-            <button id="tabBtnTimeline" class="flex-1 text-xs font-bold text-slate-400 transition-all">📊 실시간 관제</button>
-            <button id="tabBtnDetail" class="flex-1 text-xs font-bold text-slate-400 transition-all" disabled>🔍 성찰 분석</button>
+            <button id="tabBtnTimeline" class="flex-1 text-xs font-bold text-slate-400 transition-all">📊 관제</button>
+            <button id="tabBtnDetail" class="flex-1 text-xs font-bold text-slate-400 transition-all" disabled>🔍 분석</button>
         </div>
 
-        <main class="max-w-7xl mx-auto w-full px-4 py-4 flex flex-col lg:grid lg:grid-cols-12 gap-6 no-print lg:h-[calc(100vh-5rem)] flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+        <!--
+            모바일: 탭별로 패널 1개씩 전체 높이 차지 (nav 56px + tabbar 48px = 104px 제외)
+            데스크톱: grid 레이아웃, 전체 높이에서 nav(56px) + padding 제외
+        -->
+        <main id="teacherMain"
+            class="w-full flex-1 min-h-0 no-print
+                   flex flex-col lg:grid lg:grid-cols-12 lg:gap-6
+                   lg:max-w-7xl lg:mx-auto lg:px-4 lg:py-4
+                   lg:overflow-hidden"
+            style="height: calc(100dvh - 104px);">
 
-            <!-- 좌측: 학생 명부 -->
-            <div id="teacherListPanel" class="lg:col-span-4 flex flex-col gap-6 h-full min-h-[450px] lg:min-h-0">
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-0 overflow-hidden">
-                    <div class="p-5 pb-3 border-b border-slate-100 shrink-0">
-                        <h2 class="font-black text-slate-900 text-base flex justify-between">
-                            <span>👥 학생 명부</span>
-                            <span id="studentCountBadge" class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-md font-bold">0명</span>
-                        </h2>
+            <!-- ── 좌측: 학생 명부 패널 ── -->
+            <!--
+                모바일: 전체 높이를 패널이 채우고 내부 스크롤
+                데스크톱: col-span-4, flex-col, h-full
+            -->
+            <div id="teacherListPanel"
+                class="lg:col-span-4 lg:flex lg:flex-col lg:gap-6 lg:h-full lg:min-h-0"
+                style="display:none; flex-direction:column; height:100%; overflow:hidden;">
+
+                <!-- 학생 명부 카드 (모바일: flex-1 스크롤 / 데스크탑: flex-1) -->
+                <div class="bg-white flex flex-col min-h-0 overflow-hidden lg:rounded-3xl lg:shadow-sm lg:border lg:border-slate-200"
+                     style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+
+                    <!-- 헤더 -->
+                    <div class="px-4 pt-4 pb-3 border-b border-slate-100 shrink-0 flex items-center justify-between">
+                        <h2 class="font-black text-slate-900 text-base">👥 학생 명부</h2>
+                        <span id="studentCountBadge" class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-md font-bold">0명</span>
                     </div>
-                    <div class="px-5 space-y-2 mb-2 shrink-0 pt-2">
-                        <input type="text" id="teacherStudentSearch" class="w-full p-2.5 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition" placeholder="실명 또는 학번 검색">
+
+                    <!-- 검색 필터 -->
+                    <div class="px-4 space-y-2 py-3 shrink-0 border-b border-slate-100 bg-slate-50/50">
+                        <input type="text" id="teacherStudentSearch"
+                            class="w-full p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition"
+                            placeholder="🔍 실명 또는 학번 검색">
                         <div class="flex gap-2">
-                            <select id="filterYearSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none"><option value="">전체 입학</option></select>
-                            <select id="filterGradeSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                            <select id="filterYearSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-white outline-none"><option value="">전체 입학</option></select>
+                            <select id="filterGradeSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-white outline-none">
                                 <option value="">전체 학년</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                             </select>
                         </div>
                     </div>
-                    <ul id="studentListContainer" class="px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[150px]">
+
+                    <!-- 학생 리스트: 이 부분만 스크롤 -->
+                    <ul id="studentListContainer"
+                        class="px-4 space-y-2 pb-4 pt-3"
+                        style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;">
                         <li class="text-xs text-slate-400 text-center py-10 font-medium">데이터를 취합하고 있습니다...</li>
                     </ul>
                 </div>
 
-                <div class="bg-slate-900 p-5 rounded-3xl shadow-xl border border-slate-800 flex flex-col shrink-0 h-[220px] relative overflow-hidden">
+                <!-- 학사 일정 카드 (모바일에서는 숨김 → 탭 전환 필요 없음, 데스크탑에만 표시) -->
+                <div class="hidden lg:flex bg-slate-900 p-5 rounded-3xl shadow-xl border border-slate-800 flex-col shrink-0 relative overflow-hidden" style="height:220px;">
                     <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
                     <div class="relative z-10 flex items-center justify-between mb-3 border-b border-slate-700 pb-2">
                         <h2 class="font-black text-white text-sm">🏫 학사 일정 관리</h2>
@@ -386,43 +413,61 @@
                 </div>
             </div>
 
-            <!-- 우측: 대시보드 및 상세 -->
-            <div id="teacherContentPanel" class="lg:col-span-8 h-full min-h-[400px] lg:min-h-0 relative">
+            <!-- 모바일 전용: 학사 일정 관리 버튼 (학생 명부 탭 하단 고정) -->
+            <div id="mobileScheduleBar" class="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-20 hidden">
+                <div class="flex gap-2 p-3">
+                    <button id="editGoogleSheetBtnM" class="flex-1 py-2.5 bg-blue-100 text-blue-800 rounded-xl text-xs font-bold text-center transition">시트 수정</button>
+                    <button id="openEventModalBtnM" class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold transition">행사 등록</button>
+                    <button id="syncSheetTeacherBtnM" class="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold transition">시트 동기화</button>
+                </div>
+            </div>
+
+            <!-- ── 우측: 대시보드 및 상세 패널 ── -->
+            <div id="teacherContentPanel"
+                class="lg:col-span-8 lg:h-full lg:min-h-0 lg:relative"
+                style="display:none; flex-direction:column; height:100%; overflow:hidden;">
+
                 <!-- 실시간 관제보드 -->
-                <div id="teacherDashboardOverview" class="bg-white rounded-3xl shadow-sm border border-slate-200 h-full flex flex-col overflow-hidden">
-                    <div class="border-b border-slate-100 p-6 sm:px-8 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
-                        <div>
-                            <h2 class="text-lg font-black text-slate-900 tracking-tight">📊 실시간 탐구 관제보드</h2>
-                            <p class="text-slate-500 text-[11px] mt-0.5 font-medium">전체 학생의 최신 기록을 모니터링합니다.</p>
-                        </div>
-                        <div class="flex gap-2 w-full md:w-auto">
-                            <select id="timelineAreaFilter" class="px-3 py-2 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                <div id="teacherDashboardOverview"
+                    class="bg-white lg:rounded-3xl lg:shadow-sm lg:border lg:border-slate-200"
+                    style="display:none; flex-direction:column; height:100%; overflow:hidden;">
+                    <div class="border-b border-slate-100 px-4 py-4 flex flex-col gap-3 shrink-0">
+                        <h2 class="text-base font-black text-slate-900 tracking-tight">📊 실시간 탐구 관제보드</h2>
+                        <div class="flex gap-2">
+                            <select id="timelineAreaFilter" class="flex-1 px-3 py-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
                                 <option value="">전체 영역</option><option value="교과">교과</option><option value="자율">자율</option><option value="동아리">동아리</option><option value="진로">진로</option>
                             </select>
-                            <input type="text" id="timelineSearchInput" class="p-2 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500" placeholder="활동명/이름 검색">
+                            <input type="text" id="timelineSearchInput" class="flex-1 p-2.5 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500" placeholder="활동명/이름 검색">
                         </div>
                     </div>
-                    <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-6 sm:px-8 space-y-3 no-scrollbar min-h-[250px]">
+                    <div id="globalTimelineFeed"
+                        class="p-4 space-y-3 no-scrollbar"
+                        style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;">
                         <p class="text-xs text-slate-400 text-center py-20 font-bold">이력을 파악하고 있습니다...</p>
                     </div>
                 </div>
 
                 <!-- 학생 상세 보기 -->
-                <div id="teacherDetailView" class="bg-slate-50 rounded-3xl shadow-inner border border-slate-200 h-full flex-col overflow-hidden hidden lg:absolute lg:inset-0 lg:z-10">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-200 p-5 sm:px-8 bg-white shrink-0 shadow-sm z-20 w-full">
-                        <div class="flex flex-col items-center sm:items-start w-full sm:w-auto text-center sm:text-left">
-                            <div class="flex items-center justify-center sm:justify-start gap-2">
-                                <h2 class="text-xl font-black text-slate-900 tracking-tight" id="detailStudentName">로딩 중</h2>
-                                <span class="bg-blue-600 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">학습자 포트폴리오</span>
+                <div id="teacherDetailView"
+                    class="bg-slate-50 lg:rounded-3xl lg:shadow-inner lg:border lg:border-slate-200 lg:absolute lg:inset-0 lg:z-10"
+                    style="display:none; flex-direction:column; height:100%; overflow:hidden;">
+                    <!-- 헤더 -->
+                    <div class="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 bg-white shrink-0 shadow-sm">
+                        <div class="flex flex-col min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-base font-black text-slate-900 tracking-tight truncate" id="detailStudentName">로딩 중</h2>
+                                <span class="bg-blue-600 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm shrink-0">포트폴리오</span>
                             </div>
-                            <p class="text-xs font-bold text-slate-500 mt-1" id="detailStudentInfo"></p>
+                            <p class="text-xs font-bold text-slate-500 mt-0.5 truncate" id="detailStudentInfo"></p>
                         </div>
-                        <div class="flex gap-2 shrink-0 w-full sm:w-auto justify-center sm:justify-end">
-                            <button id="teacherDownloadPdfBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm">🖨️ 통합 인쇄</button>
-                            <button id="closeStudentDetailBtn" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm">🔙 복귀</button>
+                        <div class="flex gap-2 shrink-0">
+                            <button id="teacherDownloadPdfBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap">🖨️ 인쇄</button>
+                            <button id="closeStudentDetailBtn" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold px-3 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap">🔙 복귀</button>
                         </div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-5 sm:p-8 no-scrollbar bg-slate-50 min-h-[250px] w-full">
+                    <!-- 콘텐츠 -->
+                    <div class="p-4 no-scrollbar"
+                        style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;">
                         <div id="teacherStatsContainer" class="mb-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hidden"></div>
                         <div id="teacherPortfolioList" class="flex flex-col gap-4"></div>
                     </div>
@@ -899,10 +944,13 @@
             });
         });
 
-        // ===== 인증 상태 감지 =====
+        // ===== 인증 상태 감지 (로그인 버튼 클릭 시에만 동작) =====
         supabase.auth.onAuthStateChange(async (event, session) => {
+            // TOKEN_REFRESHED: 토큰 자동 갱신 — 화면 전환 없이 조용히 무시
+            if (event === 'TOKEN_REFRESHED') return;
+
             if (event === 'SIGNED_OUT' || !session) {
-                if (authInitialized) { // 최초 기동 중 false positive 방지
+                if (authInitialized) {
                     currentUser = null;
                     currentUserProfile = null;
                     authInitialized = false;
@@ -912,35 +960,33 @@
                 return;
             }
 
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                if (authInitialized && currentUser?.id === session.user.id) {
+            // SIGNED_IN: 로그인 버튼 → 여기서 처리
+            // initApp에서 이미 처리됐으면 건너뜀
+            if (event === 'SIGNED_IN') {
+                if (authInitialized && currentUser?.id === session.user.id && currentUserProfile) {
                     hideLoading();
-                    return; // 중복 처리 방지
+                    $('loginSubmitBtn').disabled = false;
+                    $('loginSubmitBtn').innerText = '안전하게 로그인';
+                    return;
                 }
 
                 currentUser = session.user;
                 authInitialized = true;
-
                 showLoading('학적 정보를 불러오고 있습니다...');
 
                 try {
-                    const timer = setTimeout(() => {
-                        $('loadingText').innerText = '서버를 깨우는 중입니다 (최대 25초 소요)...';
+                    const wakeTimer = setTimeout(() => {
+                        $('loadingText').innerText = '서버를 깨우는 중입니다 (최대 25초)...';
                     }, 3000);
 
-                    const fetchFn = async () => {
-                        const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-                        return { data, error };
-                    };
-
-                    const timeoutFn = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 25000));
-                    const { data: profile, error } = await Promise.race([fetchFn(), timeoutFn]);
-                    clearTimeout(timer);
+                    const { data: profile } = await Promise.race([
+                        supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
+                        new Promise((_, rej) => setTimeout(() => rej(new Error('TIMEOUT')), 25000))
+                    ]);
+                    clearTimeout(wakeTimer);
 
                     let finalProfile = profile;
-
                     if (!finalProfile) {
-                        // 프로필 없으면 메타데이터로 복구
                         const meta = currentUser.user_metadata || {};
                         finalProfile = {
                             id: currentUser.id,
@@ -952,25 +998,20 @@
                         };
                         await supabase.from('profiles').upsert(finalProfile, { onConflict: 'id' });
                     }
-
                     currentUserProfile = finalProfile;
                     localStorage.setItem('eduport-cached-profile', JSON.stringify(finalProfile));
+                    if (finalProfile.role === 'student') initStudentDashboard();
+                    else initTeacherDashboard();
 
-                    if (finalProfile.role === 'student') {
-                        initStudentDashboard();
-                    } else {
-                        initTeacherDashboard();
-                    }
                 } catch (err) {
-                    // 타임아웃 시 캐시 폴백
                     const cached = getCachedProfile();
                     if (cached && cached.id === currentUser.id) {
                         currentUserProfile = cached;
-                        showToast('오프라인 모드로 진입합니다.', 'info');
+                        showToast('오프라인 캐시로 진입합니다.', 'info');
                         if (cached.role === 'student') initStudentDashboard();
                         else initTeacherDashboard();
                     } else {
-                        showToast('프로필 로드 실패: ' + err.message, 'error');
+                        showToast('프로필 로드 실패. 다시 시도해 주세요.', 'error');
                         showOnlyView('auth');
                     }
                 } finally {
@@ -981,839 +1022,96 @@
             }
         });
 
-        // ===== 모바일 탭 =====
-        const tabBtnList = $('tabBtnList');
-        const tabBtnTimeline = $('tabBtnTimeline');
-        const tabBtnDetail = $('tabBtnDetail');
-
-        function setMobileActiveTab(tab) {
-            const inactive = 'flex-1 text-xs font-bold text-slate-400 transition-all';
-            const active = 'flex-1 text-xs font-black text-blue-600 border-b-4 border-blue-600 transition-all';
-            tabBtnList.className = inactive;
-            tabBtnTimeline.className = inactive;
-            tabBtnDetail.className = inactive;
-
-            $('teacherListPanel').style.display = 'none';
-            $('teacherDashboardOverview').style.display = 'none';
-            $('teacherDetailView').style.display = 'none';
-
-            if (tab === 'list') {
-                tabBtnList.className = active;
-                $('teacherListPanel').style.display = 'flex';
-                $('teacherListPanel').style.flexDirection = 'column';
-            } else if (tab === 'timeline') {
-                tabBtnTimeline.className = active;
-                $('teacherDashboardOverview').style.display = 'flex';
-                $('teacherDashboardOverview').style.flexDirection = 'column';
-            } else if (tab === 'detail') {
-                tabBtnDetail.className = active;
-                $('teacherDetailView').style.display = 'flex';
-                $('teacherDetailView').style.flexDirection = 'column';
-            }
-        }
-
-        tabBtnList.addEventListener('click', () => setMobileActiveTab('list'));
-        tabBtnTimeline.addEventListener('click', () => setMobileActiveTab('timeline'));
-        tabBtnDetail.addEventListener('click', () => { if (selectedStudentUid) setMobileActiveTab('detail'); });
-
         // ============================================================
-        // ===== 학생 대시보드 =====
-        // ============================================================
-        function initStudentDashboard() {
-            showOnlyView('student');
-            $('studentNavInfo').innerText = `${currentUserProfile.admission_year || ''}년 입학 | ${currentUserProfile.student_id || ''} | ${currentUserProfile.name}`;
-            $('pdfExportStudentId').innerText = currentUserProfile.student_id || '-';
-            $('pdfExportStudentName').innerText = currentUserProfile.name || '-';
-            $('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
-            $('pfGrade').value = currentStudentGrade;
-
-            loadCareerInfo();
-            loadStudentPortfolios();
-            loadSchoolEventsForStudents();
-
-            // 학년 탭
-            document.querySelectorAll('.grade-tab').forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    document.querySelectorAll('.grade-tab').forEach(t => {
-                        t.className = 'grade-tab px-6 py-2.5 text-center font-bold text-xs text-slate-500 hover:text-slate-800 rounded-lg transition';
-                    });
-                    e.currentTarget.className = 'grade-tab px-6 py-2.5 text-center font-black text-xs text-blue-600 bg-white rounded-lg shadow-sm transition';
-                    currentStudentGrade = parseInt(e.currentTarget.dataset.grade);
-                    $('pfGrade').value = currentStudentGrade;
-                    renderStudentPortfoliosFiltered();
-                });
-            });
-
-            $('syncSheetStudentBtn').onclick = syncGoogleSheetEvents;
-            $('studentSearchInput').addEventListener('input', renderStudentPortfoliosFiltered);
-            $('studentAreaFilter').addEventListener('change', renderStudentPortfoliosFiltered);
-            $('studentEventSearch').addEventListener('input', renderEventsFiltered);
-
-            $('cancelEditBtn').onclick = () => {
-                editingPortfolioId = null;
-                $('portfolioForm').reset();
-                $('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
-                $('pfGrade').value = currentStudentGrade;
-                $('portfolioFormTitle').innerText = '✍️ 학업 및 진로 탐구 활동 등록';
-                $('submitPortfolioBtn').innerText = '포트폴리오 영구 등록 ➔';
-                $('cancelEditBtn').classList.add('hidden');
-                showToast('수정이 취소되었습니다.');
-            };
-        }
-
-        function loadCareerInfo() {
-            let info = {};
-            try { if (currentUserProfile.career_info) info = JSON.parse(currentUserProfile.career_info); } catch {}
-            $('pdfInputCareer').value = info.career || '';
-            $('pdfInputUniv1').value = info.univ1 || '';
-            $('pdfInputUniv2').value = info.univ2 || '';
-            $('pdfInputUniv3').value = info.univ3 || '';
-            $('pdfInputMajor1').value = info.major1 || '';
-            $('pdfInputMajor2').value = info.major2 || '';
-            $('pdfInputMajor3').value = info.major3 || '';
-        }
-
-        $('saveCareerInfoBtn').addEventListener('click', async () => {
-            showLoading('저장 중...');
-            const careerInfo = {
-                career: $('pdfInputCareer').value, univ1: $('pdfInputUniv1').value, univ2: $('pdfInputUniv2').value, univ3: $('pdfInputUniv3').value,
-                major1: $('pdfInputMajor1').value, major2: $('pdfInputMajor2').value, major3: $('pdfInputMajor3').value
-            };
-            try {
-                const { error } = await supabase.from('profiles').update({ career_info: JSON.stringify(careerInfo) }).eq('id', currentUser.id);
-                if (error) throw error;
-                currentUserProfile.career_info = JSON.stringify(careerInfo);
-                localStorage.setItem('eduport-cached-profile', JSON.stringify(currentUserProfile));
-                showToast('진로/진학 정보가 저장되었습니다.', 'success');
-            } catch (err) { showToast('저장 실패: ' + err.message, 'error'); }
-            finally { hideLoading(); }
-        });
-
-        $('portfolioForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showLoading(editingPortfolioId ? '수정 중...' : '등록 중...');
-            const contentData = {
-                execution: $('pfExecution').value,
-                year: $('pfYearInput').value,
-                simple_content: $('pfSimpleContent').value,
-                reading: $('pfReading').value
-            };
-            const inputGrade = parseInt($('pfGrade').value);
-            const rowData = {
-                student_uid: currentUser.id,
-                grade: inputGrade,
-                semester: parseInt($('pfSemester').value),
-                area: $('pfArea').value,
-                activity_name: $('pfActivityName').value,
-                content: JSON.stringify(contentData),
-                self_evaluation: $('pfSelfEval').value,
-                updated_at: new Date().toISOString()
-            };
-            try {
-                if (editingPortfolioId) {
-                    const { error } = await supabase.from('portfolios').update(rowData).eq('id', editingPortfolioId);
-                    if (error) throw error;
-                    showToast('수정되었습니다!', 'success');
-                } else {
-                    const { error } = await supabase.from('portfolios').insert([rowData]);
-                    if (error) throw error;
-                    showToast('등록되었습니다!', 'success');
-                }
-                currentStudentGrade = inputGrade;
-                document.querySelectorAll('.grade-tab').forEach(t => {
-                    t.className = 'grade-tab px-6 py-2.5 text-center font-bold text-xs text-slate-500 hover:text-slate-800 rounded-lg transition';
-                });
-                const activeTab = document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`);
-                if (activeTab) activeTab.className = 'grade-tab px-6 py-2.5 text-center font-black text-xs text-blue-600 bg-white rounded-lg shadow-sm transition';
-                $('cancelEditBtn').click();
-                await loadStudentPortfolios();
-            } catch (err) { showToast('오류: ' + err.message, 'error'); }
-            finally { hideLoading(); }
-        });
-
-        async function loadStudentPortfolios() {
-            $('portfolioList').innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 font-bold">이력을 동기화하고 있습니다...</p></div>';
-            try {
-                const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', currentUser.id).order('updated_at', { ascending: false });
-                if (error) throw error;
-                cachedPortfolios = data || [];
-                localStorage.setItem('eduport-cached-portfolios', JSON.stringify(cachedPortfolios));
-
-                const stats = window.calculateStats(cachedPortfolios);
-                const statsSection = $('studentStatsSection');
-                statsSection.innerHTML = window.renderStatsHTML(stats);
-                statsSection.classList.remove('hidden');
-
-                renderStudentPortfoliosFiltered();
-            } catch (err) {
-                const cached = localStorage.getItem('eduport-cached-portfolios');
-                if (cached) {
-                    cachedPortfolios = JSON.parse(cached);
-                    const stats = window.calculateStats(cachedPortfolios);
-                    $('studentStatsSection').innerHTML = window.renderStatsHTML(stats);
-                    $('studentStatsSection').classList.remove('hidden');
-                    renderStudentPortfoliosFiltered();
-                } else {
-                    $('portfolioList').innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">데이터 불러오기 실패. 인터넷 연결을 확인하세요.</p></div>';
-                }
-            }
-        }
-
-        function renderStudentPortfoliosFiltered() {
-            const container = $('portfolioList');
-            const keyword = $('studentSearchInput').value.toLowerCase().trim();
-            const areaFilter = $('studentAreaFilter').value;
-
-            let filtered = cachedPortfolios.filter(item => item.grade === currentStudentGrade);
-            if (areaFilter) filtered = filtered.filter(item => item.area === areaFilter);
-            if (keyword) {
-                filtered = filtered.filter(item => {
-                    let text = (item.activity_name || '') + ' ' + (item.self_evaluation || '');
-                    try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || '') + ' ' + (p.reading || ''); } catch {}
-                    return text.toLowerCase().includes(keyword);
-                });
-            }
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 text-sm font-bold">조건에 부합하는 내역이 없습니다.</p></div>';
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => {
-                let execution='참여함', year='', simpleContent=item.content, reading='';
-                try { const p=JSON.parse(item.content); execution=p.execution||'참여함'; year=p.year||''; simpleContent=p.simple_content||''; reading=p.reading||''; } catch {}
-                const areaColor = item.area === '교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
-                const fb = item.feedbacks?.feedback_content || '';
-                return `<div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative group flex flex-col hover:border-blue-300 transition">
-                    <div class="absolute top-3 right-3 flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity no-print">
-                        <button onclick="window.editActivity('${item.id}')" class="text-[10px] bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-600 px-2 py-1 rounded font-bold transition">수정</button>
-                        <button onclick="window.deleteActivity('${item.id}')" class="text-[10px] bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600 px-2 py-1 rounded font-bold transition">삭제</button>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2 pr-16 mb-2">
-                        <span class="px-2 py-0.5 ${areaColor} border rounded text-[10px] font-bold">${item.area}</span>
-                        <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${year?year+'년 ':''}${item.semester}학기 / ${execution}</span>
-                        <h3 class="text-sm font-black text-slate-900 ml-1 truncate max-w-[200px]">${item.activity_name}</h3>
-                    </div>
-                    <div class="text-xs text-slate-600 leading-relaxed font-medium"><span class="font-bold text-slate-400">요약:</span> ${simpleContent}</div>
-                    ${reading ? `<div class="text-xs text-blue-700 leading-relaxed font-medium"><span class="font-bold text-blue-400">독서:</span> ${reading}</div>` : ''}
-                    <div class="text-xs text-slate-700 leading-relaxed mt-1 line-clamp-2"><span class="font-bold text-slate-400">성찰:</span> ${item.self_evaluation}</div>
-                    ${fb ? `<div class="mt-2 text-[10px] text-indigo-700 bg-indigo-50 px-2 py-1.5 rounded font-medium"><strong class="mr-1">교사피드백:</strong>${fb}</div>` : ''}
-                </div>`;
-            }).join('');
-        }
-
-        window.editActivity = (id) => {
-            const item = cachedPortfolios.find(p => p.id === id);
-            if (!item) return;
-            editingPortfolioId = id;
-            $('portfolioFormTitle').innerHTML = `✍️ <span class="text-blue-600">수정 모드</span> - ${item.activity_name}`;
-            $('submitPortfolioBtn').innerText = '수정 내용 적용하기 ✓';
-            $('cancelEditBtn').classList.remove('hidden');
-            $('pfSemester').value = item.semester;
-            $('pfGrade').value = item.grade;
-            $('pfArea').value = item.area;
-            $('pfActivityName').value = item.activity_name;
-            $('pfSelfEval').value = item.self_evaluation;
-            try {
-                const p = JSON.parse(item.content);
-                $('pfExecution').value = p.execution || '참여함';
-                $('pfYearInput').value = p.year || new Date().getFullYear();
-                $('pfSimpleContent').value = p.simple_content || '';
-                $('pfReading').value = p.reading || '';
-            } catch { $('pfSimpleContent').value = item.content; }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast('수정 모드로 전환되었습니다.', 'success');
-        };
-
-        window.deleteActivity = async (id) => {
-            const confirmed = await window.customConfirm('기록은 영구 삭제되며 복구할 수 없습니다.\n정말 삭제하시겠습니까?', '포트폴리오 삭제');
-            if (!confirmed) return;
-            showLoading('삭제 중...');
-            try {
-                const { error } = await supabase.from('portfolios').delete().eq('id', id);
-                if (error) throw error;
-                showToast('삭제 완료', 'success');
-                await loadStudentPortfolios();
-            } catch (err) { showToast('삭제 실패: ' + err.message, 'error'); }
-            finally { hideLoading(); }
-        };
-
-        async function loadSchoolEventsForStudents() {
-            const grade = currentUserProfile.admission_year
-                ? Math.min(3, Math.max(1, new Date().getFullYear() - currentUserProfile.admission_year + 1))
-                : 1;
-            const { data } = await supabase.from('school_events').select('*').in('target_grade', [0, grade]).order('event_date', { ascending: true });
-            cachedEventsData = data || [];
-            renderEventsFiltered();
-        }
-
-        function renderEventsFiltered() {
-            const container = $('studentEventsList');
-            const keyword = $('studentEventSearch')?.value.toLowerCase().trim() || '';
-            let filtered = keyword ? cachedEventsData.filter(ev => ev.event_name.toLowerCase().includes(keyword) || ev.main_content.toLowerCase().includes(keyword)) : cachedEventsData;
-            if (filtered.length === 0) { container.innerHTML = '<p class="text-xs text-slate-400 col-span-full py-4 font-bold">일치하는 행사가 없습니다.</p>'; return; }
-            container.innerHTML = filtered.map(ev => `
-                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 hover:bg-slate-700 hover:border-blue-500/50 transition flex flex-col cursor-pointer group shadow-sm" onclick="window.autofillEvent('${ev.id}')">
-                    <div class="flex items-center justify-between mb-2">
-                        <h4 class="text-xs font-black text-white truncate w-2/3 group-hover:text-blue-300 transition">${ev.event_name}</h4>
-                        <span class="text-[9px] bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-600">${ev.event_date}</span>
-                    </div>
-                    <p class="text-[10px] text-slate-400 leading-relaxed line-clamp-2 mb-3 flex-1">${ev.main_content}</p>
-                    <div class="text-[9px] text-slate-500 flex justify-between border-t border-slate-700 pt-2 font-semibold">
-                        <span>주관: ${ev.organizer}</span><span class="text-emerald-400 group-hover:underline">클릭하여 자동기입 ➔</span>
-                    </div>
-                </div>`).join('');
-        }
-
-        window.autofillEvent = (eventId) => {
-            const ev = cachedEventsData.find(e => e.id === eventId);
-            if (!ev) return;
-            const match = ev.event_name.match(/^\[(.*?)\]\s*(.*)$/);
-            if (match) {
-                const areaSelect = $('pfArea');
-                for (let i = 0; i < areaSelect.options.length; i++) {
-                    if (areaSelect.options[i].value === match[1]) { areaSelect.selectedIndex = i; break; }
-                }
-                $('pfActivityName').value = match[2];
-            } else { $('pfActivityName').value = ev.event_name; }
-            $('pfSimpleContent').value = ev.main_content.substring(0, 100);
-            $('pfExecution').value = '참여함';
-            showToast('✨ 행사 정보가 자동으로 채워졌습니다!', 'success');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        // ===== 학생 PDF 인쇄 =====
-        $('downloadPdfBtn').onclick = async () => {
-            showLoading('전체 포트폴리오 데이터를 취합하고 있습니다...');
-            try {
-                const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', currentUser.id).order('grade', { ascending: true }).order('semester', { ascending: true });
-                if (error) throw error;
-                if (!data || data.length === 0) { showToast('출력할 내역이 없습니다.', 'error'); return; }
-
-                $('pdfPrintCareer').innerText = $('pdfInputCareer').value || '-';
-                $('pdfPrintCollege').innerText = [$('pdfInputUniv1').value, $('pdfInputUniv2').value, $('pdfInputUniv3').value].filter(Boolean).join(' / ') || '-';
-                $('pdfPrintMajor').innerText = [$('pdfInputMajor1').value, $('pdfInputMajor2').value, $('pdfInputMajor3').value].filter(Boolean).join(' / ') || '-';
-
-                const stats = window.calculateStats(data);
-                $('pdfExportStats').innerHTML = window.renderPdfStatsHTML(stats);
-
-                let html = '';
-                [1,2,3].forEach(g => {
-                    const gItems = data.filter(i => i.grade === g);
-                    if (gItems.length > 0) html += `<div style="margin-top:25px;"><h2 style="font-size:11pt;font-weight:bold;margin-bottom:8px;border-left:4px solid #0f172a;padding-left:6px;color:#0f172a;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gItems)}</div>`;
-                });
-                $('pdfExportContent').innerHTML = html;
-                hideLoading();
-                setTimeout(() => window.print(), 200);
-            } catch (err) { showToast('데이터 취합 오류: ' + err.message, 'error'); hideLoading(); }
-        };
-
-        // ============================================================
-        // ===== 교사 대시보드 =====
-        // ============================================================
-        function initTeacherDashboard() {
-            showOnlyView('teacher');
-            $('teacherNavInfo').innerText = `${currentUserProfile.name} 교사`;
-
-            // 데스크톱: 기본 패널 표시 상태 복원
-            if (window.innerWidth >= 1024) {
-                $('teacherListPanel').style.display = '';
-                $('teacherDashboardOverview').style.display = '';
-                $('teacherDetailView').style.display = 'none';
-            } else {
-                setMobileActiveTab('list');
-            }
-
-            loadStudentList();
-            loadGlobalTimelineFeed();
-            loadTeacherEvents();
-
-            $('teacherStudentSearch').addEventListener('input', applyTeacherFilters);
-            $('filterGradeSelect').addEventListener('change', applyTeacherFilters);
-            $('filterYearSelect').addEventListener('change', applyTeacherFilters);
-            $('timelineAreaFilter').addEventListener('change', applyTimelineFilters);
-            $('timelineSearchInput').addEventListener('input', applyTimelineFilters);
-
-            $('openEventModalBtn').onclick = () => $('eventModal').classList.remove('hidden');
-            $('closeEventModalBtn').onclick = () => $('eventModal').classList.add('hidden');
-
-            $('closeStudentDetailBtn').onclick = () => {
-                selectedStudentUid = null;
-                $('teacherDetailView').style.display = 'none';
-                if (window.innerWidth < 1024) {
-                    tabBtnDetail.disabled = true;
-                    tabBtnDetail.innerText = '🔍 성찰 분석';
-                    setMobileActiveTab('list');
-                } else {
-                    $('teacherListPanel').style.display = '';
-                    $('teacherDashboardOverview').style.display = '';
-                }
-                loadGlobalTimelineFeed();
-            };
-
-            $('syncSheetTeacherBtn').onclick = syncGoogleSheetEvents;
-            $('editGoogleSheetBtn').onclick = () => window.open(GOOGLE_SHEET_EDIT_URL, '_blank');
-
-            $('teacherDownloadPdfBtn').onclick = () => {
-                if (!teacherCachedPortfolios || teacherCachedPortfolios.length === 0) { showToast('출력할 내역이 없습니다.', 'error'); return; }
-                $('pdfExportStudentId').innerText = teacherSelectedStudentId || '-';
-                $('pdfExportStudentName').innerText = teacherSelectedStudentName || '-';
-                let cInfo = {};
-                try { if (teacherSelectedStudentCareerInfo) cInfo = JSON.parse(teacherSelectedStudentCareerInfo); } catch {}
-                $('pdfPrintCareer').innerText = cInfo.career || '-';
-                $('pdfPrintCollege').innerText = [cInfo.univ1, cInfo.univ2, cInfo.univ3].filter(Boolean).join(' / ') || '-';
-                $('pdfPrintMajor').innerText = [cInfo.major1, cInfo.major2, cInfo.major3].filter(Boolean).join(' / ') || '-';
-
-                const stats = window.calculateStats(teacherCachedPortfolios);
-                $('pdfExportStats').innerHTML = window.renderPdfStatsHTML(stats);
-
-                const sorted = [...teacherCachedPortfolios].sort((a, b) => a.grade !== b.grade ? a.grade - b.grade : a.semester - b.semester);
-                let html = '';
-                [1,2,3].forEach(g => {
-                    const gItems = sorted.filter(i => i.grade === g);
-                    if (gItems.length > 0) html += `<div style="margin-top:25px;"><h2 style="font-size:11pt;font-weight:bold;margin-bottom:8px;border-left:4px solid #0f172a;padding-left:6px;color:#0f172a;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gItems)}</div>`;
-                });
-                $('pdfExportContent').innerHTML = html;
-                setTimeout(() => window.print(), 200);
-            };
-
-            const isAdmin = currentUserProfile.role === 'admin' || currentUserProfile.email === 'admin@school.hs.kr';
-            if (isAdmin) $('openAdminPanelBtn').classList.remove('hidden');
-
-            $('openAdminPanelBtn').onclick = () => {
-                $('adminPanelModal').classList.remove('hidden');
-                $('adminPanelModal').style.display = 'flex';
-                $('adminPanelModal').style.flexDirection = 'column';
-                loadAllProfilesForAdmin();
-            };
-            $('closeAdminPanelBtn').onclick = () => {
-                $('adminPanelModal').classList.add('hidden');
-                $('adminPanelModal').style.display = '';
-            };
-            $('adminUserSearch').addEventListener('input', applyAdminFilters);
-            $('adminRoleFilter').addEventListener('change', applyAdminFilters);
-            $('closeAdminEditModalBtn').onclick = () => $('adminEditModal').classList.add('hidden');
-            $('adminEditRole').onchange = (e) => {
-                $('adminStudentOnlyFields').classList.toggle('hidden', e.target.value !== 'student');
-            };
-        }
-
-        async function loadTeacherEvents() {
-            const { data } = await supabase.from('school_events').select('*').order('event_date', { ascending: true });
-            cachedEventsData = data || [];
-            const container = $('teacherEventsList');
-            if (cachedEventsData.length === 0) { container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-4">일정이 없습니다.</p>'; return; }
-            container.innerHTML = cachedEventsData.map(ev => `
-                <div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700 shadow-sm">
-                    <div class="flex justify-between items-center mb-1"><span class="text-xs font-bold text-white truncate max-w-[120px]">${ev.event_name}</span><span class="text-[9px] text-indigo-300">${ev.event_date}</span></div>
-                    <span class="text-[9px] text-slate-400 truncate">${ev.organizer} | ${ev.target_grade===0?'공통':ev.target_grade+'학년'}</span>
-                </div>`).join('');
-        }
-
-        $('eventForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showLoading('등록 중...');
-            const rowData = {
-                event_name: $('evName').value, event_date: $('evDate').value,
-                target_grade: parseInt($('evTarget').value), organizer: $('evOrganizer').value, main_content: $('evContent').value
-            };
-            try {
-                const { error } = await supabase.from('school_events').insert([rowData]);
-                if (error) throw error;
-                showToast('행사 등록 완료', 'success');
-                $('eventForm').reset();
-                $('eventModal').classList.add('hidden');
-                await loadTeacherEvents();
-            } catch (err) { showToast('등록 실패: ' + err.message, 'error'); }
-            finally { hideLoading(); }
-        });
-
-        async function syncGoogleSheetEvents() {
-            if (!GOOGLE_SHEET_CSV_URL) return;
-            showLoading('스프레드시트 동기화 중...');
-            try {
-                const res = await fetch(GOOGLE_SHEET_CSV_URL);
-                if (!res.ok) throw new Error('네트워크 오류');
-                const csv = await res.text();
-                const rows = csv.split('\n').slice(1).filter(r => r.trim());
-                let count = 0;
-                for (const row of rows) {
-                    const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-                    if (cols.length < 2) continue;
-                    const targetGrade = cols[5] ? parseInt(cols[5].replace(/\D/g, '')) || 0 : 0;
-                    const startMonth = cols[3] || '3';
-                    const eventDate = `${new Date().getFullYear()}-${String(startMonth).padStart(2,'0')}-01`;
-                    await supabase.from('school_events').insert([{
-                        event_name: `[${cols[2]||''}] ${cols[1]||''}`,
-                        event_date: eventDate, target_grade: targetGrade,
-                        organizer: cols[9] || '-', main_content: cols[6] || '-'
-                    }]);
-                    count++;
-                }
-                showToast(`동기화 완료 (${count}건)`, 'success');
-                await loadTeacherEvents();
-            } catch (err) { showToast('동기화 실패: ' + err.message, 'error'); }
-            finally { hideLoading(); }
-        }
-
-        async function loadStudentList() {
-            showLoading('명부 동기화 중...');
-            try {
-                const { data, error } = await supabase.from('profiles').select('*').eq('role', 'student').order('admission_year', { ascending: false }).order('student_id', { ascending: true });
-                if (error) throw error;
-                cachedStudents = data || [];
-                localStorage.setItem('eduport-cached-students', JSON.stringify(cachedStudents));
-
-                const years = [...new Set(cachedStudents.map(s => s.admission_year).filter(Boolean))].sort((a,b)=>b-a);
-                $('filterYearSelect').innerHTML = '<option value="">전체 입학</option>' + years.map(y => `<option value="${y}">${y}학년도</option>`).join('');
-                renderStudentList(cachedStudents);
-            } catch {
-                const cached = localStorage.getItem('eduport-cached-students');
-                if (cached) { cachedStudents = JSON.parse(cached); renderStudentList(cachedStudents); }
-            } finally { hideLoading(); }
-        }
-
-        function renderStudentList(students) {
-            $('studentCountBadge').innerText = `${students.length}명`;
-            const container = $('studentListContainer');
-            if (students.length === 0) { container.innerHTML = '<li class="text-xs text-slate-400 text-center py-10 font-bold">학생 없음</li>'; return; }
-            container.innerHTML = students.map(s => `
-                <li class="p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition bg-white shadow-sm student-item" data-uid="${s.id}" data-name="${s.name}" data-info="학번: ${s.student_id||''} | ${s.admission_year||''}입학">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-slate-900 text-xs">${s.name}</span>
-                        <span class="text-[9px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded border border-slate-200">${s.student_id||'-'}</span>
-                    </div>
-                    <div class="text-[9px] text-slate-400 flex justify-between"><span>${s.admission_year||''}년 입학</span><span class="text-blue-500 font-bold">상세 ➔</span></div>
-                </li>`).join('');
-
-            document.querySelectorAll('.student-item').forEach(el => {
-                el.onclick = () => {
-                    if (window.innerWidth < 1024) {
-                        tabBtnDetail.disabled = false;
-                        tabBtnDetail.innerText = `🔍 ${el.dataset.name} 분석`;
-                        setMobileActiveTab('detail');
-                    } else {
-                        $('teacherListPanel').style.display = 'none';
-                        $('teacherDashboardOverview').style.display = 'none';
-                        $('teacherDetailView').style.display = 'flex';
-                        $('teacherDetailView').style.flexDirection = 'column';
-                    }
-                    openStudentDetail(el.dataset.uid, el.dataset.name, el.dataset.info);
-                };
-            });
-        }
-
-        function applyTeacherFilters() {
-            const kw = $('teacherStudentSearch').value.toLowerCase().trim();
-            const year = $('filterYearSelect').value;
-            const grade = $('filterGradeSelect').value;
-            let filtered = cachedStudents;
-            if (kw) filtered = filtered.filter(s => s.name.toLowerCase().includes(kw) || (s.student_id && s.student_id.toLowerCase().includes(kw)));
-            if (year) filtered = filtered.filter(s => s.admission_year === parseInt(year));
-            if (grade) {
-                const curYear = new Date().getFullYear();
-                filtered = filtered.filter(s => s.admission_year && (curYear - s.admission_year + 1) === parseInt(grade));
-            }
-            renderStudentList(filtered);
-        }
-
-        async function loadGlobalTimelineFeed() {
-            try {
-                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(15);
-                if (error) throw error;
-                cachedTimelineData = data || [];
-                applyTimelineFilters();
-            } catch (err) {
-                $('globalTimelineFeed').innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">피드 연결 실패<br><span class="text-[10px]">${err.message}</span></p>`;
-            }
-        }
-
-        function applyTimelineFilters() {
-            const container = $('globalTimelineFeed');
-            const area = $('timelineAreaFilter').value;
-            const kw = $('timelineSearchInput').value.toLowerCase().trim();
-            let filtered = cachedTimelineData;
-            if (area) filtered = filtered.filter(i => i.area === area);
-            if (kw) filtered = filtered.filter(i => {
-                let text = (i.activity_name||'') + ' ' + (i.profiles?.name||'');
-                try { const p=JSON.parse(i.content); text+=' '+(p.simple_content||''); } catch {}
-                return text.toLowerCase().includes(kw);
-            });
-            if (filtered.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs text-center py-20 font-bold">조건에 맞는 피드가 없습니다.</p>'; return; }
-            container.innerHTML = filtered.map(item => {
-                const d = new Date(item.updated_at || item.created_at);
-                const fmt = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-                return `<div class="p-4 border border-slate-150 bg-slate-50 rounded-2xl flex flex-col gap-1.5 cursor-pointer hover:bg-blue-50/50 hover:border-blue-300 transition shadow-sm" onclick="window.showDirectStudentDetail('${item.student_uid}')">
-                    <div class="flex items-center gap-2"><span class="bg-blue-600 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">${item.grade}학년 ${item.area}</span><span class="text-xs text-slate-800 font-extrabold ml-1">${item.profiles?.name||'학생'} (${item.profiles?.student_id||'학번 미지정'})</span><span class="text-[9px] text-slate-400 font-medium ml-auto">${fmt}</span></div>
-                    <h4 class="text-[13px] font-black text-slate-900 truncate">${item.activity_name}</h4>
-                    <p class="text-[11px] text-slate-500 truncate font-semibold">${formatContentSummary(item.content)}</p>
-                    <div class="text-[10px] text-blue-600 font-black mt-1.5 self-end tracking-wide">기록 분석 및 피드백 기입 ➔</div>
-                </div>`;
-            }).join('');
-        }
-
-        window.showDirectStudentDetail = async (studentUid) => {
-            const student = cachedStudents.find(s => s.id === studentUid);
-            if (!student) return;
-            if (window.innerWidth < 1024) {
-                tabBtnDetail.disabled = false;
-                tabBtnDetail.innerText = `🔍 ${student.name} 분석`;
-                setMobileActiveTab('detail');
-            } else {
-                $('teacherListPanel').style.display = 'none';
-                $('teacherDashboardOverview').style.display = 'none';
-                $('teacherDetailView').style.display = 'flex';
-                $('teacherDetailView').style.flexDirection = 'column';
-            }
-            openStudentDetail(studentUid, student.name, `학번: ${student.student_id||''} | ${student.admission_year||''}년도 입학`);
-        };
-
-        async function openStudentDetail(uid, name, info) {
-            selectedStudentUid = uid;
-            teacherSelectedStudentName = name;
-            const student = cachedStudents.find(s => s.id === uid);
-            teacherSelectedStudentId = student?.student_id || '-';
-            teacherSelectedStudentCareerInfo = student?.career_info || null;
-
-            $('detailStudentName').innerText = name;
-            $('detailStudentInfo').innerText = info;
-            const container = $('teacherPortfolioList');
-            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-10">포트폴리오를 불러오고 있습니다...</p>';
-
-            try {
-                const { data, error } = await supabase.from('portfolios').select('*, feedbacks(id, feedback_content)').eq('student_uid', uid).order('updated_at', { ascending: false });
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    container.innerHTML = '<div class="text-center py-16 bg-white rounded-2xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">기록이 없습니다.</p></div>';
-                    $('teacherStatsContainer').classList.add('hidden');
-                    teacherCachedPortfolios = [];
-                    return;
-                }
-
-                teacherCachedPortfolios = data;
-                const stats = window.calculateStats(data);
-                $('teacherStatsContainer').innerHTML = window.renderStatsHTML(stats);
-                $('teacherStatsContainer').classList.remove('hidden');
-
-                container.innerHTML = data.map(item => {
-                    const fbArr = Array.isArray(item.feedbacks) ? item.feedbacks : (item.feedbacks ? [item.feedbacks] : []);
-                    const fb = fbArr[0]?.feedback_content || '';
-                    let execution='참여함', year='', simpleContent=item.content, reading='';
-                    try { const p=JSON.parse(item.content); execution=p.execution||'참여함'; year=p.year||''; simpleContent=p.simple_content||''; reading=p.reading||''; } catch {}
-                    const areaColor = item.area==='교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
-                    return `<div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-4 flex flex-col gap-2">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="px-2 py-0.5 ${areaColor} border rounded text-[10px] font-bold">${item.grade}학년 ${item.area}</span>
-                            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${item.semester}학기 / ${execution}</span>
-                            <h3 class="text-sm font-black text-slate-900 ml-1 truncate max-w-[200px]">${item.activity_name}</h3>
-                        </div>
-                        <div class="grid grid-cols-1 gap-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <div class="flex items-start gap-2"><span class="font-bold text-slate-400 min-w-[35px]">요약:</span><span class="font-medium">${simpleContent}</span></div>
-                            ${reading?`<div class="flex items-start gap-2"><span class="font-bold text-blue-400 min-w-[35px]">독서:</span><span class="font-bold text-blue-700">${reading}</span></div>`:''}
-                            <div class="flex items-start gap-2"><span class="font-bold text-slate-400 min-w-[35px]">성찰:</span><span class="font-medium whitespace-pre-wrap">${item.self_evaluation}</span></div>
-                        </div>
-                        <div class="pt-2">
-                            <label class="block text-[10px] font-black text-blue-600 mb-1">💬 교사 피드백</label>
-                            <textarea id="fb_${item.id}" class="w-full p-2.5 border border-slate-200 text-xs rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition leading-relaxed" rows="2" placeholder="조언 작성...">${fb}</textarea>
-                            <button type="button" onclick="window.saveFeedback('${item.id}')" class="mt-2 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-4 py-2 rounded-xl transition shadow-md">저장 및 전송 ➔</button>
-                        </div>
-                    </div>`;
-                }).join('');
-            } catch (err) {
-                container.innerHTML = `<div class="text-center py-16 bg-white rounded-2xl border border-red-200"><p class="text-xs text-red-500 font-bold">오류: ${err.message}</p></div>`;
-            }
-        }
-
-        window.saveFeedback = async (portfolioId) => {
-            const content = $(`fb_${portfolioId}`)?.value || '';
-            showLoading('피드백 저장 중...');
-            try {
-                const { error } = await supabase.from('feedbacks').upsert(
-                    { portfolio_id: portfolioId, teacher_uid: currentUser.id, feedback_content: content },
-                    { onConflict: 'portfolio_id' }
-                );
-                if (error) throw error;
-                showToast('피드백 저장 완료', 'success');
-            } catch (err) { showToast('저장 실패: ' + err.message, 'error'); }
-            finally { hideLoading(); }
-        };
-
-        // ============================================================
-        // ===== 관리자 =====
-        // ============================================================
-        async function loadAllProfilesForAdmin() {
-            showLoading('회원 정보 취합 중...');
-            try {
-                const { data, error } = await supabase.from('profiles').select('*').order('role', { ascending: false }).order('name', { ascending: true });
-                if (error) throw error;
-                cachedAllUsersForAdmin = data || [];
-                renderAdminUserTable(cachedAllUsersForAdmin);
-            } catch { showToast('명부 동기화 실패', 'error'); }
-            finally { hideLoading(); }
-        }
-
-        function renderAdminUserTable(users) {
-            const tbody = $('adminUserTableBody');
-            if (users.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-bold">조건에 일치하는 회원이 없습니다.</td></tr>`; return; }
-            tbody.innerHTML = users.map(u => {
-                const roleBadge = u.role==='teacher' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-200';
-                return `<tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold text-slate-700">
-                    <td class="p-4"><span class="px-2.5 py-1 ${roleBadge} border rounded-md text-[10px]">${u.role}</span></td>
-                    <td class="p-4 font-black text-slate-900">${u.name}</td>
-                    <td class="p-4 text-slate-500">${u.email}</td>
-                    <td class="p-4">${u.admission_year||'-'}</td>
-                    <td class="p-4 font-mono">${u.student_id||'-'}</td>
-                    <td class="p-4 text-center space-x-1.5 whitespace-nowrap">
-                        <button onclick="window.openAdminEditModal('${u.id}')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition font-black">수정</button>
-                        <button onclick="window.adminResetPassword('${u.id}','${u.name}')" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition font-black">비번초기화</button>
-                        <button onclick="window.adminDeleteUser('${u.id}','${u.name}')" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition font-black">삭제</button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-
-        function applyAdminFilters() {
-            const kw = $('adminUserSearch').value.toLowerCase().trim();
-            const role = $('adminRoleFilter').value;
-            let filtered = cachedAllUsersForAdmin;
-            if (role) filtered = filtered.filter(u => u.role === role);
-            if (kw) filtered = filtered.filter(u => u.name.toLowerCase().includes(kw) || u.email.toLowerCase().includes(kw) || (u.student_id && u.student_id.toLowerCase().includes(kw)));
-            renderAdminUserTable(filtered);
-        }
-
-        window.openAdminEditModal = (userId) => {
-            const u = cachedAllUsersForAdmin.find(u => u.id === userId);
-            if (!u) return;
-            $('adminEditUserId').value = u.id;
-            $('adminEditName').value = u.name;
-            $('adminEditEmail').value = u.email;
-            $('adminEditRole').value = u.role;
-            $('adminEditYear').value = u.admission_year || '';
-            $('adminEditStudentId').value = u.student_id || '';
-            $('adminStudentOnlyFields').classList.toggle('hidden', u.role !== 'student');
-            $('adminEditModal').classList.remove('hidden');
-        };
-
-        $('adminEditForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const uid = $('adminEditUserId').value;
-            const role = $('adminEditRole').value;
-            // email은 Supabase Auth와 분리된 필드로, profiles 테이블에서는 name/role/학적 정보만 업데이트
-            const updateData = {
-                name: $('adminEditName').value.trim(),
-                role,
-                admission_year: role === 'student' ? (parseInt($('adminEditYear').value) || null) : null,
-                student_id: role === 'student' ? ($('adminEditStudentId').value.trim() || null) : null
-            };
-            showLoading('반영 중...');
-            try {
-                const { error } = await supabase.from('profiles').update(updateData).eq('id', uid);
-                if (error) throw error;
-
-                // 로컬 캐시에도 즉시 반영
-                const idx = cachedAllUsersForAdmin.findIndex(u => u.id === uid);
-                if (idx !== -1) {
-                    cachedAllUsersForAdmin[idx] = { ...cachedAllUsersForAdmin[idx], ...updateData };
-                }
-
-                showToast('수정이 완료되었습니다.', 'success');
-                $('adminEditModal').classList.add('hidden');
-                renderAdminUserTable(cachedAllUsersForAdmin); // 즉시 화면 갱신
-                await loadAllProfilesForAdmin(); // 서버에서 최신 데이터 재동기화
-            } catch (err) {
-                showToast('수정 실패: ' + err.message, 'error');
-                console.error('Admin edit error:', err);
-            }
-            finally { hideLoading(); }
-        });
-
-        window.adminResetPassword = async (userId, name) => {
-            const ok = await window.customConfirm(`'${name}' 회원의 비밀번호를 '123456'으로 강제 초기화하시겠습니까?`, '비밀번호 초기화');
-            if (!ok) return;
-            showLoading('처리 중...');
-            // 실제 Auth 비밀번호 초기화는 서버사이드 기능 필요 - 관리자에게 안내만
-            showToast(`초기화 처리 요청이 기록되었습니다. Supabase Auth 대시보드에서 직접 변경하세요.`, 'info');
-            hideLoading();
-        };
-
-        window.adminDeleteUser = async (userId, name) => {
-            const ok = await window.customConfirm(`'${name}' 회원을 영구 제명하시겠습니까?\n프로필 데이터가 삭제됩니다.`, '회원 영구 탈퇴');
-            if (!ok) return;
-            showLoading('삭제 중...');
-            try {
-                const { error } = await supabase.from('profiles').delete().eq('id', userId);
-                if (error) throw error;
-                showToast('삭제 완료', 'success');
-                await loadAllProfilesForAdmin();
-            } catch (err) { showToast('삭제 실패: ' + err.message, 'error'); }
-            finally { hideLoading(); }
-        };
-
-        // ============================================================
-        // ===== 앱 초기화 =====
+        // ===== 앱 초기화: 캐시 우선 즉시 렌더 → 세션/서버는 백그라운드 =====
         // ============================================================
         async function initApp() {
-            // Supabase 기존 세션 확인
-            const { data: { session } } = await supabase.auth.getSession();
+            const cached = getCachedProfile();
 
-            if (session?.user) {
-                currentUser = session.user;
-                authInitialized = true;
-                showLoading('학적 정보를 불러오고 있습니다...');
-
-                // 캐시 있으면 즉시 렌더
-                const cached = getCachedProfile();
-                if (cached && cached.id === currentUser.id) {
-                    currentUserProfile = cached;
-                    if (cached.role === 'student') {
-                        const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
-                        if (cachedPfs) try { cachedPortfolios = JSON.parse(cachedPfs); } catch {}
-                        initStudentDashboard();
-                    } else {
-                        const cachedSts = localStorage.getItem('eduport-cached-students');
-                        if (cachedSts) try { cachedStudents = JSON.parse(cachedSts); } catch {}
-                        initTeacherDashboard();
-                    }
-                    hideLoading();
-                    // 백그라운드에서 최신 데이터 갱신
-                    supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle().then(({ data }) => {
-                        if (data) {
-                            currentUserProfile = data;
-                            localStorage.setItem('eduport-cached-profile', JSON.stringify(data));
-                        }
-                    }).catch(() => {});
+            if (cached) {
+                // ── 캐시 있음: 즉시 화면 진입 (로딩 오버레이 없음) ──
+                currentUserProfile = cached;
+                if (cached.role === 'student') {
+                    const pf = localStorage.getItem('eduport-cached-portfolios');
+                    if (pf) try { cachedPortfolios = JSON.parse(pf); } catch {}
+                    initStudentDashboard();
                 } else {
-                    // 캐시 없음 → 서버에서 직접 fetch
-                    try {
-                        const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-                        if (profile) {
-                            currentUserProfile = profile;
-                            localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
-                            if (profile.role === 'student') initStudentDashboard();
-                            else initTeacherDashboard();
-                        } else {
-                            // 프로필 없음 - 메타로 복구
-                            const meta = currentUser.user_metadata || {};
-                            const fallback = {
-                                id: currentUser.id, name: meta.name || currentUser.email.split('@')[0],
-                                email: currentUser.email, role: meta.role || 'student',
-                                admission_year: meta.admission_year ? parseInt(meta.admission_year) : null,
-                                student_id: meta.student_id || null
-                            };
-                            await supabase.from('profiles').upsert(fallback, { onConflict: 'id' });
-                            currentUserProfile = fallback;
-                            if (fallback.role === 'student') initStudentDashboard();
-                            else initTeacherDashboard();
-                        }
-                    } catch {
-                        showOnlyView('auth');
-                    } finally {
-                        hideLoading();
-                    }
+                    const st = localStorage.getItem('eduport-cached-students');
+                    if (st) try { cachedStudents = JSON.parse(st); } catch {}
+                    initTeacherDashboard();
                 }
+
+                // 백그라운드에서 세션 검증 + 최신 프로필 갱신
+                supabase.auth.getSession().then(({ data: { session } }) => {
+                    if (!session) {
+                        // 세션 만료 → 로그인으로
+                        clearLocalCache();
+                        currentUser = null; currentUserProfile = null; authInitialized = false;
+                        showOnlyView('auth');
+                        loadHomeLiveBoard();
+                        showToast('세션이 만료되었습니다. 다시 로그인해 주세요.', 'info');
+                        return;
+                    }
+                    currentUser = session.user;
+                    authInitialized = true;
+                    // 최신 프로필 갱신 (화면 전환 없음)
+                    supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle()
+                        .then(({ data }) => {
+                            if (data) {
+                                currentUserProfile = data;
+                                localStorage.setItem('eduport-cached-profile', JSON.stringify(data));
+                            }
+                        }).catch(() => {});
+                }).catch(() => {
+                    // 네트워크 없어도 캐시 화면 유지 — 아무것도 하지 않음
+                });
+
             } else {
-                showOnlyView('auth');
-                loadHomeLiveBoard();
+                // ── 캐시 없음: 세션 확인 후 서버 fetch ──
+                showLoading('불러오는 중...');
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session) {
+                        showOnlyView('auth');
+                        loadHomeLiveBoard();
+                        return;
+                    }
+                    currentUser = session.user;
+                    authInitialized = true;
+
+                    showLoading('학적 정보를 불러오고 있습니다...');
+                    const wakeTimer = setTimeout(() => {
+                        $('loadingText').innerText = '서버를 깨우는 중입니다 (최대 25초)...';
+                    }, 3000);
+
+                    const { data: profile } = await Promise.race([
+                        supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
+                        new Promise((_, rej) => setTimeout(() => rej(new Error('TIMEOUT')), 25000))
+                    ]);
+                    clearTimeout(wakeTimer);
+
+                    let finalProfile = profile;
+                    if (!finalProfile) {
+                        const meta = currentUser.user_metadata || {};
+                        finalProfile = {
+                            id: currentUser.id, name: meta.name || currentUser.email.split('@')[0],
+                            email: currentUser.email, role: meta.role || 'student',
+                            admission_year: meta.admission_year ? parseInt(meta.admission_year) : null,
+                            student_id: meta.student_id || null
+                        };
+                        await supabase.from('profiles').upsert(finalProfile, { onConflict: 'id' });
+                    }
+                    currentUserProfile = finalProfile;
+                    localStorage.setItem('eduport-cached-profile', JSON.stringify(finalProfile));
+                    if (finalProfile.role === 'student') initStudentDashboard();
+                    else initTeacherDashboard();
+
+                } catch {
+                    showOnlyView('auth');
+                    loadHomeLiveBoard();
+                } finally {
+                    hideLoading();
+                }
             }
         }
 

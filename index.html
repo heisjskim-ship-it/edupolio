@@ -181,48 +181,53 @@
         </nav>
 
         <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-            <!-- 🌟 진로 및 진학 희망 입력 섹션 -->
+            <!-- 🌟 진로 및 진학 희망 입력 섹션 (DB 연동 및 저장 기능 포함) -->
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
-                <div class="flex items-center gap-3 mb-5 border-b border-slate-100 pb-4">
-                    <h2 class="font-black text-lg text-slate-900 tracking-tight">🎯 희망 진로 및 진학 목표 설정 (인쇄 시 표지 반영)</h2>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b border-slate-100 pb-4">
+                    <h2 class="font-black text-lg text-slate-900 tracking-tight">🎯 희망 진로 및 진학 목표 (인쇄 시 표지 반영)</h2>
+                    <button id="saveCareerInfoBtn" type="button" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1">
+                        💾 내용 저장 및 업데이트
+                    </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="md:col-span-3">
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 전공 및 진로 분야</label>
-                        <input type="text" id="pdfInputCareer" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 컴퓨터공학 / 인공지능 소프트웨어 개발자">
+                        <input type="text" id="pdfInputCareer" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="예: 컴퓨터공학 / 인공지능 소프트웨어 개발자">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (1순위)</label>
-                        <input type="text" id="pdfInputUniv1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1순위 대학명">
+                        <input type="text" id="pdfInputUniv1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="1순위 대학명">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (2순위)</label>
-                        <input type="text" id="pdfInputUniv2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2순위 대학명">
+                        <input type="text" id="pdfInputUniv2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="2순위 대학명">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (3순위)</label>
-                        <input type="text" id="pdfInputUniv3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="3순위 대학명">
+                        <input type="text" id="pdfInputUniv3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="3순위 대학명">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (1순위)</label>
-                        <input type="text" id="pdfInputMajor1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1순위 학과명">
+                        <input type="text" id="pdfInputMajor1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="1순위 학과명">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (2순위)</label>
-                        <input type="text" id="pdfInputMajor2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2순위 학과명">
+                        <input type="text" id="pdfInputMajor2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="2순위 학과명">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (3순위)</label>
-                        <input type="text" id="pdfInputMajor3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="3순위 학과명">
+                        <input type="text" id="pdfInputMajor3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="3순위 학과명">
                     </div>
                 </div>
+                <p class="text-[10px] text-slate-400 mt-3 font-medium">※ 입력 후 반드시 <span class="text-emerald-600 font-bold">[저장]</span> 버튼을 눌러야 다음 로그인 시에도 정보가 유지됩니다.</p>
             </section>
 
             <!-- [활동 등록 폼] -->
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
                 <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
-                        <h2 class="font-black text-xl text-slate-900 tracking-tight" id="portfolioFormTitle">✍️ 학업 및 진로 탐구 활동 등록</h2>
+                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-lg">✍️</div>
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight" id="portfolioFormTitle">학업 및 진로 탐구 활동 등록</h2>
                     </div>
                     <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded-md hidden md:block">하단의 학교 행사 목록 클릭 시 자동 기입됩니다.</span>
                 </div>
@@ -295,7 +300,6 @@
                     <h3 class="font-black text-lg text-slate-800 tracking-tight">📑 등록된 포트폴리오 종합 내역</h3>
                 </div>
 
-                <!-- 학년 제어 및 분류 검색바 -->
                 <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-3 justify-between items-center">
                     <div class="flex overflow-x-auto whitespace-nowrap w-full md:w-auto no-scrollbar gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
                         <button class="grade-tab active-tab px-6 py-2.5 text-center font-black text-xs text-blue-600 bg-white rounded-lg shadow-sm transition" data-grade="1">1학년</button>
@@ -349,7 +353,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- [3] 🌟 지도 교사용 관제 센터 (높이/헤더 깨짐 완벽 분리 수정) -->
+    <!-- [3] 🌟 지도 교사용 관제 센터 -->
     <!-- ========================================== -->
     <div id="teacherView" class="hidden h-screen bg-slate-100 flex-col overflow-hidden">
         <nav class="bg-slate-900 text-white border-b border-slate-800 z-40 shadow-md no-print shrink-0 h-16">
@@ -363,12 +367,9 @@
             </div>
         </nav>
 
-        <!-- 전체 영역을 화면에 꽉 차게 고정하고 자식 패널들에 h-full을 주어 높이를 균일화 -->
         <main class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:grid lg:grid-cols-12 gap-6 no-print flex-1 min-h-0">
-            
             <!-- [좌측 패널] 학생 명부 및 행사 -->
             <div id="teacherListPanel" class="lg:col-span-4 flex flex-col gap-6 h-full min-h-0">
-                <!-- 학생 명부 카드 (내부 스크롤) -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-0 overflow-hidden">
                     <div class="p-5 pb-3 border-b border-slate-100 shrink-0">
                         <h2 class="font-black text-slate-900 text-base flex justify-between">
@@ -390,14 +391,13 @@
                     </ul>
                 </div>
 
-                <!-- 행사 관리 카드 (고정 높이) -->
                 <div class="bg-slate-900 p-5 rounded-3xl shadow-xl border border-slate-800 flex flex-col shrink-0 h-[220px] relative overflow-hidden">
                     <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
                     <div class="relative z-10 flex items-center justify-between mb-3 border-b border-slate-700 pb-2">
                         <h2 class="font-black text-white text-sm">🏫 학사 일정 관리</h2>
                     </div>
                     <div class="flex gap-2 mb-3 relative z-10">
-                        <!-- 🔥 시트 직접 수정 버튼 연결 완벽 대응 (클릭 이벤트 적용) -->
+                        <!-- 🔥 구글 시트 직접 접속 버튼 연결 -->
                         <button id="editGoogleSheetBtn" class="flex-1 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px] font-bold text-center transition flex items-center justify-center decoration-transparent">시트 직접 수정</button>
                         <button id="openEventModalBtn" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition">수동 등록</button>
                         <button id="syncSheetTeacherBtn" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold transition">시트 동기화</button>
@@ -411,7 +411,6 @@
             <!-- [우측 패널] 대시보드 및 상세 내역 -->
             <div id="teacherContentPanel" class="lg:col-span-8 h-full min-h-0 relative">
                 
-                <!-- 메인 타임라인 뷰 -->
                 <div id="teacherDashboardOverview" class="bg-white rounded-3xl shadow-sm border border-slate-200 h-full flex flex-col overflow-hidden">
                     <div class="border-b border-slate-100 p-6 sm:px-8 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
                         <div>
@@ -422,7 +421,7 @@
                             <select id="timelineAreaFilter" class="px-3 py-2 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
                                 <option value="">전체 영역</option><option value="교과">교과 활동</option><option value="자율">자율 활동</option><option value="동아리">동아리 활동</option><option value="진로">진로 활동</option>
                             </select>
-                            <input type="text" id="timelineSearchInput" class="p-2 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500" placeholder="활동/이름 검색">
+                            <input type="text" id="timelineSearchInput" class="p-2 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500" placeholder="활동명/이름 검색">
                         </div>
                     </div>
                     <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-6 sm:px-8 space-y-3 no-scrollbar">
@@ -430,7 +429,7 @@
                     </div>
                 </div>
 
-                <!-- 특정 학생 상세 보기 뷰 (스크롤/헤더 분리 구조로 깨짐 원천 차단) -->
+                <!-- 특정 학생 상세 보기 뷰 -->
                 <div id="teacherDetailView" class="bg-slate-50 rounded-3xl shadow-inner border border-slate-200 h-full flex flex-col overflow-hidden hidden absolute inset-0 z-10">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 p-5 sm:px-8 sm:py-5 bg-white shrink-0 shadow-sm z-20">
                         <div>
@@ -564,16 +563,16 @@
         const SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
         
-        // CSV 배포 주소
         const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
         
-        // 🔴 [수정 부분] 실제 선생님의 구글 시트 편집용 주소 (https://docs.google.com/spreadsheets/d/.../edit 형식)
+        // 🔴 실제 선생님의 구글 시트 편집용 주소
         const GOOGLE_SHEET_EDIT_URL = 'https://docs.google.com/spreadsheets/d/1dOpzZP_TG2wslL8LzT0DFCoz5YIEPPHQ/edit?usp=sharing&ouid=109071059180505445413&rtpof=true&sd=true'; 
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null; let currentUserProfile = null; let currentStudentGrade = 1; let selectedStudentUid = null;
         let cachedStudents = []; let cachedPortfolios = []; let teacherCachedPortfolios = []; let teacherSelectedStudentName = ''; let teacherSelectedStudentId = '';
+        let teacherSelectedStudentCareerInfo = null;
         let cachedEventsData = []; let cachedAllUsersForAdmin = []; let cachedTimelineData = [];
 
         let isAuthenticating = false; let editingPortfolioId = null;
@@ -773,6 +772,9 @@
             document.getElementById('pdfExportStudentName').innerText = currentUserProfile.name || '-';
             document.getElementById('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
 
+            // 진로/진학 희망 정보 로드
+            loadCareerInfo();
+
             loadStudentPortfolios(currentStudentGrade);
             loadSchoolEventsForStudents();
 
@@ -799,6 +801,45 @@
                 document.getElementById('cancelEditBtn').classList.add('hidden'); showToast("수정이 취소되었습니다.");
             };
         }
+
+        // 진로/진학 희망 정보 불러오기 및 세팅
+        function loadCareerInfo() {
+            let info = {};
+            if (currentUserProfile.career_info) {
+                try { info = JSON.parse(currentUserProfile.career_info); } catch(e) {}
+            }
+            document.getElementById('pdfInputCareer').value = info.career || '';
+            document.getElementById('pdfInputUniv1').value = info.univ1 || '';
+            document.getElementById('pdfInputUniv2').value = info.univ2 || '';
+            document.getElementById('pdfInputUniv3').value = info.univ3 || '';
+            document.getElementById('pdfInputMajor1').value = info.major1 || '';
+            document.getElementById('pdfInputMajor2').value = info.major2 || '';
+            document.getElementById('pdfInputMajor3').value = info.major3 || '';
+        }
+
+        // 진로/진학 희망 정보 저장
+        document.getElementById('saveCareerInfoBtn').addEventListener('click', async () => {
+            showLoading("진로/진학 정보를 저장하고 있습니다...");
+            const careerInfo = {
+                career: document.getElementById('pdfInputCareer').value,
+                univ1: document.getElementById('pdfInputUniv1').value,
+                univ2: document.getElementById('pdfInputUniv2').value,
+                univ3: document.getElementById('pdfInputUniv3').value,
+                major1: document.getElementById('pdfInputMajor1').value,
+                major2: document.getElementById('pdfInputMajor2').value,
+                major3: document.getElementById('pdfInputMajor3').value
+            };
+            try {
+                const { error } = await supabase.from('profiles').update({ career_info: JSON.stringify(careerInfo) }).eq('id', currentUser.id);
+                if (error) throw error;
+                currentUserProfile.career_info = JSON.stringify(careerInfo);
+                showToast("진로/진학 정보가 성공적으로 보존되었습니다.", "success");
+            } catch (err) {
+                showToast("저장 실패: " + err.message, "error");
+            } finally {
+                hideLoading();
+            }
+        });
 
         document.getElementById('portfolioForm').addEventListener('submit', async (e) => {
             e.preventDefault(); showLoading(editingPortfolioId ? "수정 중..." : "등록 중...");
@@ -981,7 +1022,6 @@
 
             document.getElementById('syncSheetTeacherBtn').onclick = () => syncGoogleSheetEvents();
             
-            // 🔴 [에러 수정 완료] 선생님 시트 직접 접속 버튼 이벤트 부착
             document.getElementById('editGoogleSheetBtn').onclick = () => {
                 if(GOOGLE_SHEET_EDIT_URL) {
                     window.open(GOOGLE_SHEET_EDIT_URL, '_blank');
@@ -995,7 +1035,15 @@
                 document.getElementById('pdfExportStudentId').innerText = teacherSelectedStudentId || '-';
                 document.getElementById('pdfExportStudentName').innerText = teacherSelectedStudentName || '-';
                 document.getElementById('pdfExportGrade').innerText = '통합(전체)';
-                document.getElementById('pdfPrintCareer').innerText = '-'; document.getElementById('pdfPrintCollege').innerText = '-'; document.getElementById('pdfPrintMajor').innerText = '-';
+                
+                // 교사가 인쇄 시 학생의 진로 희망 정보를 PDF에 연계
+                let cInfo = {};
+                try { if(teacherSelectedStudentCareerInfo) cInfo = JSON.parse(teacherSelectedStudentCareerInfo); } catch(e){}
+                document.getElementById('pdfPrintCareer').innerText = cInfo.career || '-'; 
+                const u1 = cInfo.univ1; const u2 = cInfo.univ2; const u3 = cInfo.univ3;
+                document.getElementById('pdfPrintCollege').innerText = [u1, u2, u3].filter(Boolean).join(' / ') || '-';
+                const m1 = cInfo.major1; const m2 = cInfo.major2; const m3 = cInfo.major3;
+                document.getElementById('pdfPrintMajor').innerText = [m1, m2, m3].filter(Boolean).join(' / ') || '-';
                 
                 const sortedPortfolios = [...teacherCachedPortfolios].sort((a, b) => { if(a.grade !== b.grade) return a.grade - b.grade; return a.semester - b.semester; });
                 document.getElementById('pdfExportContent').innerHTML = generatePdfHtml(sortedPortfolios);
@@ -1137,7 +1185,10 @@
         // 교사용 1줄 압축형 리스트 렌더러
         async function openStudentDetail(uid, name, info) {
             selectedStudentUid = uid; teacherSelectedStudentName = name;
-            const student = cachedStudents.find(s => s.id === uid); teacherSelectedStudentId = student ? student.student_id : '-';
+            const student = cachedStudents.find(s => s.id === uid); 
+            teacherSelectedStudentId = student ? student.student_id : '-';
+            teacherSelectedStudentCareerInfo = student ? student.career_info : null;
+
             document.getElementById('detailStudentName').innerText = name; document.getElementById('detailStudentInfo').innerText = info;
             const container = document.getElementById('teacherPortfolioList');
             const { data } = await supabase.from('portfolios').select('*, feedbacks(id, feedback_content)').eq('student_uid', uid).order('updated_at', { ascending: false });

@@ -236,16 +236,18 @@
         // =========================================================================
         // 🔴 아래 두 줄의 따옴표('') 안에 본인 프로젝트의 URL과 ANON_KEY를 복사해 넣으세요!
         // =========================================================================
-        const SUPABASE_URL = 'https://nysawmnglyshjswdthzk.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2F3bW5nbHlzaGpzY290aHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTgzMTkyMjksImV4cCI6MjAzMzg5NTIyOX0.1234567890abcdefghijklmnopqrstuvwxyz';
+        const SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
 
-        // 만약 키를 입력하지 않았다면 경고창 띄우기
-        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-            alert("⚠️ 코드 내에 SUPABASE_URL과 SUPABASE_ANON_KEY가 비어있습니다. Supabase 대시보드에서 복사하여 채워주세요.");
+        // API 설정 오류 검출 기능 강화
+        const hasMissingKeys = !SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes("nysawmnglyshjswdthzk") || SUPABASE_ANON_KEY.startsWith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2F3bW5nbHlzaGpzY290aHpr");
+        if (hasMissingKeys) {
+            console.error("Supabase API 자격 증명이 누락되었거나 가짜 키가 입력되었습니다. Supabase 대시보드에서 실제 프로젝트 URL과 anon 키를 가져와 index.html의 245~246번째 줄에 올바르게 입력해주세요.");
+            alert("⚠️ Supabase 연동에 필요한 URL 또는 API 키가 올바르지 않습니다.\n\nSupabase 대시보드(Settings -> API)에서 복사한 정확한 값을 입력한 후, 다시 Commit & Push 해주세요.");
         }
 
         // Supabase 클라이언트 초기화
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = createClient(SUPABASE_URL || 'https://placeholder.supabase.co', SUPABASE_ANON_KEY || 'placeholder');
 
         // 전역 상태 관리
         let currentUser = null;
@@ -304,6 +306,10 @@
         // 회원가입 제출 로직
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (hasMissingKeys) {
+                alert("Supabase API 키가 유효하지 않아 회원가입을 진행할 수 없습니다. 소스 코드를 확인해 주세요.");
+                return;
+            }
             showLoading();
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
@@ -312,29 +318,38 @@
             const admission_year = role === 'student' ? document.getElementById('signupYear').value : null;
             const student_id = role === 'student' ? document.getElementById('signupStudentId').value : null;
 
-            // 1. Supabase Auth에 계정 생성
-            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-            
-            if (authError) { alert(`가입 실패: ${authError.message}`); hideLoading(); return; }
-
-            // 2. 가입 성공 시 Profiles 테이블에 추가 정보 저장
-            if (authData.user) {
-                const { error: profileError } = await supabase.from('profiles').insert([{
-                    id: authData.user.id,
-                    name: name,
-                    email: email,
-                    role: role,
-                    admission_year: admission_year,
-                    student_id: student_id
-                }]);
-
-                if (profileError) {
-                    alert("프로필 저장 실패. (SQL Editor에 INSERT 정책을 추가했는지 확인하세요!)");
-                    console.error(profileError);
-                } else {
-                    alert("회원가입이 완료되었습니다!");
-                    document.getElementById('showLoginBtn').click(); // 로그인 화면으로 이동
+            try {
+                // 1. Supabase Auth에 계정 생성
+                const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+                
+                if (authError) { 
+                    alert(`가입 실패: ${authError.message}`); 
+                    hideLoading(); 
+                    return; 
                 }
+
+                // 2. 가입 성공 시 Profiles 테이블에 추가 정보 저장
+                if (authData.user) {
+                    const { error: profileError } = await supabase.from('profiles').insert([{
+                        id: authData.user.id,
+                        name: name,
+                        email: email,
+                        role: role,
+                        admission_year: admission_year ? parseInt(admission_year) : null,
+                        student_id: student_id
+                    }]);
+
+                    if (profileError) {
+                        alert("회원 정보 생성 중 오류가 발생했습니다.\n(인증 계정은 생성되었으나 DB 프로필 저장에 실패했습니다. SQL Editor에 RLS INSERT 정책이 정상 세팅되었는지 확인하세요!)");
+                        console.error(profileError);
+                    } else {
+                        alert("회원가입이 완료되었습니다!");
+                        document.getElementById('showLoginBtn').click(); // 로그인 화면으로 이동
+                    }
+                }
+            } catch (error) {
+                console.error("네트워크 에러 상세:", error);
+                alert(`통신 오류가 발생했습니다: ${error.message}\n\n[가능성 높은 원인]\n1. Supabase URL이 정상적이지 않음\n2. 방화벽 차단`);
             }
             hideLoading();
         });
@@ -342,13 +357,25 @@
         // 로그인 제출 로직
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (hasMissingKeys) {
+                alert("Supabase API 키가 유효하지 않아 로그인을 진행할 수 없습니다. 소스 코드를 확인해 주세요.");
+                return;
+            }
             showLoading();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) { alert("이메일이나 비밀번호가 틀렸습니다."); hideLoading(); return; }
-            // 로그인이 성공하면 onAuthStateChange 이벤트가 발생하여 화면이 자동으로 넘어갑니다.
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) { 
+                    alert(`로그인 실패: ${error.message}`); 
+                    hideLoading(); 
+                    return; 
+                }
+            } catch (error) {
+                console.error("네트워크 에러 상세:", error);
+                alert(`통신 오류가 발생했습니다: ${error.message}\n\n입력한 Supabase URL을 다시 한번 확인해 주세요.`);
+            }
             hideLoading();
         });
 
@@ -364,26 +391,31 @@
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 currentUser = session.user;
-                // 사용자 프로필 정보 가져오기 (역할 확인)
-                const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-                
-                // 프로필 정보가 없거나 에러가 났을 때 무한 로딩 방지 처리
-                if (error || !profile) {
-                    console.error("프로필 불러오기 에러:", error);
-                    alert("프로필 정보를 찾을 수 없습니다.\n(데이터베이스 오류 혹은 이전 가입 시 프로필이 생성되지 않은 계정입니다.)\n확인을 누르면 로그아웃됩니다. 다른 이메일로 다시 회원가입해주세요.");
-                    await supabase.auth.signOut();
-                    hideLoading();
-                    return;
-                }
+                try {
+                    // 사용자 프로필 정보 가져오기 (역할 확인)
+                    const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                    
+                    // 프로필 정보가 없거나 에러가 났을 때 무한 로딩 방지 처리
+                    if (error || !profile) {
+                        console.error("프로필 불러오기 에러:", error);
+                        alert("프로필 정보를 찾을 수 없습니다.\n(데이터베이스 오류 혹은 이전 가입 시 프로필이 생성되지 않은 계정입니다.)\n확인을 누르면 로그아웃됩니다. 다른 이메일로 다시 회원가입해주세요.");
+                        await supabase.auth.signOut();
+                        hideLoading();
+                        return;
+                    }
 
-                currentUserProfile = profile;
-                
-                if (profile.role === 'student') {
-                    initStudentDashboard();
-                } else if (profile.role === 'teacher') {
-                    initTeacherDashboard();
+                    currentUserProfile = profile;
+                    
+                    if (profile.role === 'student') {
+                        initStudentDashboard();
+                    } else if (profile.role === 'teacher') {
+                        initTeacherDashboard();
+                    }
+                } catch (err) {
+                    console.error("프로필 패치 네트워크 에러:", err);
+                    alert("서버와 연결할 수 없습니다. 인터넷 상태 또는 Supabase 설정을 확인하세요.");
+                    await supabase.auth.signOut();
                 }
-                
                 hideLoading(); // 정상적으로 대시보드가 열리면 로딩 화면 숨기기
             } else {
                 currentUser = null;
@@ -400,8 +432,8 @@
         function initStudentDashboard() {
             switchView('student');
             // 상단 정보 세팅
-            document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year}년 입학 | ${currentUserProfile.student_id} | ${currentUserProfile.name}`;
-            document.getElementById('pdfStudentInfo').innerText = `학번: ${currentUserProfile.student_id} | 이름: ${currentUserProfile.name}`;
+            document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year || ''}년 입학 | ${currentUserProfile.student_id || ''} | ${currentUserProfile.name}`;
+            document.getElementById('pdfStudentInfo').innerText = `학번: ${currentUserProfile.student_id || ''} | 이름: ${currentUserProfile.name}`;
             
             // 데이터 로드
             loadStudentPortfolios(currentStudentGrade);
@@ -431,7 +463,7 @@
             const data = {
                 student_uid: currentUser.id,
                 grade: currentStudentGrade,
-                semester: document.getElementById('pfSemester').value,
+                semester: parseInt(document.getElementById('pfSemester').value),
                 area: document.getElementById('pfArea').value,
                 activity_name: document.getElementById('pfActivityName').value,
                 content: document.getElementById('pfContent').value,
@@ -439,7 +471,7 @@
             };
 
             const { error } = await supabase.from('portfolios').insert([data]);
-            if (error) alert("저장 실패");
+            if (error) alert("저장 실패: " + error.message);
             else {
                 alert("활동이 저장되었습니다!");
                 document.getElementById('portfolioForm').reset();
@@ -453,66 +485,74 @@
             const listContainer = document.getElementById('portfolioList');
             listContainer.innerHTML = '<p class="text-center text-slate-400 py-4">불러오는 중...</p>';
 
-            // 포트폴리오 목록과, 그에 달린 교사 피드백을 동시에(JOIN) 가져옵니다.
-            const { data, error } = await supabase
-                .from('portfolios')
-                .select(`
-                    *,
-                    feedbacks ( feedback_content, created_at, profiles(name) )
-                `)
-                .eq('student_uid', currentUser.id)
-                .eq('grade', grade)
-                .order('semester', { ascending: true })
-                .order('created_at', { ascending: false });
+            try {
+                // 포트폴리오 목록과, 그에 달린 교사 피드백을 동시에(JOIN) 가져옵니다.
+                const { data, error } = await supabase
+                    .from('portfolios')
+                    .select(`
+                        *,
+                        feedbacks ( feedback_content, created_at, profiles(name) )
+                    `)
+                    .eq('student_uid', currentUser.id)
+                    .eq('grade', grade)
+                    .order('semester', { ascending: true })
+                    .order('created_at', { ascending: false });
 
-            if (error) { listContainer.innerHTML = '<p class="text-red-500 text-center">데이터를 불러오는 중 오류가 발생했습니다.</p>'; return; }
-            
-            if (data.length === 0) {
-                listContainer.innerHTML = `<p class="text-slate-400 text-center py-10">등록된 ${grade}학년 활동이 없습니다.</p>`;
-                return;
-            }
-
-            let html = '';
-            data.forEach(item => {
-                // 영역별 색상 뱃지
-                const areaColor = item.area === '교과' ? 'bg-blue-100 text-blue-700' : 
-                                  item.area === '동아리' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700';
-
-                // 교사 피드백이 있는지 확인
-                let feedbackHtml = '';
-                if (item.feedbacks && item.feedbacks.length > 0) {
-                    item.feedbacks.forEach(fb => {
-                        feedbackHtml += `
-                            <div class="mt-4 p-4 bg-slate-50 border-l-4 border-slate-800 rounded-r-lg">
-                                <p class="text-sm font-bold text-slate-800 mb-1">👨‍🏫 교사 피드백 (${fb.profiles?.name || '선생님'})</p>
-                                <p class="text-sm text-slate-600">${fb.feedback_content}</p>
-                            </div>
-                        `;
-                    });
+                if (error) { 
+                    listContainer.innerHTML = '<p class="text-red-500 text-center">데이터를 불러오는 중 오류가 발생했습니다.</p>'; 
+                    return; 
+                }
+                
+                if (data.length === 0) {
+                    listContainer.innerHTML = `<p class="text-slate-400 text-center py-10">등록된 ${grade}학년 활동이 없습니다.</p>`;
+                    return;
                 }
 
-                html += `
-                    <div class="border border-slate-200 rounded-xl p-5 print-break-inside-avoid">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="px-2 py-1 rounded text-xs font-bold ${areaColor}">${item.area}</span>
-                            <span class="text-sm text-slate-500">${item.semester}학기</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2">${item.activity_name}</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">활동 내용</p>
-                                <p class="text-sm text-slate-700 whitespace-pre-wrap">${item.content}</p>
+                let html = '';
+                data.forEach(item => {
+                    // 영역별 색상 뱃지
+                    const areaColor = item.area === '교과' ? 'bg-blue-100 text-blue-700' : 
+                                      item.area === '동아리' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700';
+
+                    // 교사 피드백이 있는지 확인
+                    let feedbackHtml = '';
+                    if (item.feedbacks && item.feedbacks.length > 0) {
+                        item.feedbacks.forEach(fb => {
+                            feedbackHtml += `
+                                <div class="mt-4 p-4 bg-slate-50 border-l-4 border-slate-800 rounded-r-lg">
+                                    <p class="text-sm font-bold text-slate-800 mb-1">👨‍🏫 교사 피드백 (${fb.profiles?.name || '선생님'})</p>
+                                    <p class="text-sm text-slate-600">${fb.feedback_content}</p>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    html += `
+                        <div class="border border-slate-200 rounded-xl p-5 print-break-inside-avoid">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="px-2 py-1 rounded text-xs font-bold ${areaColor}">${item.area}</span>
+                                <span class="text-sm text-slate-500">${item.semester}학기</span>
                             </div>
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">자기 평가</p>
-                                <p class="text-sm text-slate-700 bg-blue-50/50 p-3 rounded whitespace-pre-wrap">${item.self_evaluation}</p>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">${item.activity_name}</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">활동 내용</p>
+                                    <p class="text-sm text-slate-700 whitespace-pre-wrap">${item.content}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">자기 평가</p>
+                                    <p class="text-sm text-slate-700 bg-blue-50/50 p-3 rounded whitespace-pre-wrap">${item.self_evaluation}</p>
+                                </div>
                             </div>
+                            ${feedbackHtml}
                         </div>
-                        ${feedbackHtml}
-                    </div>
-                `;
-            });
-            listContainer.innerHTML = html;
+                    `;
+                });
+                listContainer.innerHTML = html;
+            } catch (err) {
+                console.error(err);
+                listContainer.innerHTML = '<p class="text-red-500 text-center">네트워크 통신 중 에러가 발생했습니다.</p>';
+            }
         }
 
         // PDF 다운로드 기능
@@ -552,7 +592,7 @@
             
             let query = supabase.from('profiles').select('*').eq('role', 'student').order('admission_year', { ascending: false });
             
-            if (yearFilter) query = query.eq('admission_year', yearFilter);
+            if (yearFilter) query = query.eq('admission_year', parseInt(yearFilter));
             if (nameFilter) query = query.ilike('name', `%${nameFilter}%`);
 
             const { data, error } = await query;
@@ -561,9 +601,9 @@
             let html = '';
             data.forEach(student => {
                 html += `
-                    <li class="p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50 transition student-item" data-uid="${student.id}" data-name="${student.name}" data-info="${student.student_id} | ${student.admission_year}년">
+                    <li class="p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50 transition student-item" data-uid="${student.id}" data-name="${student.name}" data-info="${student.student_id || ''} | ${student.admission_year || ''}년">
                         <div class="font-bold text-slate-800">${student.name}</div>
-                        <div class="text-xs text-slate-500">학번: ${student.student_id}</div>
+                        <div class="text-xs text-slate-500">학번: ${student.student_id || '없음'}</div>
                     </li>
                 `;
             });

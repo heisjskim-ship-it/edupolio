@@ -28,10 +28,10 @@
         <p id="loadingText" class="text-slate-600 font-bold tracking-tight">데이터 동기화 및 렌더링을 시작하고 있습니다...</p>
     </div>
 
-    <!-- 토스트 메시지 실시간 알림창 컨테이너 (alert 대체용) -->
+    <!-- 토스트 메시지 실시간 알림창 컨테이너 -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none no-print"></div>
 
-    <!-- 커스텀 모달 확인창 (confirm 대체용) -->
+    <!-- 커스텀 모달 확인창 -->
     <div id="confirmModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-100 transform transition-all duration-300">
             <h3 class="text-base font-bold text-slate-900 mb-2" id="confirmTitle">확인</h3>
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <!-- 오른쪽 구역: 세련된 계정 인증 패널 (로그인 / 회원가입) -->
+        <!-- 오른쪽 구역: 세련된 계정 인증 패널 -->
         <div class="lg:w-1/3 bg-white p-6 sm:p-10 lg:p-12 flex flex-col justify-center border-l border-slate-100">
             <div class="max-w-md mx-auto w-full">
                 <!-- 로그인 패널 -->
@@ -117,7 +117,6 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">학교 소속 이메일</label>
-                        <!-- iOS 줌 인 방지를 위한 모바일 16px(text-base), 데스크톱 14px(text-sm) 폰트 분기 적용 -->
                         <input type="email" id="loginEmail" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition text-base md:text-sm min-h-[44px]" placeholder="example@school.hs.kr" required>
                     </div>
                     <div>
@@ -190,7 +189,7 @@
             </div>
         </nav>
         <main class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
-            <!-- 모바일 가로 탭 밀기 제스처 적용(whitespace-nowrap & overflow-x-auto) -->
+            <!-- 모바일 가로 탭 밀기 제스처 적용 -->
             <div class="flex overflow-x-auto whitespace-nowrap mb-6 no-print bg-white p-1.5 rounded-2xl shadow-sm no-scrollbar">
                 <button class="grade-tab active-tab flex-1 min-w-[120px] py-3 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition" data-grade="1">고등학교 1학년</button>
                 <button class="grade-tab flex-1 min-w-[120px] py-3 text-center font-medium text-slate-400 hover:text-blue-600 transition" data-grade="2">고등학교 2학년</button>
@@ -217,7 +216,7 @@
                     <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">✍️ 새로운 활동 추가 및 기록</h3>
                         <form id="portfolioForm" class="space-y-4">
-                            <!-- 실행 구분 추가 (계획함 or 참여함) -->
+                            <!-- 실행 구분 추가 -->
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">실행 구분</label>
                                 <select id="pfExecution" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 text-base md:text-sm font-semibold min-h-[44px]" required>
@@ -258,13 +257,13 @@
                                 </div>
                             </div>
 
-                            <!-- 활동 내용 (한 줄로 간단히) -->
+                            <!-- 활동 내용 -->
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">활동 내용 (한 줄 요약)</label>
                                 <input type="text" id="pfSimpleContent" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm font-medium min-h-[44px]" placeholder="핵심 내용만 한 줄로 간략히 요약 입력" required>
                             </div>
 
-                            <!-- 독서 연계 기록 (책 제목 및 저자) -->
+                            <!-- 독서 연계 기록 -->
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">연계 독서 기록 (선택)</label>
                                 <input type="text" id="pfReading" class="w-full p-3.5 border border-slate-200 rounded-xl text-base md:text-sm font-medium min-h-[44px]" placeholder="예: 과학의 역사(저자명) - 없을 경우 비워둠">
@@ -298,7 +297,7 @@
                 <div class="lg:col-span-2" id="pdfPrintArea">
                     <div class="bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-slate-200 min-h-[500px] sm:min-h-[600px]">
                         
-                        <!-- 🎓 학술 보고서 스타일의 프로페셔널한 인쇄 헤더 설정 (print:block) -->
+                        <!-- 🎓 학술 보고서 스타일 인쇄 헤더 -->
                         <div class="hidden print:block mb-8 text-center pb-6 border-b-4 border-double border-slate-950">
                             <h1 class="text-3xl font-black text-slate-950 tracking-widest mb-4">포 트 폴 리 오</h1>
                             
@@ -346,7 +345,6 @@
                     <p class="text-slate-400 text-xs mt-1">학년, 이름, 학번으로 상세 조회가 가능합니다.</p>
                 </div>
                 
-                <!-- 학생 통합 상세 검색바 -->
                 <div class="mb-4 space-y-2">
                     <div class="relative">
                         <input type="text" id="teacherStudentSearch" class="w-full p-2.5 pl-9 border border-slate-200 text-base md:text-xs rounded-xl outline-none focus:border-blue-500 transition min-h-[44px]" placeholder="학생 실명 또는 학번(5자리) 검색">
@@ -365,7 +363,6 @@
                     </div>
                 </div>
 
-                <!-- 학생 데이터 바인딩 컨테이너 -->
                 <ul id="studentListContainer" class="space-y-2 flex-1 overflow-y-auto pr-1 no-scrollbar">
                     <li class="text-xs text-slate-400 text-center py-12">소속 정보를 취합하고 있습니다...</li>
                 </ul>
@@ -380,7 +377,7 @@
 
             <!-- [교사용] 우측 대시보드 메인 영역 -->
             <div id="teacherContentPanel" class="lg:col-span-8 space-y-6">
-                <!-- 최신 실시간 업데이트 피드 타임라인 위젯 (아무도 선택하지 않았을 때 보임) -->
+                <!-- 최신 실시간 업데이트 피드 타임라인 -->
                 <div id="teacherDashboardOverview" class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] flex flex-col">
                     <div class="border-b border-slate-100 pb-4 mb-4 flex justify-between items-center">
                         <div>
@@ -395,7 +392,7 @@
                     </div>
                 </div>
 
-                <!-- 특정 학생 상세 보기 레이아웃 (선택 시 오버레이 노출) -->
+                <!-- 특정 학생 상세 보기 레이아웃 -->
                 <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-8rem)] overflow-y-auto hidden" id="teacherDetailView">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
                         <div>
@@ -410,7 +407,6 @@
                         </button>
                     </div>
 
-                    <!-- 학생 전체 3개년 통합 포트폴리오 렌더링 영역 -->
                     <div id="teacherPortfolioList" class="space-y-6 sm:space-y-8"></div>
                 </div>
             </div>
@@ -447,33 +443,31 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
         // =========================================================================
-        // 🔴 제공해주신 URL과 API Key를 안전하게 하드코딩 처리했습니다.
+        // 🔴 제공해주신 URL과 API Key 하드코딩
         // =========================================================================
         const SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'sb_publishable_YV2CLNJY61rIwI9CCnhVSg_A0pEPvE5';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
+
+        // ✅ 구글 스프레드시트 배포 배포된 CSV 파일 URL 주소
+        const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
         // =========================================================================
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // ✅ 구글 스프레드시트 배포 배포된 CSV 파일 URL 주소 (pub?output=csv 변환 적용 완료)
-        const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
 
         let currentUser = null;
         let currentUserProfile = null;
         let currentStudentGrade = 1;
         let selectedStudentUid = null;
-        
-        // 실시간 필터 캐시 데이터베이스
         let cachedStudents = []; 
-        let cachedPortfolios = []; // 학생용 포트폴리오 로컬 캐시
+        let cachedPortfolios = [];
 
-        const showLoading = (text = "데이터 동기화 및 렌더링을 시작하고 있습니다...") => {
+        const showLoading = (text = "데이터를 처리하고 있습니다...") => {
             document.getElementById('loadingText').innerText = text;
             document.getElementById('loadingOverlay').classList.remove('hidden');
         };
         const hideLoading = () => document.getElementById('loadingOverlay').classList.add('hidden');
         
-        // 🔔 [전역 커스텀 토스트 알림 함수] - iframe 차단 예방
+        // 🔔 전역 커스텀 토스트 알림 함수
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -482,10 +476,7 @@
                 type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-emerald-500' : 'bg-slate-800'
             }`;
             
-            toast.innerHTML = `
-                <span>${message.replace(/\n/g, '<br>')}</span>
-                <button class="ml-4 text-white/70 hover:text-white font-black text-sm">&times;</button>
-            `;
+            toast.innerHTML = `<span>${message.replace(/\n/g, '<br>')}</span><button class="ml-4 text-white/70 hover:text-white font-black text-sm">&times;</button>`;
             
             toast.querySelector('button').onclick = () => {
                 toast.classList.add('opacity-0', 'translate-y-2');
@@ -493,11 +484,7 @@
             };
 
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('opacity-0', 'translate-y-2');
-            }, 10);
-
+            setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
             setTimeout(() => {
                 if (toast.parentNode) {
                     toast.classList.add('opacity-0', 'translate-y-2');
@@ -506,17 +493,14 @@
             }, 4000);
         }
 
-        // 🔔 [전역 커스텀 모달 확인 함수] - iframe confirm() 대체용
+        // 🔔 전역 커스텀 모달 확인 함수
         let confirmResolve;
         function customConfirm(message, title = "확인") {
             const modal = document.getElementById('confirmModal');
             document.getElementById('confirmTitle').innerText = title;
             document.getElementById('confirmModalMessage').innerText = message;
             modal.classList.remove('hidden');
-            
-            return new Promise((resolve) => {
-                confirmResolve = resolve;
-            });
+            return new Promise((resolve) => { confirmResolve = resolve; });
         }
         
         document.getElementById('confirmCancelBtn').onclick = () => {
@@ -545,25 +529,25 @@
             }
         }
 
+        // 세션 데이터 꼬임 방지를 위한 안전한 소거 함수
         function forceClearLocalSession() {
+            const keysToRemove = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key && key.startsWith('sb-')) {
-                    localStorage.removeItem(key);
+                    keysToRemove.push(key);
                 }
             }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
         }
 
         function blindName(name) {
             if (!name) return '학생';
             const len = name.length;
-            if (len <= 2) {
-                return name.charAt(0) + '*';
-            }
+            if (len <= 2) return name.charAt(0) + '*';
             return name.charAt(0) + '*'.repeat(len - 2) + name.charAt(len - 1);
         }
 
-        // JSON 또는 일반 텍스트 포맷 헬퍼 (타임라인 등 연동)
         function formatContentSummary(contentStr) {
             try {
                 const parsed = JSON.parse(contentStr);
@@ -576,6 +560,15 @@
             }
         }
 
+        // API 키 오류 자동 경고 시스템
+        window.onload = () => {
+            if (!SUPABASE_ANON_KEY.startsWith('eyJ')) {
+                setTimeout(() => {
+                    showToast("⚠️ 입력된 API 키가 Supabase의 정상적인 'anon public' 키 형식이 아닙니다.\n데이터 통신이 차단될 수 있습니다.", "error");
+                }, 1000);
+            }
+        }
+
         // =========================================================================
         // 🔒 [비로그인 홈 화면] 실시간 라이브 보드 정보 수집
         // =========================================================================
@@ -584,12 +577,7 @@
             const eventContainer = document.getElementById('homeEventsList');
 
             try {
-                const { data, error } = await supabase
-                    .from('portfolios')
-                    .select('*, profiles(name, student_id)')
-                    .order('updated_at', { ascending: false })
-                    .limit(5);
-
+                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(5);
                 if (error) throw error;
                 if (!data || data.length === 0) {
                     feedContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">최근 업데이트된 진로 기록이 없습니다.</p>';
@@ -619,17 +607,11 @@
                     feedContainer.innerHTML = html;
                 }
             } catch (err) {
-                console.error("Home Timeline Loading Failure: ", err);
                 feedContainer.innerHTML = '<p class="text-xs text-slate-600 text-center py-10">데이터 피드를 연동할 수 없습니다.</p>';
             }
 
             try {
-                const { data, error } = await supabase
-                    .from('school_events')
-                    .select('*')
-                    .order('event_date', { ascending: true })
-                    .limit(5);
-
+                const { data, error } = await supabase.from('school_events').select('*').order('event_date', { ascending: true }).limit(5);
                 if (error) throw error;
                 if (!data || data.length === 0) {
                     eventContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">수립된 교내 활성화 행사가 없습니다.</p>';
@@ -648,52 +630,126 @@
                     eventContainer.innerHTML = html;
                 }
             } catch (err) {
-                console.error("Home Events Loading Failure: ", err);
                 eventContainer.innerHTML = '<p class="text-xs text-slate-600 text-center py-10">공식 일정을 연동할 수 없습니다.</p>';
             }
         }
 
-        // ★ 완벽하게 해결된 Auth 상태 수신기 (어떠한 경우에도 로딩 가둠 레이어가 남지 않도록 try-catch-finally 전면 튜닝) ★
+        // 화면 제어 바인딩
+        document.getElementById('showSignupBtn').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.remove('hidden');
+        };
+        document.getElementById('showLoginBtn').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        };
+
+        const roleStudentBtn = document.getElementById('roleStudentBtn');
+        const roleTeacherBtn = document.getElementById('roleTeacherBtn');
+        const studentOnlyFields = document.getElementById('studentOnlyFields');
+        const signupRole = document.getElementById('signupRole');
+
+        roleStudentBtn.onclick = () => {
+            signupRole.value = 'student';
+            roleStudentBtn.className = "py-2.5 border-2 border-blue-600 text-blue-600 bg-blue-50/50 font-bold rounded-xl transition text-xs min-h-[44px]";
+            roleTeacherBtn.className = "py-2.5 border border-slate-100 text-slate-400 font-semibold rounded-xl transition text-xs min-h-[44px]";
+            studentOnlyFields.classList.remove('hidden');
+        };
+        roleTeacherBtn.onclick = () => {
+            signupRole.value = 'teacher';
+            roleTeacherBtn.className = "py-2.5 border-2 border-slate-900 text-slate-900 bg-slate-50 font-bold rounded-xl transition text-xs min-h-[44px]";
+            roleStudentBtn.className = "py-2.5 border border-slate-100 text-slate-400 font-semibold rounded-xl transition text-xs min-h-[44px]";
+            studentOnlyFields.classList.add('hidden');
+        };
+
+        // 회원가입
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading("가입 정보를 승인 및 등록하는 중입니다...");
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const name = document.getElementById('signupName').value;
+            const role = signupRole.value;
+            const admission_year = role === 'student' ? document.getElementById('signupYear').value : null;
+            const student_id = role === 'student' ? document.getElementById('signupStudentId').value : null;
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email, password,
+                    options: { data: { name, role, admission_year: admission_year ? parseInt(admission_year) : null, student_id } }
+                });
+                if (error) showToast(`가입 실패: ${error.message}`, 'error');
+                else {
+                    showToast("회원가입 신청이 안전하게 완료되었습니다!\n로그인을 진행해 주세요.", 'success');
+                    document.getElementById('showLoginBtn').click();
+                }
+            } catch (err) { showToast("서버와의 통신에 실패했습니다.", 'error'); }
+            finally { hideLoading(); }
+        });
+
+        // 로그인
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading("사용자 식별을 처리하고 있습니다...");
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    showToast(`로그인 실패: ${error.message}`, 'error');
+                    hideLoading();
+                }
+            } catch (err) { 
+                showToast("네트워크 연결에 실패했습니다.", 'error'); 
+                hideLoading();
+            }
+        });
+
+        document.querySelectorAll('.logoutBtn').forEach(btn => {
+            btn.onclick = async () => {
+                showLoading("안전하게 로그아웃 중입니다...");
+                try { await supabase.auth.signOut(); } catch(e) {}
+                forceClearLocalSession();
+                window.location.reload();
+            }
+        });
+
+        // ★ 완벽히 해결된 무한 로딩 차단 Auth 상태 수신기 ★
         supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                currentUserProfile = null;
+                switchView('auth');
+                hideLoading();
+                return;
+            }
+
             if (session) {
                 showLoading("프로필 소속 권한을 인증하고 있습니다...");
-                currentUser = session.user;
                 try {
+                    currentUser = session.user;
                     const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
                     
                     if (error || !profile) {
-                        console.error("Profile Fetch Error: ", error);
-                        showToast("⚠️ 프로필 정보를 찾을 수 없습니다.\n새로운 이메일로 다시 회원가입을 신청해 주세요.", 'error');
-                        
-                        forceClearLocalSession();
-                        currentUser = null;
-                        currentUserProfile = null;
-                        
-                        try { 
-                            await supabase.auth.signOut(); 
-                        } catch(signOutErr){
-                            console.error("signOut recovery error: ", signOutErr);
-                        }
-                        
-                        switchView('auth');
-                        return;
+                        throw new Error("프로필 데이터 부재");
                     }
 
                     currentUserProfile = profile;
-                    if (profile.role === 'student') {
-                        initStudentDashboard();
-                    } else {
-                        initTeacherDashboard();
-                    }
+                    if (profile.role === 'student') initStudentDashboard();
+                    else initTeacherDashboard();
+
                 } catch (e) {
-                    console.error("Session Processing Error: ", e);
+                    console.error("Auth Verification Failed: ", e);
+                    showToast("⚠️ 프로필 정보를 찾을 수 없습니다.\n제공하신 API 키가 'sb_publishable_' 형식이라면 통신이 불가능합니다.\n새로운 이메일로 다시 가입해 보세요.", 'error');
                     forceClearLocalSession();
                     currentUser = null;
                     currentUserProfile = null;
                     try { await supabase.auth.signOut(); } catch(err){}
                     switchView('auth');
                 } finally {
-                    // ✅ 성공하든 오류가 발생하든 상관없이 무조건 로딩 오버레이를 가차없이 꺼버립니다.
+                    // 무슨 일이 있어도 여기서 로딩 스피너를 무조건 제거합니다.
                     hideLoading(); 
                 }
             } else {
@@ -711,17 +767,13 @@
             switchView('student');
             document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year || ''}년 입학 | ${currentUserProfile.student_id || ''} | ${currentUserProfile.name}`;
             
-            // 🎓 전문 보고서 헤더에 학생 정보 선제 세팅
             document.getElementById('pdfStudentIdText').innerText = currentUserProfile.student_id || '-';
             document.getElementById('pdfStudentNameText').innerText = currentUserProfile.name || '-';
-
-            // 입력란 기본 학년도 주입
             document.getElementById('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
 
             loadStudentPortfolios(currentStudentGrade);
             loadSchoolEventsForStudents();
 
-            // 탭 클릭 제어
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
                     document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3 text-center font-medium text-slate-400");
@@ -732,22 +784,15 @@
                 }
             });
             
-            // 학생용 구글 스프레드시트 수집 리스너 바인딩
-            document.getElementById('syncSheetStudentBtn').onclick = () => {
-                syncGoogleSheetEvents();
-            };
-
-            // 검색 & 필터 체인지 리스너
+            document.getElementById('syncSheetStudentBtn').onclick = () => syncGoogleSheetEvents();
             document.getElementById('studentSearchInput').addEventListener('input', renderStudentPortfoliosFiltered);
             document.getElementById('studentAreaFilter').addEventListener('change', renderStudentPortfoliosFiltered);
         }
 
-        // 포트폴리오 등록 로직
         document.getElementById('portfolioForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading("새 탐구 활동 포트폴리오를 등재하고 있습니다...");
             
-            // 복잡한 세부 필드들을 JSON 형태의 TEXT 구조로 설계하여 content 열에 병합합니다. (호환성 보장)
             const contentData = {
                 execution: document.getElementById('pfExecution').value,
                 year: document.getElementById('pfYearInput').value,
@@ -761,7 +806,7 @@
                 semester: parseInt(document.getElementById('pfSemester').value),
                 area: document.getElementById('pfArea').value,
                 activity_name: document.getElementById('pfActivityName').value,
-                content: JSON.stringify(contentData), // 직렬화 저장
+                content: JSON.stringify(contentData),
                 self_evaluation: document.getElementById('pfSelfEval').value,
                 updated_at: new Date().toISOString()
             };
@@ -770,11 +815,9 @@
             if (error) showToast(error.message, 'error');
             else { 
                 showToast("포트폴리오가 정상 등록되었습니다!", 'success');
-                // 폼 초기화 (단 학년도는 유지)
                 const savedYear = document.getElementById('pfYearInput').value;
                 document.getElementById('portfolioForm').reset(); 
                 document.getElementById('pfYearInput').value = savedYear;
-
                 loadStudentPortfolios(currentStudentGrade); 
             }
             hideLoading();
@@ -804,16 +847,13 @@
             }
         }
 
-        // 실시간 필터링 및 고화질 렌더링 뷰
         function renderStudentPortfoliosFiltered() {
             const container = document.getElementById('portfolioList');
             const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim();
             const areaFilter = document.getElementById('studentAreaFilter').value;
 
             let filtered = cachedPortfolios;
-            if (areaFilter) {
-                filtered = filtered.filter(item => item.area === areaFilter);
-            }
+            if (areaFilter) filtered = filtered.filter(item => item.area === areaFilter);
             if (keyword) {
                 filtered = filtered.filter(item => {
                     let textToSearch = (item.activity_name || '') + ' ' + (item.self_evaluation || '');
@@ -864,7 +904,6 @@
                         
                         <h3 class="text-base sm:text-lg font-black mt-2 mb-3 leading-tight text-slate-900">${item.activity_name}</h3>
                         
-                        <!-- 🎓 보고서 디자인에 최적화된 격자형 상세 정보 테이블 -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs bg-slate-50 p-4 rounded-xl border border-slate-100/70">
                             <div><span class="text-slate-400 font-medium">실행 구분:</span> <span class="text-slate-800 font-bold">${execution}</span></div>
                             <div><span class="text-slate-400 font-medium">활동 기간:</span> <span class="text-slate-800 font-bold">${year ? year + '학년도' : '-'}</span></div>
@@ -927,14 +966,8 @@
             };
             
             html2pdf().set(opt).from(element).save()
-            .then(() => {
-                console.log("PDF 출력 완수");
-                hideLoading();
-            })
-            .catch((err) => {
-                console.error("PDF 출력 과정 오류:", err);
-                hideLoading();
-            });
+            .then(() => hideLoading())
+            .catch((err) => { console.error("PDF 오류:", err); hideLoading(); });
         };
 
         // =========================================================================
@@ -960,9 +993,7 @@
                 loadGlobalTimelineFeed();
             };
 
-            document.getElementById('syncSheetTeacherBtn').onclick = () => {
-                syncGoogleSheetEvents();
-            };
+            document.getElementById('syncSheetTeacherBtn').onclick = () => syncGoogleSheetEvents();
         }
 
         document.getElementById('eventForm').addEventListener('submit', async (e) => {
@@ -983,7 +1014,6 @@
             }
         });
 
-        // 📊 교내 권장 행사 "구글 스프레드시트" CSV 연동 기술 모듈
         async function syncGoogleSheetEvents() {
             if (!GOOGLE_SHEET_CSV_URL) {
                 showToast("⚠️ 구글 스프레드시트 CSV 연동 링크가 소스코드에 등록되지 않았습니다.", 'error');
@@ -1027,11 +1057,8 @@
                 }
 
                 showToast(`🎉 스프레드시트 연동 성공! 총 ${successCount}개 일정이 동기화되었습니다.`, 'success');
-                if (currentUserProfile.role === 'teacher') {
-                    loadStudentList();
-                } else {
-                    loadSchoolEventsForStudents();
-                }
+                if (currentUserProfile.role === 'teacher') loadStudentList();
+                else loadSchoolEventsForStudents();
             } catch (err) {
                 console.error("Sheet Sync Error: ", err);
                 showToast("구글 시트 로드 에러가 발생했습니다. 권한을 확인하세요.", 'error');
@@ -1040,17 +1067,10 @@
             }
         }
 
-        // 실시간 가입 학생 통합 정보 관리 및 검색 렌더링
         async function loadStudentList() {
             showLoading("학생들의 최신 발달사를 확인하고 있습니다...");
             try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('role', 'student')
-                    .order('admission_year', { ascending: false })
-                    .order('student_id', { ascending: true });
-
+                const { data, error } = await supabase.from('profiles').select('*').eq('role', 'student').order('admission_year', { ascending: false }).order('student_id', { ascending: true });
                 if (error) throw error;
                 cachedStudents = data || [];
 
@@ -1060,7 +1080,6 @@
                 years.forEach(y => {
                     yearSelect.innerHTML += `<option value="${y}">${y}학년도 입학</option>`;
                 });
-
                 renderStudentList(cachedStudents);
             } catch (e) {
                 console.error(e);
@@ -1099,7 +1118,6 @@
                     document.getElementById('teacherListPanel').classList.add('hidden', 'lg:flex');
                     document.getElementById('teacherDashboardOverview').classList.add('hidden');
                     document.getElementById('teacherDetailView').classList.remove('hidden');
-                    
                     openStudentDetail(el.dataset.uid, el.dataset.name, el.dataset.info);
                 };
             });
@@ -1111,40 +1129,26 @@
             const gradeFilter = document.getElementById('filterGradeSelect').value;
 
             let filtered = cachedStudents;
-
             if (searchKeyword) {
-                filtered = filtered.filter(s => 
-                    s.name.toLowerCase().includes(searchKeyword) || 
-                    (s.student_id && s.student_id.toLowerCase().includes(searchKeyword))
-                );
+                filtered = filtered.filter(s => s.name.toLowerCase().includes(searchKeyword) || (s.student_id && s.student_id.toLowerCase().includes(searchKeyword)));
             }
-
             if (yearFilter) {
                 filtered = filtered.filter(s => s.admission_year === parseInt(yearFilter));
             }
-
             if (gradeFilter) {
                 const currentYear = new Date().getFullYear();
                 filtered = filtered.filter(s => {
                     if (!s.admission_year) return false;
-                    const calculatedGrade = (currentYear - s.admission_year) + 1;
-                    return calculatedGrade === parseInt(gradeFilter);
+                    return ((currentYear - s.admission_year) + 1) === parseInt(gradeFilter);
                 });
             }
-
             renderStudentList(filtered);
         }
 
-        // 📈 실시간 타임라인 피드: 최신 탐구 활동 이력 일괄 추적
         async function loadGlobalTimelineFeed() {
             const feedContainer = document.getElementById('globalTimelineFeed');
             try {
-                const { data, error } = await supabase
-                    .from('portfolios')
-                    .select('*, profiles(name, student_id)')
-                    .order('updated_at', { ascending: false })
-                    .limit(10);
-
+                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(10);
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
@@ -1175,7 +1179,6 @@
                 });
                 feedContainer.innerHTML = html;
             } catch (err) {
-                console.error("Timeline Feed Load Failed: ", err);
                 feedContainer.innerHTML = '<p class="text-red-500 text-xs text-center py-6">타임라인을 연동할 수 없습니다.</p>';
             }
         }
@@ -1205,7 +1208,6 @@
             let html = '';
             data.forEach(item => {
                 const fb = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : (item.feedbacks ? item.feedbacks.feedback_content : '');
-                
                 const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at);
                 const formatUpdate = `${updateDate.getFullYear()}-${String(updateDate.getMonth()+1).padStart(2, '0')}-${String(updateDate.getDate()).padStart(2, '0')} ${String(updateDate.getHours()).padStart(2, '0')}:${String(updateDate.getMinutes()).padStart(2, '0')}`;
 

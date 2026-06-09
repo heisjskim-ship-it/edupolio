@@ -197,7 +197,7 @@
                 <button class="grade-tab flex-1 min-w-[120px] py-3 text-center font-medium text-slate-400 hover:text-blue-600 transition" data-grade="3">고등학교 3학년</button>
             </div>
 
-            <!-- 학생용 검색 필터바 (추가됨) -->
+            <!-- 학생용 검색 필터바 -->
             <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 no-print">
                 <div class="relative flex-1">
                     <input type="text" id="studentSearchInput" class="w-full p-2.5 pl-9 border border-slate-200 text-sm rounded-xl outline-none focus:border-blue-500 transition" placeholder="과목명, 활동명, 내용, 자기평가 등 검색...">
@@ -455,8 +455,8 @@
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 구글 스프레드시트 배포 배포된 CSV 파일 URL 주소 
-        const GOOGLE_SHEET_CSV_URL = ''; 
+        // ✅ 구글 스프레드시트 배포 배포된 CSV 파일 URL 주소 (pub?output=csv 변환 적용 완료)
+        const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlzz9BLmQTX30HFa8Dg9MzPQyKvlIWnDnX0e0fUHdJ3X4yG_lqGRe3y-ELZp7wQw/pub?output=csv'; 
 
         let currentUser = null;
         let currentUserProfile = null;
@@ -653,7 +653,7 @@
             }
         }
 
-        // ★ 완벽하게 해결된 Auth 상태 수신기 (무한 로딩 및 세션 리로드 루프 차단) ★
+        // ★ 완벽하게 해결된 Auth 상태 수신기 (어떠한 경우에도 로딩 가둠 레이어가 남지 않도록 try-catch-finally 전면 튜닝) ★
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 showLoading("프로필 소속 권한을 인증하고 있습니다...");
@@ -661,12 +661,10 @@
                 try {
                     const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
                     
-                    // DB 테이블이 초기화되었거나 프로필 레코드가 누락된 경우 예외 처리 고도화
                     if (error || !profile) {
                         console.error("Profile Fetch Error: ", error);
                         showToast("⚠️ 프로필 정보를 찾을 수 없습니다.\n새로운 이메일로 다시 회원가입을 신청해 주세요.", 'error');
                         
-                        // 새로고침 없이 즉각 세션 변수 강제 소거 및 로그아웃 유도
                         forceClearLocalSession();
                         currentUser = null;
                         currentUserProfile = null;
@@ -678,7 +676,6 @@
                         }
                         
                         switchView('auth');
-                        hideLoading(); // 가두리 로딩을 완전히 차단합니다.
                         return;
                     }
 
@@ -696,7 +693,8 @@
                     try { await supabase.auth.signOut(); } catch(err){}
                     switchView('auth');
                 } finally {
-                    hideLoading(); // 세션 검사가 정상 작동했거나 예외가 발생하면 확실하게 로딩 스피너 제거
+                    // ✅ 성공하든 오류가 발생하든 상관없이 무조건 로딩 오버레이를 가차없이 꺼버립니다.
+                    hideLoading(); 
                 }
             } else {
                 currentUser = null;
@@ -739,7 +737,7 @@
                 syncGoogleSheetEvents();
             };
 
-            // 검색 & 필터 체인지 리스너 (추가됨)
+            // 검색 & 필터 체인지 리스너
             document.getElementById('studentSearchInput').addEventListener('input', renderStudentPortfoliosFiltered);
             document.getElementById('studentAreaFilter').addEventListener('change', renderStudentPortfoliosFiltered);
         }
@@ -806,7 +804,7 @@
             }
         }
 
-        // 실시간 필터링 및 고화질 렌더링 뷰 (추가 및 개선됨)
+        // 실시간 필터링 및 고화질 렌더링 뷰
         function renderStudentPortfoliosFiltered() {
             const container = document.getElementById('portfolioList');
             const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim();

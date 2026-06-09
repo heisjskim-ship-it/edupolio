@@ -236,14 +236,29 @@
         // =========================================================================
         // 🔴 아래 두 줄의 따옴표('') 안에 본인 프로젝트의 URL과 ANON_KEY를 복사해 넣으세요!
         // =========================================================================
-        const SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
+        let SUPABASE_URL = 'https://haytxocuzaxrkfcrlpii.supabase.co'; 
+        let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhheXR4b2N1emF4cmtmY3JscGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDExNjAsImV4cCI6MjA5NjUxNzE2MH0.MwepGAJShlrqrTEUBFy1zrRGhGcDSCap5WHNtZU5wNk';
+
+        // [입력 값 초정밀 자동 정제 및 오타 교정 시스템 적용]
+        if (SUPABASE_URL) {
+            SUPABASE_URL = SUPABASE_URL.trim(); // 앞뒤 공백 제거
+            if (SUPABASE_URL.endsWith('/')) {
+                SUPABASE_URL = SUPABASE_URL.slice(0, -1); // 끝에 실수로 붙은 슬래시(/) 제거
+            }
+            if (SUPABASE_URL.includes('.supabase.com')) {
+                // 초보자가 흔히 저지르는 .com 실수 자동 수정
+                SUPABASE_URL = SUPABASE_URL.replace('.supabase.com', '.supabase.co');
+                console.log("🛠️ URL이 '.com'에서 '.co'로 자동 변환되었습니다.");
+            }
+        }
+        if (SUPABASE_ANON_KEY) {
+            SUPABASE_ANON_KEY = SUPABASE_ANON_KEY.trim(); // 키 앞뒤 공백 제거
+        }
 
         // API 설정 오류 검출 기능 강화
         const hasMissingKeys = !SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes("nysawmnglyshjswdthzk") || SUPABASE_ANON_KEY.startsWith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2F3bW5nbHlzaGpzY290aHpr");
         if (hasMissingKeys) {
-            console.error("Supabase API 자격 증명이 누락되었거나 가짜 키가 입력되었습니다. Supabase 대시보드에서 실제 프로젝트 URL과 anon 키를 가져와 index.html의 245~246번째 줄에 올바르게 입력해주세요.");
-            alert("⚠️ Supabase 연동에 필요한 URL 또는 API 키가 올바르지 않습니다.\n\nSupabase 대시보드(Settings -> API)에서 복사한 정확한 값을 입력한 후, 다시 Commit & Push 해주세요.");
+            console.error("Supabase API 자격 증명이 누락되었거나 예시 키가 입력되었습니다. index.html의 코드 최하단에 실제 URL과 키를 입력했는지 확인해주세요.");
         }
 
         // Supabase 클라이언트 초기화
@@ -270,6 +285,16 @@
             if (viewName === 'auth') document.getElementById('authView').classList.remove('hidden');
             else if (viewName === 'student') document.getElementById('studentView').classList.remove('hidden');
             else if (viewName === 'teacher') document.getElementById('teacherView').classList.remove('hidden');
+        }
+
+        // 로컬 토큰 강제 비우기 함수 (세션 꼬임 해결책)
+        function forceClearLocalSession() {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sb-')) {
+                    localStorage.removeItem(key);
+                }
+            }
         }
 
         // =========================================================================
@@ -307,7 +332,7 @@
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (hasMissingKeys) {
-                alert("Supabase API 키가 유효하지 않아 회원가입을 진행할 수 없습니다. 소스 코드를 확인해 주세요.");
+                alert("⚠️ 웹앱에 Supabase 연동 정보가 비어 있거나 올바르지 않습니다.\n\n[확인 사항]\nindex.html 파일 내부의 SUPABASE_URL 설정 부분을 본인의 실제 주소로 변경했는지 확인 후 커밋해주세요!");
                 return;
             }
             showLoading();
@@ -324,7 +349,6 @@
                 
                 if (authError) { 
                     alert(`가입 실패: ${authError.message}`); 
-                    hideLoading(); 
                     return; 
                 }
 
@@ -342,6 +366,7 @@
                     if (profileError) {
                         alert("회원 정보 생성 중 오류가 발생했습니다.\n(인증 계정은 생성되었으나 DB 프로필 저장에 실패했습니다. SQL Editor에 RLS INSERT 정책이 정상 세팅되었는지 확인하세요!)");
                         console.error(profileError);
+                        try { await supabase.auth.signOut(); } catch(e){}
                     } else {
                         alert("회원가입이 완료되었습니다!");
                         document.getElementById('showLoginBtn').click(); // 로그인 화면으로 이동
@@ -349,16 +374,17 @@
                 }
             } catch (error) {
                 console.error("네트워크 에러 상세:", error);
-                alert(`통신 오류가 발생했습니다: ${error.message}\n\n[가능성 높은 원인]\n1. Supabase URL이 정상적이지 않음\n2. 방화벽 차단`);
+                alert(`🌐 통신 오류 (Failed to fetch)가 발생했습니다.\n\n[원인 파악용 정보]\n시도한 주소: "${SUPABASE_URL}"\n\n[조치 안내]\n1. 주소 끝에 .com이 아닌 '.co'가 들어갔는지 스펠링을 다시 보아주세요.\n2. 학교/기관 인터넷을 사용 중이라면 스마트폰 핫스팟으로 연결해 보세요.\n3. 수정한 코드가 깃허브를 통해 Vercel에 커밋&푸시 반영 완료되었는지 대시보드 상태를 확인하세요.`);
+            } finally {
+                hideLoading();
             }
-            hideLoading();
         });
 
         // 로그인 제출 로직
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (hasMissingKeys) {
-                alert("Supabase API 키가 유효하지 않아 로그인을 진행할 수 없습니다. 소스 코드를 확인해 주세요.");
+                alert("⚠️ Supabase API 키가 비어 있습니다. 코드를 업데이트해 주세요.");
                 return;
             }
             showLoading();
@@ -369,27 +395,40 @@
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) { 
                     alert(`로그인 실패: ${error.message}`); 
-                    hideLoading(); 
                     return; 
                 }
             } catch (error) {
                 console.error("네트워크 에러 상세:", error);
-                alert(`통신 오류가 발생했습니다: ${error.message}\n\n입력한 Supabase URL을 다시 한번 확인해 주세요.`);
+                alert(`🌐 통신 오류가 발생했습니다.\n\n시도한 주소: "${SUPABASE_URL}"\n\n입력한 Supabase URL 주소를 다시 한번 꼼꼼하게 검토해 보세요.`);
+            } finally {
+                hideLoading();
             }
-            hideLoading();
         });
 
         // 로그아웃 로직 (모든 로그아웃 버튼에 적용)
         document.querySelectorAll('.logoutBtn').forEach(btn => {
             btn.onclick = async () => {
-                await supabase.auth.signOut();
+                showLoading();
+                try {
+                    await supabase.auth.signOut();
+                } catch(e) {}
+                forceClearLocalSession();
                 window.location.reload(); // 깔끔하게 새로고침
             }
         });
 
         // ★ 앱 시작 시 세션 상태 감지 (가장 중요) ★
         supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                currentUserProfile = null;
+                switchView('auth');
+                hideLoading();
+                return;
+            }
+
             if (session) {
+                showLoading();
                 currentUser = session.user;
                 try {
                     // 사용자 프로필 정보 가져오기 (역할 확인)
@@ -398,9 +437,11 @@
                     // 프로필 정보가 없거나 에러가 났을 때 무한 로딩 방지 처리
                     if (error || !profile) {
                         console.error("프로필 불러오기 에러:", error);
-                        alert("프로필 정보를 찾을 수 없습니다.\n(데이터베이스 오류 혹은 이전 가입 시 프로필이 생성되지 않은 계정입니다.)\n확인을 누르면 로그아웃됩니다. 다른 이메일로 다시 회원가입해주세요.");
-                        await supabase.auth.signOut();
-                        hideLoading();
+                        alert("⚠️ 세션 정보가 올바르지 않거나 프로필을 찾을 수 없습니다.\n(가입 정보 삭제 등으로 인해 로그인 세션이 만료되었습니다.)\n\n확인을 누르면 로그인 화면으로 리셋됩니다.");
+                        
+                        forceClearLocalSession();
+                        try { await supabase.auth.signOut(); } catch(e) {}
+                        window.location.reload();
                         return;
                     }
 
@@ -414,9 +455,12 @@
                 } catch (err) {
                     console.error("프로필 패치 네트워크 에러:", err);
                     alert("서버와 연결할 수 없습니다. 인터넷 상태 또는 Supabase 설정을 확인하세요.");
-                    await supabase.auth.signOut();
+                    forceClearLocalSession();
+                    try { await supabase.auth.signOut(); } catch(e) {}
+                    window.location.reload();
+                } finally {
+                    hideLoading(); // 어떤 경우라도 로딩 오버레이 차단 해제
                 }
-                hideLoading(); // 정상적으로 대시보드가 열리면 로딩 화면 숨기기
             } else {
                 currentUser = null;
                 currentUserProfile = null;
@@ -470,14 +514,19 @@
                 self_evaluation: document.getElementById('pfSelfEval').value
             };
 
-            const { error } = await supabase.from('portfolios').insert([data]);
-            if (error) alert("저장 실패: " + error.message);
-            else {
-                alert("활동이 저장되었습니다!");
-                document.getElementById('portfolioForm').reset();
-                loadStudentPortfolios(currentStudentGrade); // 리스트 새로고침
+            try {
+                const { error } = await supabase.from('portfolios').insert([data]);
+                if (error) alert("저장 실패: " + error.message);
+                else {
+                    alert("활동이 저장되었습니다!");
+                    document.getElementById('portfolioForm').reset();
+                    loadStudentPortfolios(currentStudentGrade); // 리스트 새로고침
+                }
+            } catch (err) {
+                alert("네트워크 연결 실패: " + err.message);
+            } finally {
+                hideLoading();
             }
-            hideLoading();
         });
 
         // 포트폴리오 불러오기 (Read)
@@ -674,19 +723,23 @@
             if (!content.trim()) return alert("피드백 내용을 입력해주세요.");
 
             showLoading();
-            // 기존 피드백이 있는지 확인 후 Insert 또는 Update를 해야하지만, 
-            // 편의상 새로운 피드백을 추가하거나 에러 처리하도록 단순화합니다.
-            // Supabase의 upsert를 사용하면 편합니다.
-            const { error } = await supabase.from('feedbacks').insert([{
-                portfolio_id: portfolioId,
-                teacher_uid: currentUser.id,
-                feedback_content: content
-            }]);
+            try {
+                // 기존 피드백이 있는지 확인 후 Insert 또는 Update를 해야하지만, 
+                // 편의상 새로운 피드백을 추가하거나 에러 처리하도록 단순화합니다.
+                // Supabase의 upsert를 사용하면 편합니다.
+                const { error } = await supabase.from('feedbacks').insert([{
+                    portfolio_id: portfolioId,
+                    teacher_uid: currentUser.id,
+                    feedback_content: content
+                }]);
 
-            if (error) alert("피드백 저장 중 오류가 발생했습니다. (이미 저장된 피드백이 있다면 관리자에게 문의하세요)");
-            else alert("피드백이 성공적으로 저장되었습니다!");
-            
-            hideLoading();
+                if (error) alert("피드백 저장 중 오류가 발생했습니다. (이미 저장된 피드백이 있다면 관리자에게 문의하세요)");
+                else alert("피드백이 성공적으로 저장되었습니다!");
+            } catch(e) {
+                alert("네트워크 통신 실패: " + e.message);
+            } finally {
+                hideLoading();
+            }
         };
 
     </script>

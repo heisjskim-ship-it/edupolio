@@ -116,7 +116,7 @@
                     </div>
                     <div class="space-y-3.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학교 계정 이메일 (관리자는 admin)</label>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학교 계정 이메일</label>
                             <input type="text" id="loginEmail" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-sm font-semibold" required>
                         </div>
                         <div>
@@ -146,7 +146,7 @@
                             <input type="text" id="signupStudentId" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium" placeholder="학번 (5자리)">
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl transition shadow-lg text-xs mt-2">가입 완료 및 승인 요청</button>
+                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl transition shadow-lg text-xs mt-2">가입 완료</button>
                     <p class="text-center text-xs text-slate-500 pt-1">이미 계정이 있으신가요? <a href="#" onclick="window.showLogin(event)" class="text-blue-600 font-bold hover:underline">로그인하기</a></p>
                 </form>
             </div>
@@ -158,7 +158,6 @@
     <!-- ========================================== -->
     <div id="studentView" class="hidden min-h-[100dvh] pb-16 bg-slate-100 font-sans">
         <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
-            <!-- 🌟 와이드 확장 (max-w-[1600px]) -->
             <div class="max-w-[1600px] mx-auto px-5 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <h1 class="text-2xl font-black text-blue-600 tracking-tighter">EduPort</h1>
@@ -168,7 +167,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- 🌟 온클릭 이벤트 하드코딩으로 인쇄 버튼 에러 영구 박멸 -->
                     <button onclick="window.printStudentPortfolio()" type="button" class="bg-slate-900 text-white px-4 sm:px-5 py-2.5 rounded-xl text-xs font-black tracking-wide hover:bg-slate-800 transition shadow-md flex items-center gap-2 min-h-[44px]">
                         🖨️ 포트폴리오 인쇄
                     </button>
@@ -177,7 +175,6 @@
             </div>
         </nav>
 
-        <!-- 🌟 와이드 캔버스 적용 -->
         <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 space-y-8">
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b border-slate-100 pb-4">
@@ -189,14 +186,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="md:col-span-3">
                         <label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 전공 및 진로 분야</label>
-                        <input type="text" id="pdfInputCareer" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="예: 컴퓨터공학 / 인공지능 개발자">
+                        <input type="text" id="pdfInputCareer" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" placeholder="예: 컴퓨터공학 / 인공지능 개발자">
                     </div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (1순위)</label><input type="text" id="pdfInputUniv1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1순위 대학명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (2순위)</label><input type="text" id="pdfInputUniv2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2순위 대학명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (3순위)</label><input type="text" id="pdfInputUniv3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="3순위 대학명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (1순위)</label><input type="text" id="pdfInputMajor1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1순위 학과명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (2순위)</label><input type="text" id="pdfInputMajor2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2순위 학과명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (3순위)</label><input type="text" id="pdfInputMajor3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="3순위 학과명"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (1순위)</label><input type="text" id="pdfInputUniv1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="1순위 대학명"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (2순위)</label><input type="text" id="pdfInputUniv2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="2순위 대학명"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (3순위)</label><input type="text" id="pdfInputUniv3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="3순위 대학명"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (1순위)</label><input type="text" id="pdfInputMajor1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="1순위 학과명"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (2순위)</label><input type="text" id="pdfInputMajor2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="2순위 학과명"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (3순위)</label><input type="text" id="pdfInputMajor3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="3순위 학과명"></div>
                 </div>
             </section>
 
@@ -214,56 +211,53 @@
                         <div class="md:col-span-3 space-y-5 bg-slate-50 p-6 rounded-2xl border border-slate-100">
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">실행 상태</label>
-                                <select id="pfExecution" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                <select id="pfExecution" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
                                     <option value="참여함">✅ 참여함 (탐구 완료)</option><option value="계획함">🗓️ 계획함 (진행 예정)</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">학년도</label>
-                                <input type="number" id="pfYearInput" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                <input type="number" id="pfYearInput" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">학년</label>
-                                    <select id="pfGrade" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <select id="pfGrade" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
                                         <option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">학기</label>
-                                    <select id="pfSemester" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                    <select id="pfSemester" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
                                         <option value="1">1학기</option><option value="2">2학기</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">기록 영역</label>
-                                <select id="pfArea" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                <select id="pfArea" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
                                     <option value="교과">교과 (과목 세특)</option><option value="자율">창체 - 자율활동</option><option value="동아리">창체 - 동아리활동</option><option value="진로">창체 - 진로활동</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="md:col-span-9 space-y-5">
-                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none" required></div>
-                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" required></div>
-                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-4 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required></div>
+                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required></div>
+                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-4 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]"></div>
                             <div><label class="block text-sm font-bold text-blue-700 mb-1.5 pl-1">🧠 자기 성찰 및 평가 <span class="text-red-500">*</span></label><textarea id="pfSelfEval" rows="4" class="w-full p-4 border border-blue-200 rounded-xl bg-blue-50/30 text-sm font-medium leading-relaxed focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none" required></textarea></div>
                         </div>
                     </div>
                     
                     <div class="pt-2 flex justify-end gap-3">
-                        <button type="button" id="cancelEditBtn" onclick="window.cancelEditPortfolio()" class="hidden px-6 py-4 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition">수정 취소</button>
-                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-600/20 text-sm">포트폴리오 영구 등록 ➔</button>
+                        <button type="button" id="cancelEditBtn" onclick="window.cancelEditPortfolio()" class="hidden px-6 py-4 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition min-h-[44px]">수정 취소</button>
+                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-600/20 text-sm min-h-[44px]">포트폴리오 영구 등록 ➔</button>
                     </div>
                 </form>
             </section>
 
-            <!-- 📊 학년-학기별 누적 통계 섹션 -->
-            <section id="studentStatsSection" class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print hidden">
-            </section>
+            <section id="studentStatsSection" class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print hidden"></section>
 
-            <!-- [포트폴리오 압축 리스트] -->
             <section class="space-y-5 no-print">
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="font-black text-xl text-slate-800 tracking-tight">📑 등록된 포트폴리오 종합 내역</h3>
@@ -277,7 +271,7 @@
                     </div>
                     
                     <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                        <select id="studentAreaFilter" class="px-4 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                        <select id="studentAreaFilter" class="px-4 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
                             <option value="">전체 영역</option>
                             <option value="교과">교과 활동</option>
                             <option value="자율">자율 활동</option>
@@ -285,7 +279,7 @@
                             <option value="진로">진로 활동</option>
                         </select>
                         <div class="relative w-full sm:w-[300px]">
-                            <input type="text" id="studentSearchInput" class="w-full p-3 pl-10 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition" placeholder="내용, 도서명 등 검색">
+                            <input type="text" id="studentSearchInput" class="w-full p-3 pl-10 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition min-h-[44px]" placeholder="내용, 도서명 등 검색">
                             <svg class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
@@ -296,7 +290,6 @@
                 </div>
             </section>
 
-            <!-- [학교 행사 리스트] -->
             <section class="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden no-print">
                 <div class="absolute right-0 top-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
                 
@@ -305,10 +298,10 @@
                     
                     <div class="flex gap-2 w-full md:w-auto">
                         <div class="relative flex-1 md:w-[300px]">
-                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-10 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-10 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none focus:border-blue-500 transition placeholder-slate-400 min-h-[44px]" placeholder="행사명 검색 (클릭 시 자동 기입)">
                             <svg class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
-                        <button onclick="window.syncGoogleSheetEvents()" type="button" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-3 rounded-xl border border-slate-700 transition flex items-center gap-1 shrink-0">
+                        <button onclick="window.syncGoogleSheetEvents()" type="button" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-3 rounded-xl border border-slate-700 transition flex items-center gap-1 shrink-0 min-h-[44px]">
                             🔄 동기화
                         </button>
                     </div>
@@ -336,7 +329,6 @@
             </div>
         </nav>
 
-        <!-- 모바일 전용 퀵-스위칭 탭 바 -->
         <div id="mobileTabSelector" class="flex lg:hidden bg-white border-b border-slate-200 shrink-0 h-14 z-30 shadow-sm w-full">
             <button id="tabBtnList" class="flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all">👥 명부</button>
             <button id="tabBtnEvents" class="flex-1 text-sm font-bold text-slate-400 transition-all">🏫 일정</button>
@@ -344,13 +336,9 @@
             <button id="tabBtnDetail" class="flex-1 text-sm font-bold text-slate-400 transition-all" disabled>🔍 분석</button>
         </div>
 
-        <!-- 🌟 [넓어진 와이드 레이아웃] 데스크톱에선 3:9 비율 1600px 광활한 그리드 적용 -->
         <main class="max-w-[1600px] mx-auto w-full px-2 sm:px-6 py-4 lg:py-6 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-8 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden no-print">
             
-            <!-- [좌측 래퍼 - 25% 비율 할당]: 학생 명부(flex-3)와 행사 일정(flex-2)이 수직 분할됨 -->
             <div id="teacherLeftWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-6 h-full min-h-0 shrink-0 hidden lg:flex">
-                
-                <!-- [Card 1]: 학생 명부 카드 -->
                 <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[400px] lg:min-h-0 overflow-hidden flex">
                     <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
                         <h2 class="font-black text-slate-900 text-lg flex justify-between items-center">
@@ -359,10 +347,10 @@
                         </h2>
                     </div>
                     <div class="px-4 sm:px-5 space-y-3 mb-2 shrink-0 pt-3">
-                        <input type="text" id="teacherStudentSearch" class="w-full p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition" placeholder="실명 또는 학번 검색">
+                        <input type="text" id="teacherStudentSearch" class="w-full p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition min-h-[44px]" placeholder="실명/학번 검색">
                         <div class="flex gap-2">
-                            <select id="filterYearSelect" class="w-1/2 p-3 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none"><option value="">입학년도</option></select>
-                            <select id="filterGradeSelect" class="w-1/2 p-3 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                            <select id="filterYearSelect" class="w-1/2 p-3 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]"><option value="">입학년도</option></select>
+                            <select id="filterGradeSelect" class="w-1/2 p-3 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
                                 <option value="">전체 학년</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                             </select>
                         </div>
@@ -372,16 +360,15 @@
                     </ul>
                 </div>
 
-                <!-- [Card 2]: 학사 일정 관리 카드 -->
                 <div id="teacherEventsCard" class="bg-slate-900 p-4 sm:p-6 rounded-2xl lg:rounded-3xl shadow-xl border border-slate-800 flex-col flex-1 lg:flex-[2] min-h-[300px] lg:min-h-0 relative overflow-hidden hidden lg:flex">
                     <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
                     <div class="relative z-10 flex items-center justify-between mb-4 border-b border-slate-700 pb-3 shrink-0">
                         <h2 class="font-black text-white text-base">🏫 학사 일정 관리</h2>
                     </div>
                     <div class="flex gap-2 mb-4 relative z-10 shrink-0">
-                        <button onclick="window.openGoogleSheet()" class="flex-1 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold text-center transition flex items-center justify-center">시트 편집</button>
-                        <button onclick="window.openEventModal()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">수동 등록</button>
-                        <button onclick="window.syncGoogleSheetEvents()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition">동기화</button>
+                        <button onclick="window.openGoogleSheet()" class="flex-1 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold text-center transition flex items-center justify-center min-h-[44px]">시트 편집</button>
+                        <button onclick="window.openEventModal()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">수동 등록</button>
+                        <button onclick="window.syncGoogleSheetEvents()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">동기화</button>
                     </div>
                     <div id="teacherEventsList" class="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar relative z-10 min-h-[200px] lg:min-h-0">
                         <p class="text-xs text-slate-500 text-center py-4">일정이 없습니다.</p>
@@ -389,10 +376,7 @@
                 </div>
             </div>
 
-            <!-- [우측 패널 래퍼 - 75% 널찍한 비율 할당]: 메인 대시보드 또는 학생 상세 분석 뷰 -->
             <div id="teacherRightWrapper" class="lg:col-span-9 h-full min-h-0 relative flex flex-col w-full">
-                
-                <!-- [Card 3]: 대시보드 메인 타임라인 뷰 -->
                 <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-1 flex-col overflow-hidden hidden lg:flex">
                     <div class="border-b border-slate-100 p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                         <div>
@@ -400,10 +384,10 @@
                             <p class="text-slate-500 text-sm mt-1 font-medium">전체 학생의 최신 기록을 모니터링합니다.</p>
                         </div>
                         <div class="flex gap-2 w-full md:w-auto">
-                            <select id="timelineAreaFilter" class="px-4 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                            <select id="timelineAreaFilter" class="px-4 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
                                 <option value="">전체 영역</option><option value="교과">교과 활동</option><option value="자율">자율 활동</option><option value="동아리">동아리 활동</option><option value="진로">진로 활동</option>
                             </select>
-                            <input type="text" id="timelineSearchInput" class="p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 w-full md:w-64" placeholder="활동명/이름 검색">
+                            <input type="text" id="timelineSearchInput" class="p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 w-full md:w-64 min-h-[44px]" placeholder="활동명/이름 검색">
                         </div>
                     </div>
                     <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-5 sm:p-8 space-y-4 no-scrollbar min-h-[300px] lg:min-h-0">
@@ -411,9 +395,8 @@
                     </div>
                 </div>
 
-                <!-- 🌟 [Card 4]: 특정 학생 상세 보기 뷰 (앱 UI처럼 완벽 분리 배치) -->
+                <!-- 🌟 [Absolute 완전 제거] UI 가려짐 원천 방지 및 안전한 Flex 블록 교체식 렌더링 -->
                 <div id="teacherDetailCard" class="bg-slate-50 rounded-2xl lg:rounded-3xl shadow-inner border border-slate-200 flex-1 flex-col overflow-hidden hidden">
-                    <!-- 상단 고정 제어 헤더 -->
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200 p-5 sm:px-8 bg-white shrink-0 shadow-sm z-20 w-full lg:rounded-t-3xl">
                         <div class="flex flex-col items-center sm:items-start w-full sm:w-auto text-center sm:text-left">
                             <div class="flex items-center justify-center sm:justify-start gap-3">
@@ -423,11 +406,10 @@
                             <p class="text-sm font-bold text-slate-500 mt-1.5" id="detailStudentInfo"></p>
                         </div>
                         <div class="flex gap-2 shrink-0 w-full sm:w-auto justify-center sm:justify-end">
-                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3 rounded-xl transition shadow-sm flex items-center gap-1.5">🖨️ 학생 통합 인쇄</button>
-                            <button onclick="window.closeStudentDetail()" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-bold px-6 py-3 rounded-xl transition shadow-sm">🔙 관제보드로 복귀</button>
+                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3 rounded-xl transition shadow-sm flex items-center gap-1.5 min-h-[44px]">🖨️ 학생 통합 인쇄</button>
+                            <button onclick="window.closeStudentDetail()" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-bold px-6 py-3 rounded-xl transition shadow-sm min-h-[44px]">🔙 관제보드로 복귀</button>
                         </div>
                     </div>
-                    <!-- 스크롤 컨텐츠 영역 -->
                     <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 no-scrollbar bg-slate-50 w-full min-h-[300px] lg:min-h-0">
                         <div id="teacherStatsContainer" class="mb-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hidden"></div>
                         <div id="teacherPortfolioList" class="flex flex-col gap-6"></div>
@@ -444,8 +426,8 @@
         <nav class="bg-red-950 text-white shadow-lg border-b border-red-900/50 h-16 shrink-0 flex items-center px-5 justify-between">
             <h1 class="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">🛡️ 에듀포트 최고 관리자 센터</h1>
             <div class="flex items-center gap-3">
-                <button class="logoutBtn text-red-200 hover:text-white text-xs font-black transition px-3 py-2 border border-red-800/80 rounded-xl bg-red-900/40">로그아웃</button>
-                <button id="closeAdminPanelBtn" class="text-white bg-red-800 hover:bg-red-700 text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm">관제 화면 복귀 ✕</button>
+                <button onclick="window.execLogout()" class="text-red-200 hover:text-white text-xs font-black transition px-3 py-2 border border-red-800/80 rounded-xl bg-red-900/40 min-h-[44px]">로그아웃</button>
+                <button id="closeAdminPanelBtn" class="text-white bg-red-800 hover:bg-red-700 text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm min-h-[44px]">관제 화면 복귀 ✕</button>
             </div>
         </nav>
         <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8 overflow-y-auto">
@@ -456,8 +438,8 @@
                         <p class="text-slate-500 text-xs mt-1">학적 정보 수정, 비밀번호 강제 초기화 및 영구 탈퇴 처리.</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <input type="text" id="adminUserSearch" class="p-2.5 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-red-800 bg-slate-50 focus:bg-white" placeholder="이름/이메일 검색">
-                        <select id="adminRoleFilter" class="p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                        <input type="text" id="adminUserSearch" class="p-2.5 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-red-800 bg-slate-50 focus:bg-white min-h-[44px]" placeholder="이름/이메일 검색">
+                        <select id="adminRoleFilter" class="p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
                             <option value="">전체 권한</option><option value="student">학생</option><option value="teacher">교사</option>
                         </select>
                     </div>
@@ -482,21 +464,21 @@
             <h2 class="text-xl font-black text-slate-900 mb-4 tracking-tight">👤 회원 정보 수정</h2>
             <form id="adminEditForm" class="space-y-4">
                 <input type="hidden" id="adminEditUserId">
-                <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">실명</label><input type="text" id="adminEditName" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold" required></div>
-                <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">이메일</label><input type="email" id="adminEditEmail" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold" required></div>
+                <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">실명</label><input type="text" id="adminEditName" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]" required></div>
+                <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">이메일</label><input type="email" id="adminEditEmail" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]" required></div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">권한</label>
-                    <select id="adminEditRole" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold bg-slate-50">
+                    <select id="adminEditRole" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold bg-slate-50 min-h-[44px]">
                         <option value="student">student (학생)</option><option value="teacher">teacher (교사)</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-2 gap-3" id="adminStudentOnlyFields">
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">입학연도</label><input type="number" id="adminEditYear" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold"></div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학번</label><input type="text" id="adminEditStudentId" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">입학연도</label><input type="number" id="adminEditYear" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학번</label><input type="text" id="adminEditStudentId" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]"></div>
                 </div>
                 <div class="flex gap-2 pt-2">
-                    <button type="button" id="closeAdminEditModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-xs hover:bg-slate-200 transition">취소</button>
-                    <button type="submit" class="w-2/3 bg-red-950 text-white font-black py-3 rounded-xl text-xs hover:bg-red-900 transition">저장 ➔</button>
+                    <button type="button" id="closeAdminEditModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-xs hover:bg-slate-200 transition min-h-[44px]">취소</button>
+                    <button type="submit" class="w-2/3 bg-red-950 text-white font-black py-3 rounded-xl text-xs hover:bg-red-900 transition min-h-[44px]">저장 ➔</button>
                 </div>
             </form>
         </div>
@@ -507,18 +489,18 @@
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-100">
             <h2 class="text-2xl font-black text-slate-900 mb-6 tracking-tight">🏫 행사 수동 등록</h2>
             <form id="eventForm" class="space-y-4">
-                <input type="text" id="evName" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="행사명" required>
+                <input type="text" id="evName" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" placeholder="행사명" required>
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="evDate" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" required>
-                    <select id="evTarget" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    <input type="date" id="evDate" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required>
+                    <select id="evTarget" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]">
                         <option value="0">공통</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                     </select>
                 </div>
-                <input type="text" id="evOrganizer" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="주관 부서" required>
+                <input type="text" id="evOrganizer" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" placeholder="주관 부서" required>
                 <textarea id="evContent" rows="3" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="요약 기입" required></textarea>
                 <div class="flex gap-2 pt-2">
-                    <button type="button" id="closeEventModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3.5 rounded-xl text-sm hover:bg-slate-200 transition">취소</button>
-                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-black py-3.5 rounded-xl text-sm hover:bg-blue-700 transition">등록</button>
+                    <button type="button" id="closeEventModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3.5 rounded-xl text-sm hover:bg-slate-200 transition min-h-[44px]">취소</button>
+                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-black py-3.5 rounded-xl text-sm hover:bg-blue-700 transition min-h-[44px]">등록</button>
                 </div>
             </form>
         </div>
@@ -543,9 +525,25 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
-        // =========================================================================
-        // 🌟 1. 시스템 전역 함수 선언 (ReferenceError 절대 방어)
-        // =========================================================================
+        // 🌟 메모리 변수군 (isAppReady 강제 초기화로 무한로딩 방어)
+        window.currentUser = null; 
+        window.currentUserProfile = null; 
+        window.currentStudentGrade = 1; 
+        window.selectedStudentUid = null;
+        window.cachedStudents = []; 
+        window.cachedPortfolios = []; 
+        window.teacherCachedPortfolios = []; 
+        window.teacherSelectedStudentName = ''; 
+        window.teacherSelectedStudentId = '';
+        window.teacherSelectedStudentCareerInfo = null; 
+        window.cachedEventsData = []; 
+        window.cachedAllUsersForAdmin = []; 
+        window.cachedTimelineData = [];
+        window.isAuthenticating = false; 
+        window.editingPortfolioId = null;
+        window.isAppReady = false; 
+
+        // 🌟 시스템 전역 함수 선언
         window.generatePdfHtml = (portfolios) => {
             let pdfHtml = '';
             portfolios.forEach((item) => {
@@ -648,15 +646,23 @@
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 🌟 메모리 변수군
-        let currentUser = null; let currentUserProfile = null; let currentStudentGrade = 1; let selectedStudentUid = null;
-        let cachedStudents = []; let cachedPortfolios = []; let teacherCachedPortfolios = []; let teacherSelectedStudentName = ''; let teacherSelectedStudentId = '';
-        let teacherSelectedStudentCareerInfo = null; let cachedEventsData = []; let cachedAllUsersForAdmin = []; let cachedTimelineData = [];
-        let isAuthenticating = false; let editingPortfolioId = null;
-
         // UI 헬퍼
-        const showLoading = (text = "처리 중입니다...") => { document.getElementById('loadingText').innerText = text; document.getElementById('loadingOverlay').classList.remove('hidden'); setTimeout(() => document.getElementById('loadingOverlay').classList.remove('opacity-0'), 10); };
-        const hideLoading = () => { document.getElementById('loadingOverlay').classList.add('opacity-0'); setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 300); };
+        let loadingTimeout;
+        window.showLoading = (text = "처리 중입니다...") => { 
+            clearTimeout(loadingTimeout);
+            document.getElementById('loadingText').innerText = text; 
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('hidden'); 
+            requestAnimationFrame(() => overlay.classList.remove('opacity-0'));
+        };
+        
+        window.hideLoading = () => { 
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('opacity-0'); 
+            clearTimeout(loadingTimeout);
+            loadingTimeout = setTimeout(() => overlay.classList.add('hidden'), 300); 
+        };
+        
         window.showToast = function(message, type = 'info') {
             const container = document.getElementById('toastContainer'); const toast = document.createElement('div');
             toast.className = `p-4 rounded-2xl shadow-xl text-white text-xs font-bold transition-all duration-300 transform translate-y-4 opacity-0 flex items-center justify-between min-w-[250px] max-w-sm z-50 ${type === 'error' ? 'bg-red-600 shadow-red-600/20' : type === 'success' ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-slate-900'}`;
@@ -680,15 +686,17 @@
             const keysToRemove = [];
             for (let i = 0; i < localStorage.length; i++) { const key = localStorage.key(i); if (key && key.startsWith('sb-')) keysToRemove.push(key); }
             keysToRemove.forEach(k => localStorage.removeItem(k));
-            currentUser = null; currentUserProfile = null; cachedStudents = []; cachedPortfolios = []; teacherCachedPortfolios = []; cachedEventsData = []; cachedTimelineData = []; selectedStudentUid = null; isAuthenticating = false;
+            
+            window.currentUser = null; window.currentUserProfile = null; window.cachedStudents = []; window.cachedPortfolios = []; 
+            window.teacherCachedPortfolios = []; window.cachedEventsData = []; window.cachedTimelineData = []; 
+            window.selectedStudentUid = null; window.isAuthenticating = false; window.isAppReady = false;
         };
 
-        // 전역 로그아웃 퓨즈
         window.execLogout = async function() {
-            showLoading("로그아웃 중...");
+            window.showLoading("로그아웃 중...");
             window.forceClearLocalSession();
             try { await Promise.race([ supabase.auth.signOut(), new Promise(r => setTimeout(r, 500)) ]); } catch(err) {}
-            switchView('auth'); hideLoading(); window.showToast("안전하게 로그아웃 되었습니다.", "success");
+            switchView('auth'); window.hideLoading(); window.showToast("안전하게 로그아웃 되었습니다.", "success");
         };
         // HTML 상의 모든 logoutBtn에 강제 할당
         document.querySelectorAll('.logoutBtn').forEach(btn => { btn.onclick = window.execLogout; });
@@ -767,16 +775,16 @@
         }
 
         tabBtnList.addEventListener('click', () => window.setMobileActiveTab('list')); tabBtnEvents.addEventListener('click', () => window.setMobileActiveTab('events'));
-        tabBtnTimeline.addEventListener('click', () => window.setMobileActiveTab('timeline')); tabBtnDetail.addEventListener('click', () => { if (selectedStudentUid) window.setMobileActiveTab('detail'); });
+        tabBtnTimeline.addEventListener('click', () => window.setMobileActiveTab('timeline')); tabBtnDetail.addEventListener('click', () => { if (window.selectedStudentUid) window.setMobileActiveTab('detail'); });
 
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024 && document.getElementById('teacherView').classList.contains('flex')) {
                 document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex');
                 document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
-                if (selectedStudentUid) { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherTimelineCard').classList.remove('flex'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); } 
+                if (window.selectedStudentUid) { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherTimelineCard').classList.remove('flex'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); } 
                 else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); document.getElementById('teacherDetailCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('flex');}
             } else if (window.innerWidth < 1024 && document.getElementById('teacherView').classList.contains('flex')) {
-                if(!selectedStudentUid) window.setMobileActiveTab('list'); else window.setMobileActiveTab('detail');
+                if(!window.selectedStudentUid) window.setMobileActiveTab('list'); else window.setMobileActiveTab('detail');
             }
         });
 
@@ -784,79 +792,95 @@
         // 🚀 [최종 진화형 단일 Auth 통합 파이프라인 (무한로딩 및 좀비 제거)]
         // =========================================================================
         
-        // 브라우저가 화면을 그리기 전에 캐시가 있다면 오프라인 모드로 0.05초 만에 즉시 렌더링
-        const initialProfileStr = localStorage.getItem('eduport-cached-profile');
-        if (initialProfileStr) {
+        window.bootApp = async () => {
+            window.showLoading("시스템 연결 중...");
             try {
-                currentUserProfile = JSON.parse(initialProfileStr);
-                if (currentUserProfile.role === 'student') {
-                    initStudentDashboard();
-                    const pC = localStorage.getItem('eduport-cached-portfolios');
-                    if (pC) { cachedPortfolios = JSON.parse(pC); renderStudentPortfoliosFiltered(); const st = document.getElementById('studentStatsSection'); st.innerHTML = window.renderStatsHTML(window.calculateStats(cachedPortfolios)); st.classList.remove('hidden'); }
-                } else {
-                    initTeacherDashboard();
-                    const sC = localStorage.getItem('eduport-cached-students');
-                    if (sC) { cachedStudents = JSON.parse(sC); renderStudentList(cachedStudents); }
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error || !session) {
+                    window.forceClearLocalSession();
+                    switchView('auth');
+                    window.hideLoading();
+                    return;
                 }
-            } catch(e) {}
-        }
 
-        // Supabase Auth 이벤트 리스너가 유일한 통제권을 가집니다.
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_OUT' || !session) { 
-                window.forceClearLocalSession(); switchView('auth'); hideLoading(); return; 
-            }
-            
-            // 로그인 상태가 들어왔을 때
-            if (isAuthenticating) return; // 중복 실행 락
-            isAuthenticating = true;
-            currentUser = session.user;
-
-            // 로컬 캐시와의 교차 검증 (다른 아이디로 로그인했으면 즉시 캐시 갈아치움)
-            if (currentUserProfile && currentUserProfile.id !== currentUser.id) {
-                currentUserProfile = null;
-            }
-
-            if (!currentUserProfile) {
-                showLoading("학적 프로필을 동기화하고 있습니다...");
-                try {
-                    const fetchProfile = supabase.from('profiles').select('*').eq('id', currentUser.id).limit(1);
-                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
-                    let { data: profileData, error } = await Promise.race([fetchProfile, timeout]);
-                    
-                    let profile = profileData && profileData.length > 0 ? profileData[0] : null;
-
-                    if (error || !profile) {
-                        const meta = currentUser.user_metadata || {};
-                        const fallbackProfile = { id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
-                        const { data: inserted, error: insertError } = await supabase.from('profiles').insert([fallbackProfile]).select().limit(1);
-                        profile = (!insertError && inserted && inserted.length > 0) ? inserted[0] : fallbackProfile;
-                    }
-
-                    currentUserProfile = profile;
-                    localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
-
-                    if (profile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
-                } catch (e) {
-                    window.showToast("데이터베이스 로딩 지연. 오프라인 모드로 진입합니다.", "info");
-                    const meta = currentUser.user_metadata || {};
-                    currentUserProfile = { id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
-                    if (currentUserProfile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
+                window.currentUser = session.user;
+                
+                // 1. 오프라인 캐시를 통한 즉각 화면 렌더링 (Zero-Latency)
+                const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
+                if (cachedProfileStr) {
+                    try {
+                        window.currentUserProfile = JSON.parse(cachedProfileStr);
+                        if (window.currentUserProfile.role === 'student') {
+                            initStudentDashboard();
+                            const pC = localStorage.getItem('eduport-cached-portfolios');
+                            if (pC) { window.cachedPortfolios = JSON.parse(pC); renderStudentPortfoliosFiltered(); const st = document.getElementById('studentStatsSection'); st.innerHTML = window.renderStatsHTML(window.calculateStats(window.cachedPortfolios)); st.classList.remove('hidden'); }
+                        } else {
+                            initTeacherDashboard();
+                            const sC = localStorage.getItem('eduport-cached-students');
+                            if (sC) { window.cachedStudents = JSON.parse(sC); renderStudentList(window.cachedStudents); }
+                        }
+                        window.hideLoading(); // 화면 개방
+                    } catch(e) { console.error("Cache parsing error", e); }
                 }
-            } else {
-                // 이미 오프라인 렌더러가 화면을 띄운 상태라면 서버 동기화만 백그라운드에서 조용히 수행
-                try {
-                    const { data: profileData } = await supabase.from('profiles').select('*').eq('id', currentUser.id).limit(1);
-                    if (profileData && profileData.length > 0) {
-                        currentUserProfile = profileData[0];
-                        localStorage.setItem('eduport-cached-profile', JSON.stringify(currentUserProfile));
-                    }
-                } catch(e) {}
-            }
 
-            isAuthenticating = false;
-            hideLoading();
+                // 2. 백그라운드 동기화 (화면이 이미 열려있어도 조용히 최신화)
+                const fetchProfile = supabase.from('profiles').select('*').eq('id', window.currentUser.id).limit(1);
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
+                
+                let profileData;
+                try {
+                    const result = await Promise.race([fetchProfile, timeout]);
+                    profileData = result.data;
+                } catch(e) { profileData = null; }
+
+                let profile = profileData && profileData.length > 0 ? profileData[0] : null;
+
+                if (!profile) {
+                    const meta = window.currentUser.user_metadata || {};
+                    const fallbackProfile = { id: window.currentUser.id, name: meta.name || window.currentUser.email.split('@')[0], email: window.currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
+                    try {
+                        const { data: inserted } = await supabase.from('profiles').insert([fallbackProfile]).select().limit(1);
+                        profile = (inserted && inserted.length > 0) ? inserted[0] : fallbackProfile;
+                    } catch(e) { profile = fallbackProfile; }
+                }
+
+                const previousRole = window.currentUserProfile ? window.currentUserProfile.role : null;
+                window.currentUserProfile = profile;
+                localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
+
+                // 캐시가 없었거나 역할이 변경되었다면 뷰를 최신화
+                if (!cachedProfileStr || previousRole !== profile.role) {
+                    if (profile.role === 'student') initStudentDashboard();
+                    else initTeacherDashboard();
+                    window.hideLoading();
+                }
+
+            } catch (err) {
+                console.warn("Boot error:", err);
+                if (!window.currentUserProfile) {
+                    window.forceClearLocalSession();
+                    switchView('auth');
+                }
+                window.hideLoading();
+            } finally {
+                window.isAppReady = true;
+            }
+        };
+
+        // 🌟 최초 부팅 시작
+        window.bootApp();
+
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+                window.forceClearLocalSession();
+                switchView('auth');
+                window.hideLoading();
+            } else if (event === 'SIGNED_IN' && !window.isAppReady) {
+                window.bootApp();
+            }
         });
+
 
         // =========================================================================
         // 🔒 [인증 및 폼 제어 로직]
@@ -868,29 +892,29 @@
         document.getElementById('roleTeacherBtn').onclick = () => { document.getElementById('signupRole').value = 'teacher'; document.getElementById('roleTeacherBtn').className = "w-1/2 py-2 bg-white text-slate-900 shadow-sm font-black rounded-lg transition text-xs"; document.getElementById('roleStudentBtn').className = "w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.add('hidden'); };
 
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); showLoading("가입 처리 중...");
+            e.preventDefault(); window.showLoading("가입 처리 중...");
             try {
                 const { error } = await supabase.auth.signUp({ email: document.getElementById('signupEmail').value, password: document.getElementById('signupPassword').value, options: { data: { name: document.getElementById('signupName').value, role: document.getElementById('signupRole').value, admission_year: document.getElementById('signupRole').value === 'student' ? parseInt(document.getElementById('signupYear').value) : null, student_id: document.getElementById('signupRole').value === 'student' ? document.getElementById('signupStudentId').value : null } } });
                 if (error) window.showToast(`가입 거부: ${error.message}`, 'error'); else { window.showToast("회원가입 완료!", 'success'); document.getElementById('showLoginBtn').click(); }
-            } catch (err) { window.showToast("통신 실패.", 'error'); } finally { hideLoading(); }
+            } catch (err) { window.showToast("통신 실패.", 'error'); } finally { window.hideLoading(); }
         });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault(); const emailField = document.getElementById('loginEmail').value.trim(); const passwordField = document.getElementById('loginPassword').value;
             if ((emailField === 'admin' || emailField === 'admin@school.hs.kr') && passwordField === 'tlagkr1!') {
-                showLoading("관리자 인증 중...");
+                window.showLoading("관리자 인증 중...");
                 try {
                     const { error: signInError } = await supabase.auth.signInWithPassword({ email: 'admin@school.hs.kr', password: passwordField });
                     if (signInError) { await supabase.auth.signUp({ email: 'admin@school.hs.kr', password: passwordField, options: { data: { name: '최고 관리자', role: 'teacher', admission_year: null, student_id: null } } }); await supabase.auth.signInWithPassword({ email: 'admin@school.hs.kr', password: passwordField }); }
                     window.showToast("최고관리자 로드 완료", "success");
-                } catch (err) { window.showToast("접속 장애", "error"); hideLoading(); } return; 
+                } catch (err) { window.showToast("접속 장애", "error"); window.hideLoading(); } return; 
             }
-            showLoading("인증 중...");
+            window.showLoading("인증 중...");
             try {
                 let loginTargetEmail = emailField; if (!loginTargetEmail.includes('@') && loginTargetEmail !== 'admin') loginTargetEmail = loginTargetEmail + '@school.hs.kr';
                 const { error } = await supabase.auth.signInWithPassword({ email: loginTargetEmail, password: passwordField });
-                if (error) { window.showToast(`인증 실패: ${error.message}`, 'error'); hideLoading(); }
-            } catch (err) { window.showToast("통신 실패.", 'error'); hideLoading(); }
+                if (error) { window.showToast(`인증 실패: ${error.message}`, 'error'); window.hideLoading(); }
+            } catch (err) { window.showToast("통신 실패.", 'error'); window.hideLoading(); }
         });
 
         // =========================================================================
@@ -898,72 +922,72 @@
         // =========================================================================
         function initStudentDashboard() {
             switchView('student');
-            document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year || ''}년 입학 | ${currentUserProfile.student_id || ''} | ${currentUserProfile.name}`;
-            document.getElementById('pdfExportStudentId').innerText = currentUserProfile.student_id || '-'; document.getElementById('pdfExportStudentName').innerText = currentUserProfile.name || '-';
-            document.getElementById('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
-            document.getElementById('pfGrade').value = currentStudentGrade;
+            document.getElementById('studentNavInfo').innerText = `${window.currentUserProfile.admission_year || ''}년 입학 | ${window.currentUserProfile.student_id || ''} | ${window.currentUserProfile.name}`;
+            document.getElementById('pdfExportStudentId').innerText = window.currentUserProfile.student_id || '-'; document.getElementById('pdfExportStudentName').innerText = window.currentUserProfile.name || '-';
+            document.getElementById('pfYearInput').value = window.currentUserProfile.admission_year || new Date().getFullYear();
+            document.getElementById('pfGrade').value = window.currentStudentGrade;
 
-            loadCareerInfo(); loadStudentPortfolios(currentStudentGrade); loadSchoolEventsForStudents();
+            loadCareerInfo(); loadStudentPortfolios(window.currentStudentGrade); loadSchoolEventsForStudents();
 
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
                     document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
                     e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
-                    currentStudentGrade = parseInt(e.target.dataset.grade); document.getElementById('pfGrade').value = currentStudentGrade; loadStudentPortfolios(currentStudentGrade);
+                    window.currentStudentGrade = parseInt(e.target.dataset.grade); document.getElementById('pfGrade').value = window.currentStudentGrade; loadStudentPortfolios(window.currentStudentGrade);
                 }
             });
             document.getElementById('studentSearchInput').addEventListener('input', renderStudentPortfoliosFiltered); document.getElementById('studentAreaFilter').addEventListener('change', renderStudentPortfoliosFiltered); document.getElementById('studentEventSearch').addEventListener('input', renderEventsFiltered);
         }
 
         function loadCareerInfo() {
-            let info = {}; if (currentUserProfile.career_info) { try { info = JSON.parse(currentUserProfile.career_info); } catch(e) {} }
+            let info = {}; if (window.currentUserProfile.career_info) { try { info = JSON.parse(window.currentUserProfile.career_info); } catch(e) {} }
             document.getElementById('pdfInputCareer').value = info.career || '';
             document.getElementById('pdfInputUniv1').value = info.univ1 || ''; document.getElementById('pdfInputUniv2').value = info.univ2 || ''; document.getElementById('pdfInputUniv3').value = info.univ3 || '';
             document.getElementById('pdfInputMajor1').value = info.major1 || ''; document.getElementById('pdfInputMajor2').value = info.major2 || ''; document.getElementById('pdfInputMajor3').value = info.major3 || '';
         }
 
         window.saveStudentCareerInfo = async function() {
-            showLoading("저장 중...");
+            window.showLoading("저장 중...");
             const careerInfo = { career: document.getElementById('pdfInputCareer').value, univ1: document.getElementById('pdfInputUniv1').value, univ2: document.getElementById('pdfInputUniv2').value, univ3: document.getElementById('pdfInputUniv3').value, major1: document.getElementById('pdfInputMajor1').value, major2: document.getElementById('pdfInputMajor2').value, major3: document.getElementById('pdfInputMajor3').value };
-            try { await supabase.from('profiles').update({ career_info: JSON.stringify(careerInfo) }).eq('id', currentUser.id); currentUserProfile.career_info = JSON.stringify(careerInfo); localStorage.setItem('eduport-cached-profile', JSON.stringify(currentUserProfile)); window.showToast("진로 정보 보존 완료.", "success"); } 
-            catch (err) { window.showToast("저장 실패", "error"); } finally { hideLoading(); }
+            try { await supabase.from('profiles').update({ career_info: JSON.stringify(careerInfo) }).eq('id', window.currentUser.id); window.currentUserProfile.career_info = JSON.stringify(careerInfo); localStorage.setItem('eduport-cached-profile', JSON.stringify(window.currentUserProfile)); window.showToast("진로 정보 보존 완료.", "success"); } 
+            catch (err) { window.showToast("저장 실패", "error"); } finally { window.hideLoading(); }
         };
 
         document.getElementById('portfolioForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); showLoading(editingPortfolioId ? "수정 중..." : "등록 중...");
+            e.preventDefault(); window.showLoading(window.editingPortfolioId ? "수정 중..." : "등록 중...");
             const contentData = { execution: document.getElementById('pfExecution').value, year: document.getElementById('pfYearInput').value, simple_content: document.getElementById('pfSimpleContent').value, reading: document.getElementById('pfReading').value };
             const inputGrade = parseInt(document.getElementById('pfGrade').value);
-            const data = { student_uid: currentUser.id, grade: inputGrade, semester: parseInt(document.getElementById('pfSemester').value), area: document.getElementById('pfArea').value, activity_name: document.getElementById('pfActivityName').value, content: JSON.stringify(contentData), self_evaluation: document.getElementById('pfSelfEval').value, updated_at: new Date().toISOString() };
+            const data = { student_uid: window.currentUser.id, grade: inputGrade, semester: parseInt(document.getElementById('pfSemester').value), area: document.getElementById('pfArea').value, activity_name: document.getElementById('pfActivityName').value, content: JSON.stringify(contentData), self_evaluation: document.getElementById('pfSelfEval').value, updated_at: new Date().toISOString() };
             try {
-                if (editingPortfolioId) { await supabase.from('portfolios').update(data).eq('id', editingPortfolioId); window.showToast("수정 완료!", 'success'); } 
+                if (window.editingPortfolioId) { await supabase.from('portfolios').update(data).eq('id', window.editingPortfolioId); window.showToast("수정 완료!", 'success'); } 
                 else { await supabase.from('portfolios').insert([data]); window.showToast("등록 완료!", 'success'); }
-                currentStudentGrade = inputGrade; document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition"); document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
-                window.cancelEditPortfolio(); await loadStudentPortfolios(currentStudentGrade); 
-            } catch (err) { window.showToast("오류 발생", 'error'); } finally { hideLoading(); }
+                window.currentStudentGrade = inputGrade; document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition"); document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
+                window.cancelEditPortfolio(); await loadStudentPortfolios(window.currentStudentGrade); 
+            } catch (err) { window.showToast("오류 발생", 'error'); } finally { window.hideLoading(); }
         });
 
         window.cancelEditPortfolio = function() {
-            editingPortfolioId = null; document.getElementById('portfolioForm').reset(); document.getElementById('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear(); document.getElementById('pfGrade').value = currentStudentGrade; document.getElementById('portfolioFormTitle').innerText = '✍️ 학업 및 진로 탐구 활동 등록'; document.getElementById('submitPortfolioBtn').innerText = '포트폴리오 영구 등록 ➔'; document.getElementById('cancelEditBtn').classList.add('hidden');
+            window.editingPortfolioId = null; document.getElementById('portfolioForm').reset(); document.getElementById('pfYearInput').value = window.currentUserProfile.admission_year || new Date().getFullYear(); document.getElementById('pfGrade').value = window.currentStudentGrade; document.getElementById('portfolioFormTitle').innerText = '✍️ 학업 및 진로 탐구 활동 등록'; document.getElementById('submitPortfolioBtn').innerText = '포트폴리오 영구 등록 ➔'; document.getElementById('cancelEditBtn').classList.add('hidden');
         };
 
         async function loadStudentPortfolios(grade) {
             const container = document.getElementById('portfolioList'); container.innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 font-bold">이력을 동기화하고 있습니다...</p></div>';
             try {
-                const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', currentUser.id).order('updated_at', { ascending: false });
-                if (error) throw error; cachedPortfolios = data || []; localStorage.setItem('eduport-cached-portfolios', JSON.stringify(cachedPortfolios));
-                const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(window.calculateStats(cachedPortfolios)); statsContainer.classList.remove('hidden'); renderStudentPortfoliosFiltered();
+                const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', window.currentUser.id).order('updated_at', { ascending: false });
+                if (error) throw error; window.cachedPortfolios = data || []; localStorage.setItem('eduport-cached-portfolios', JSON.stringify(window.cachedPortfolios));
+                const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(window.calculateStats(window.cachedPortfolios)); statsContainer.classList.remove('hidden'); renderStudentPortfoliosFiltered();
             } catch (err) { 
                 container.innerHTML = `<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">오프라인 모드로 기록을 표시합니다.</p></div>`; 
                 const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
-                if (cachedPfs) { cachedPortfolios = JSON.parse(cachedPfs); const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(window.calculateStats(cachedPortfolios)); statsContainer.classList.remove('hidden'); renderStudentPortfoliosFiltered(); }
+                if (cachedPfs) { window.cachedPortfolios = JSON.parse(cachedPfs); const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(window.calculateStats(window.cachedPortfolios)); statsContainer.classList.remove('hidden'); renderStudentPortfoliosFiltered(); }
             }
         }
 
         function renderStudentPortfoliosFiltered() {
             const container = document.getElementById('portfolioList'); const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim(); const areaFilter = document.getElementById('studentAreaFilter').value;
-            let filtered = cachedPortfolios.filter(item => item.grade === currentStudentGrade);
+            let filtered = window.cachedPortfolios.filter(item => item.grade === window.currentStudentGrade);
             if (areaFilter) { if (areaFilter === "교과") filtered = filtered.filter(item => item.area === "교과"); else filtered = filtered.filter(item => item.area === areaFilter); }
-            if (keyword) { filtered = filtered.filter(item => { let text = (item.activity_name || '') + ' ' + (item.self_evaluation || ''); try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || '') + ' ' + (p.reading || ''); } catch(e) {} return text.toLowerCase().includes(keyword); }); }
+            if (keyword) { filtered = filtered.filter(item => { let text = (item.activity_name || '') + ' ' + (item.self_evaluation || ''); try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || '') + ' ' + (p.reading || ''); } catch(e) { text += ' ' + (item.content || ''); } return text.toLowerCase().includes(keyword); }); }
             if (filtered.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 text-sm font-bold">내역이 없습니다.</p></div>'; return; }
             let html = '';
             filtered.forEach(item => {
@@ -985,7 +1009,7 @@
         }
 
         window.editActivity = (id) => {
-            const item = cachedPortfolios.find(p => p.id === id); if(!item) return; editingPortfolioId = id;
+            const item = window.cachedPortfolios.find(p => p.id === id); if(!item) return; window.editingPortfolioId = id;
             document.getElementById('portfolioFormTitle').innerHTML = `✍️ <span class="text-blue-600">수정 모드</span> - ${item.activity_name}`; document.getElementById('submitPortfolioBtn').innerText = '수정 내용 적용하기 ✓'; document.getElementById('cancelEditBtn').classList.remove('hidden');
             document.getElementById('pfSemester').value = item.semester; document.getElementById('pfGrade').value = item.grade; document.getElementById('pfArea').value = item.area; document.getElementById('pfActivityName').value = item.activity_name; document.getElementById('pfSelfEval').value = item.self_evaluation;
             try { const p = JSON.parse(item.content); document.getElementById('pfExecution').value = p.execution || '참여함'; document.getElementById('pfYearInput').value = p.year || new Date().getFullYear(); document.getElementById('pfSimpleContent').value = p.simple_content || ''; document.getElementById('pfReading').value = p.reading || ''; } catch(e) {} window.scrollTo({top: 0, behavior: 'smooth'}); window.showToast("수정 모드로 전환되었습니다.", "success");
@@ -993,15 +1017,15 @@
 
         window.deleteActivity = async (id) => {
             const confirmed = await window.customConfirm("기록은 영구적으로 삭제되며 복구할 수 없습니다.\n정말 삭제하시겠습니까?", "포트폴리오 삭제");
-            if(!confirmed) return; showLoading("삭제 중..."); try { await supabase.from('portfolios').delete().eq('id', id); window.showToast("삭제 성공", 'success'); await loadStudentPortfolios(currentStudentGrade); } catch (err) { window.showToast("삭제 실패", 'error'); } finally { hideLoading(); }
+            if(!confirmed) return; window.showLoading("삭제 중..."); try { await supabase.from('portfolios').delete().eq('id', id); window.showToast("삭제 성공", 'success'); await loadStudentPortfolios(window.currentStudentGrade); } catch (err) { window.showToast("삭제 실패", 'error'); } finally { window.hideLoading(); }
         };
 
         async function loadSchoolEventsForStudents() {
-            const { data } = await supabase.from('school_events').select('*').in('target_grade', [0, currentStudentGrade]).order('event_date', { ascending: true }); cachedEventsData = data || []; renderEventsFiltered();
+            const { data } = await supabase.from('school_events').select('*').in('target_grade', [0, window.currentStudentGrade]).order('event_date', { ascending: true }); window.cachedEventsData = data || []; renderEventsFiltered();
         }
 
         function renderEventsFiltered() {
-            const container = document.getElementById('studentEventsList'); const keyword = document.getElementById('studentEventSearch') ? document.getElementById('studentEventSearch').value.toLowerCase().trim() : ''; let filtered = cachedEventsData;
+            const container = document.getElementById('studentEventsList'); const keyword = document.getElementById('studentEventSearch') ? document.getElementById('studentEventSearch').value.toLowerCase().trim() : ''; let filtered = window.cachedEventsData;
             if(keyword) filtered = filtered.filter(ev => ev.event_name.toLowerCase().includes(keyword) || ev.main_content.toLowerCase().includes(keyword));
             if(filtered.length === 0) { container.innerHTML = '<p class="text-sm text-slate-400 col-span-full py-4 font-bold">일치하는 행사가 없습니다.</p>'; return; }
             let html = '';
@@ -1012,23 +1036,23 @@
         }
 
         window.autofillEvent = (eventId) => {
-            const ev = cachedEventsData.find(e => e.id === eventId); if(!ev) return; const match = ev.event_name.match(/^\[(.*?)\]\s*(.*)$/);
+            const ev = window.cachedEventsData.find(e => e.id === eventId); if(!ev) return; const match = ev.event_name.match(/^\[(.*?)\]\s*(.*)$/);
             if(match) { const areaSelect = document.getElementById('pfArea'); for (let i=0; i<areaSelect.options.length; i++) { if(areaSelect.options[i].value === match[1]) { areaSelect.selectedIndex = i; break; } } document.getElementById('pfActivityName').value = match[2]; } else { document.getElementById('pfActivityName').value = ev.event_name; }
             document.getElementById('pfSimpleContent').value = ev.main_content.substring(0, 100); document.getElementById('pfExecution').value = "참여함";
-            window.showToast("✨ 행사 정보가 입력창에 채워졌습니다!", "success"); window.scrollTo({top: 0, behavior: 'smooth'});
+            window.showToast("✨ 행사 정보가 입력창에 자동으로 채워졌습니다!", "success"); window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
         // 🌟 명시적 인쇄 버튼 이벤트 연결 (HTML onclick 연계로 유실 불가 보장)
         window.printStudentPortfolio = async () => {
-            showLoading("3개년 전체 포트폴리오 데이터를 취합하고 있습니다...");
+            window.showLoading("3개년 전체 포트폴리오 데이터를 취합하고 있습니다...");
             try {
-                let dataToPrint = cachedPortfolios;
+                let dataToPrint = window.cachedPortfolios;
                 try {
-                    const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', currentUser.id).order('grade', { ascending: true }).order('semester', { ascending: true }).order('updated_at', { ascending: false });
+                    const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', window.currentUser.id).order('grade', { ascending: true }).order('semester', { ascending: true }).order('updated_at', { ascending: false });
                     if (!error && data) dataToPrint = data;
                 } catch(e) { console.warn("오프라인 캐시를 사용해 인쇄합니다."); }
 
-                if (!dataToPrint || dataToPrint.length === 0) { window.showToast("출력할 내역이 없습니다.", "error"); hideLoading(); return; }
+                if (!dataToPrint || dataToPrint.length === 0) { window.showToast("출력할 내역이 없습니다.", "error"); window.hideLoading(); return; }
 
                 document.getElementById('pdfPrintCareer').innerText = document.getElementById('pdfInputCareer')?.value || '-';
                 const u1 = document.getElementById('pdfInputUniv1')?.value; const u2 = document.getElementById('pdfInputUniv2')?.value; const u3 = document.getElementById('pdfInputUniv3')?.value; document.getElementById('pdfPrintCollege').innerText = [u1, u2, u3].filter(Boolean).join(' / ') || '-';
@@ -1042,8 +1066,8 @@
                     if (gradePortfolios.length > 0) html += `<div style="margin-top: 25px; page-break-before: auto;"><h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a; page-break-after: avoid;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gradePortfolios)}</div>`;
                 });
                 document.getElementById('pdfExportContent').innerHTML = html;
-                hideLoading(); setTimeout(() => window.print(), 300);
-            } catch (err) { window.showToast("인쇄 중 오류 발생", "error"); hideLoading(); }
+                window.hideLoading(); setTimeout(() => window.print(), 300);
+            } catch (err) { window.showToast("인쇄 중 오류 발생", "error"); window.hideLoading(); }
         };
 
         // =========================================================================
@@ -1051,14 +1075,14 @@
         // =========================================================================
         function initTeacherDashboard() {
             switchView('teacher');
-            document.getElementById('teacherNavInfo').innerText = `${currentUserProfile.name} 교사`;
+            document.getElementById('teacherNavInfo').innerText = `${window.currentUserProfile.name} 교사`;
             
             loadStudentList(); loadGlobalTimelineFeed(); loadTeacherEvents();
 
             document.getElementById('teacherStudentSearch').addEventListener('input', applyTeacherFilters); document.getElementById('filterGradeSelect').addEventListener('change', applyTeacherFilters); document.getElementById('filterYearSelect').addEventListener('change', applyTeacherFilters);
             document.getElementById('timelineAreaFilter').addEventListener('change', applyTimelineFilters); document.getElementById('timelineSearchInput').addEventListener('input', applyTimelineFilters);
 
-            const isAdmin = currentUserProfile.role === 'admin' || (currentUserProfile.role === 'teacher' && currentUserProfile.email === 'admin@school.hs.kr');
+            const isAdmin = window.currentUserProfile.role === 'admin' || (window.currentUserProfile.role === 'teacher' && window.currentUserProfile.email === 'admin@school.hs.kr');
             if (isAdmin) document.getElementById('openAdminPanelBtn').classList.remove('hidden'); else document.getElementById('openAdminPanelBtn').classList.add('hidden');
             document.getElementById('openAdminPanelBtn').onclick = () => { document.getElementById('adminPanelModal').classList.remove('hidden'); loadAllProfilesForAdmin(); };
             document.getElementById('closeAdminPanelBtn').onclick = () => document.getElementById('adminPanelModal').classList.add('hidden');
@@ -1076,7 +1100,7 @@
         };
 
         window.syncGoogleSheetEvents = async () => {
-            if (!GOOGLE_SHEET_CSV_URL) return; showLoading("스프레드시트 동기화 중...");
+            if (!GOOGLE_SHEET_CSV_URL) return; window.showLoading("스프레드시트 동기화 중...");
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL); if (!response.ok) throw new Error("네트워크 오류");
                 const csvData = await response.text(); const rows = csvData.split('\n').slice(1); let successCount = 0;
@@ -1086,20 +1110,20 @@
                     const eventDateStr = `${new Date().getFullYear()}-${String(startMonth || 3).padStart(2, '0')}-01`;
                     await supabase.from('school_events').insert([{ event_name: `[${recordArea}] ${eventName}`, event_date: eventDateStr, target_grade: targetGrade, organizer: organizer, main_content: mainContent }]); successCount++;
                 }
-                window.showToast("동기화 완료!", 'success'); loadTeacherEvents(); if(currentUserProfile.role === 'student') loadSchoolEventsForStudents();
-            } catch (err) { window.showToast("연동 오류", 'error'); } finally { hideLoading(); }
+                window.showToast("동기화 완료!", 'success'); loadTeacherEvents(); if(window.currentUserProfile.role === 'student') loadSchoolEventsForStudents();
+            } catch (err) { window.showToast("연동 오류", 'error'); } finally { window.hideLoading(); }
         };
 
         window.openGoogleSheet = () => { if(GOOGLE_SHEET_EDIT_URL) window.open(GOOGLE_SHEET_EDIT_URL, '_blank'); else window.showToast("시트 주소가 없습니다.", "error"); };
 
         window.printTeacherPortfolio = () => {
-            if (!teacherCachedPortfolios || teacherCachedPortfolios.length === 0) { window.showToast("출력할 내역이 존재하지 않습니다.", "error"); return; }
-            document.getElementById('pdfExportStudentId').innerText = teacherSelectedStudentId || '-'; document.getElementById('pdfExportStudentName').innerText = teacherSelectedStudentName || '-';
-            let cInfo = {}; try { if(teacherSelectedStudentCareerInfo) cInfo = JSON.parse(teacherSelectedStudentCareerInfo); } catch(e){}
+            if (!window.teacherCachedPortfolios || window.teacherCachedPortfolios.length === 0) { window.showToast("출력할 내역이 존재하지 않습니다.", "error"); return; }
+            document.getElementById('pdfExportStudentId').innerText = window.teacherSelectedStudentId || '-'; document.getElementById('pdfExportStudentName').innerText = window.teacherSelectedStudentName || '-';
+            let cInfo = {}; try { if(window.teacherSelectedStudentCareerInfo) cInfo = JSON.parse(window.teacherSelectedStudentCareerInfo); } catch(e){}
             document.getElementById('pdfPrintCareer').innerText = cInfo.career || '-'; document.getElementById('pdfPrintCollege').innerText = [cInfo.univ1, cInfo.univ2, cInfo.univ3].filter(Boolean).join(' / ') || '-'; document.getElementById('pdfPrintMajor').innerText = [cInfo.major1, cInfo.major2, cInfo.major3].filter(Boolean).join(' / ') || '-';
             
-            const stats = window.calculateStats(teacherCachedPortfolios); document.getElementById('pdfExportStats').innerHTML = window.renderPdfStatsHTML(stats);
-            const sortedPortfolios = [...teacherCachedPortfolios].sort((a, b) => { if(a.grade !== b.grade) return a.grade - b.grade; return a.semester - b.semester; });
+            const stats = window.calculateStats(window.teacherCachedPortfolios); document.getElementById('pdfExportStats').innerHTML = window.renderPdfStatsHTML(stats);
+            const sortedPortfolios = [...window.teacherCachedPortfolios].sort((a, b) => { if(a.grade !== b.grade) return a.grade - b.grade; return a.semester - b.semester; });
             let html = '';
             [1, 2, 3].forEach(g => {
                 const gradePortfolios = sortedPortfolios.filter(item => item.grade === g);
@@ -1109,32 +1133,32 @@
         };
 
         async function loadTeacherEvents() {
-            const { data } = await supabase.from('school_events').select('*').order('event_date', { ascending: true }); cachedEventsData = data || []; const container = document.getElementById('teacherEventsList');
-            if(cachedEventsData.length === 0) { container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-4">일정이 없습니다.</p>'; return; }
+            const { data } = await supabase.from('school_events').select('*').order('event_date', { ascending: true }); window.cachedEventsData = data || []; const container = document.getElementById('teacherEventsList');
+            if(window.cachedEventsData.length === 0) { container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-4">일정이 없습니다.</p>'; return; }
             let html = '';
-            cachedEventsData.forEach(ev => { html += `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex flex-col"><div class="flex justify-between items-center mb-1"><span class="text-sm font-bold text-white truncate max-w-[160px]">${ev.event_name}</span><span class="text-[10px] text-indigo-300">${ev.event_date}</span></div><span class="text-xs text-slate-400 truncate">${ev.organizer} | ${ev.target_grade===0?'공통':ev.target_grade+'학년'}</span></div>`; });
+            window.cachedEventsData.forEach(ev => { html += `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex flex-col"><div class="flex justify-between items-center mb-1"><span class="text-sm font-bold text-white truncate max-w-[160px]">${ev.event_name}</span><span class="text-[10px] text-indigo-300">${ev.event_date}</span></div><span class="text-xs text-slate-400 truncate">${ev.organizer} | ${ev.target_grade===0?'공통':ev.target_grade+'학년'}</span></div>`; });
             container.innerHTML = html;
         }
 
         document.getElementById('eventForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); showLoading("등록 중...");
+            e.preventDefault(); window.showLoading("등록 중...");
             const data = { event_name: document.getElementById('evName').value, event_date: document.getElementById('evDate').value, target_grade: parseInt(document.getElementById('evTarget').value), organizer: document.getElementById('evOrganizer').value, main_content: document.getElementById('evContent').value };
-            await supabase.from('school_events').insert([data]); hideLoading(); window.showToast("행사 등록 완료", 'success'); document.getElementById('eventForm').reset(); window.closeEventModal(); loadTeacherEvents(); 
+            await supabase.from('school_events').insert([data]); window.hideLoading(); window.showToast("행사 등록 완료", 'success'); document.getElementById('eventForm').reset(); window.closeEventModal(); loadTeacherEvents(); 
         });
 
         async function loadStudentList() {
             const cachedSts = localStorage.getItem('eduport-cached-students');
-            if (cachedSts) { cachedStudents = JSON.parse(cachedSts); renderStudentList(cachedStudents); }
-            else { showLoading("명단 구성 중..."); }
+            if (cachedSts) { window.cachedStudents = JSON.parse(cachedSts); renderStudentList(window.cachedStudents); }
+            else { window.showLoading("명단 구성 중..."); }
             try {
                 const { data, error } = await supabase.from('profiles').select('*').eq('role', 'student').order('admission_year', { ascending: false }).order('student_id', { ascending: true });
                 if (error) throw error;
-                cachedStudents = data || []; localStorage.setItem('eduport-cached-students', JSON.stringify(cachedStudents));
-                const years = [...new Set(cachedStudents.map(s => s.admission_year).filter(Boolean))].sort((a,b)=>b-a);
+                window.cachedStudents = data || []; localStorage.setItem('eduport-cached-students', JSON.stringify(window.cachedStudents));
+                const years = [...new Set(window.cachedStudents.map(s => s.admission_year).filter(Boolean))].sort((a,b)=>b-a);
                 const yearSelect = document.getElementById('filterYearSelect'); yearSelect.innerHTML = '<option value="">전체 입학</option>';
                 years.forEach(y => { yearSelect.innerHTML += `<option value="${y}">${y}학년도</option>`; });
-                renderStudentList(cachedStudents);
-            } catch (e) { console.warn("명부 지연: 캐시 유지"); } finally { hideLoading(); }
+                renderStudentList(window.cachedStudents);
+            } catch (e) { console.warn("명부 지연: 캐시 유지"); } finally { window.hideLoading(); }
         }
 
         function renderStudentList(students) {
@@ -1160,7 +1184,7 @@
 
         function applyTeacherFilters() {
             const searchKeyword = document.getElementById('teacherStudentSearch').value.toLowerCase().trim(); const yearFilter = document.getElementById('filterYearSelect').value; const gradeFilter = document.getElementById('filterGradeSelect').value;
-            let filtered = cachedStudents;
+            let filtered = window.cachedStudents;
             if (searchKeyword) filtered = filtered.filter(s => s.name.toLowerCase().includes(searchKeyword) || (s.student_id && s.student_id.toLowerCase().includes(searchKeyword)));
             if (yearFilter) filtered = filtered.filter(s => s.admission_year === parseInt(yearFilter));
             if (gradeFilter) { const currentYear = new Date().getFullYear(); filtered = filtered.filter(s => { if (!s.admission_year) return false; return ((currentYear - s.admission_year) + 1) === parseInt(gradeFilter); }); }
@@ -1170,18 +1194,18 @@
         async function loadGlobalTimelineFeed() {
             const feedContainer = document.getElementById('globalTimelineFeed');
             try {
-                // RLS 조인 에러 완전 차단: 순수 portfolios 테이블만 호출 후 로컬 명부와 매핑
-                const { data, error } = await supabase.from('portfolios').select('*').order('updated_at', { ascending: false }).limit(20);
-                if (error) throw error; cachedTimelineData = data || []; window.applyTimelineFilters(); 
-            } catch (err) { feedContainer.innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">피드 로딩 지연 중단</p>`; }
+                // 🌟 RLS 조인 에러 완전 차단: profiles 조인을 빼고 순수 portfolios 테이블만 호출 후 로컬 명부와 매핑
+                const { data, error } = await supabase.from('portfolios').select('*').order('updated_at', { ascending: false }).limit(25);
+                if (error) throw error; window.cachedTimelineData = data || []; window.applyTimelineFilters(); 
+            } catch (err) { feedContainer.innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">피드 로딩 지연</p>`; }
         }
 
         window.applyTimelineFilters = function() {
             const feedContainer = document.getElementById('globalTimelineFeed'); const areaFilter = document.getElementById('timelineAreaFilter').value; const keyword = document.getElementById('timelineSearchInput').value.toLowerCase().trim();
             
-            // 수동으로 이름 및 학번 매핑 (DB Join 대체 기술)
-            let filtered = cachedTimelineData.map(item => {
-                const stu = cachedStudents.find(s => s.id === item.student_uid);
+            // 수동으로 이름 및 학번 매핑 (DB Join 에러 대체 기술)
+            let filtered = window.cachedTimelineData.map(item => {
+                const stu = window.cachedStudents.find(s => s.id === item.student_uid);
                 return { ...item, st_name: stu ? stu.name : '학생', st_id: stu ? stu.student_id : '' };
             });
 
@@ -1202,23 +1226,23 @@
         };
 
         window.showDirectStudentDetail = async (studentUid) => {
-            const student = cachedStudents.find(s => s.id === studentUid); if (!student) return;
+            const student = window.cachedStudents.find(s => s.id === studentUid); if (!student) return;
             if (window.innerWidth < 1024) { window.setMobileActiveTab('detail'); tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${student.name} 분석`; } 
             else { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherTimelineCard').classList.remove('flex'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); }
             window.openStudentDetail(studentUid, student.name, `학번: ${student.student_id || ''} | ${student.admission_year || ''}년도 입학`);
         };
 
         window.openStudentDetail = async (uid, name, info) => {
-            selectedStudentUid = uid; teacherSelectedStudentName = name; const student = cachedStudents.find(s => s.id === uid); teacherSelectedStudentId = student ? student.student_id : '-'; teacherSelectedStudentCareerInfo = student ? student.career_info : null;
+            window.selectedStudentUid = uid; window.teacherSelectedStudentName = name; const student = window.cachedStudents.find(s => s.id === uid); window.teacherSelectedStudentId = student ? student.student_id : '-'; window.teacherSelectedStudentCareerInfo = student ? student.career_info : null;
             document.getElementById('detailStudentName').innerText = name; document.getElementById('detailStudentInfo').innerText = info;
             const container = document.getElementById('teacherPortfolioList'); container.innerHTML = '<p class="text-center py-10 text-sm font-bold text-slate-400">불러오는 중...</p>';
             try {
                 // RLS 조인 에러 원천 차단: feedbacks는 본인 데이터 종속이므로 허용됨
                 const { data, error } = await supabase.from('portfolios').select('*, feedbacks(id, feedback_content)').eq('student_uid', uid).order('updated_at', { ascending: false });
                 if (error) throw error;
-                if(!data || data.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-sm text-slate-400 font-bold">기록이 없습니다.</p></div>'; document.getElementById('teacherStatsContainer').classList.add('hidden'); teacherCachedPortfolios = []; return; }
+                if(!data || data.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-sm text-slate-400 font-bold">기록이 없습니다.</p></div>'; document.getElementById('teacherStatsContainer').classList.add('hidden'); window.teacherCachedPortfolios = []; return; }
                 
-                teacherCachedPortfolios = data || []; const stats = window.calculateStats(teacherCachedPortfolios); const teacherStatsContainer = document.getElementById('teacherStatsContainer'); teacherStatsContainer.innerHTML = window.renderStatsHTML(stats); teacherStatsContainer.classList.remove('hidden');
+                window.teacherCachedPortfolios = data || []; const stats = window.calculateStats(window.teacherCachedPortfolios); const teacherStatsContainer = document.getElementById('teacherStatsContainer'); teacherStatsContainer.innerHTML = window.renderStatsHTML(stats); teacherStatsContainer.classList.remove('hidden');
                 let html = '';
                 data.forEach(item => {
                     const fb = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : (item.feedbacks ? item.feedbacks.feedback_content : '');
@@ -1249,16 +1273,16 @@
         };
 
         window.saveFeedback = async (portfolioId) => {
-            const content = document.getElementById(`fb_${portfolioId}`).value; showLoading("피드백 저장 중...");
-            try { await supabase.from('feedbacks').upsert({ portfolio_id: portfolioId, teacher_uid: currentUser.id, feedback_content: content }, { onConflict: 'portfolio_id' }); window.showToast("피드백 반영 완료", 'success'); } catch(e) { window.showToast("저장 실패", 'error'); } finally { hideLoading(); }
+            const content = document.getElementById(`fb_${portfolioId}`).value; window.showLoading("피드백 저장 중...");
+            try { await supabase.from('feedbacks').upsert({ portfolio_id: portfolioId, teacher_uid: window.currentUser.id, feedback_content: content }, { onConflict: 'portfolio_id' }); window.showToast("피드백 반영 완료", 'success'); } catch(e) { window.showToast("저장 실패", 'error'); } finally { window.hideLoading(); }
         };
 
         // =========================================================================
         // 🛡️ [최고 관리자(Admin) 모달 렌더링 엔진]
         // =========================================================================
         async function loadAllProfilesForAdmin() {
-            showLoading("전체 회원 정보 취합 중...");
-            try { const { data, error } = await supabase.from('profiles').select('*').order('role', { ascending: false }).order('name', { ascending: true }); if (error) throw error; cachedAllUsersForAdmin = data || []; renderAdminUserTable(cachedAllUsersForAdmin); } catch(e) { window.showToast("명부 동기화 실패", "error"); } finally { hideLoading(); }
+            window.showLoading("전체 회원 정보 취합 중...");
+            try { const { data, error } = await supabase.from('profiles').select('*').order('role', { ascending: false }).order('name', { ascending: true }); if (error) throw error; window.cachedAllUsersForAdmin = data || []; renderAdminUserTable(window.cachedAllUsersForAdmin); } catch(e) { window.showToast("명부 동기화 실패", "error"); } finally { window.hideLoading(); }
         }
 
         function renderAdminUserTable(users) {
@@ -1285,14 +1309,14 @@
         }
 
         function applyAdminFilters() {
-            const keyword = document.getElementById('adminUserSearch').value.toLowerCase().trim(); const roleFilter = document.getElementById('adminRoleFilter').value; let filtered = cachedAllUsersForAdmin;
+            const keyword = document.getElementById('adminUserSearch').value.toLowerCase().trim(); const roleFilter = document.getElementById('adminRoleFilter').value; let filtered = window.cachedAllUsersForAdmin;
             if (roleFilter) filtered = filtered.filter(u => u.role === roleFilter);
             if (keyword) filtered = filtered.filter(u => u.name.toLowerCase().includes(keyword) || u.email.toLowerCase().includes(keyword) || (u.student_id && u.student_id.toLowerCase().includes(keyword)));
             renderAdminUserTable(filtered);
         }
 
         window.openAdminEditModal = (userId) => {
-            const u = cachedAllUsersForAdmin.find(user => user.id === userId); if (!u) return;
+            const u = window.cachedAllUsersForAdmin.find(user => user.id === userId); if (!u) return;
             document.getElementById('adminEditUserId').value = u.id; document.getElementById('adminEditName').value = u.name; document.getElementById('adminEditEmail').value = u.email; document.getElementById('adminEditRole').value = u.role; document.getElementById('adminEditYear').value = u.admission_year || ''; document.getElementById('adminEditStudentId').value = u.student_id || '';
             const fields = document.getElementById('adminStudentOnlyFields'); if (u.role === 'student') fields.classList.remove('hidden'); else fields.classList.add('hidden');
             document.getElementById('adminEditModal').classList.remove('hidden');
@@ -1302,20 +1326,20 @@
             e.preventDefault();
             const uid = document.getElementById('adminEditUserId').value; const role = document.getElementById('adminEditRole').value;
             const data = { name: document.getElementById('adminEditName').value.trim(), email: document.getElementById('adminEditEmail').value.trim(), role: role, admission_year: role === 'student' ? parseInt(document.getElementById('adminEditYear').value) || null : null, student_id: role === 'student' ? document.getElementById('adminEditStudentId').value.trim() || null : null };
-            showLoading("반영 중...");
-            try { await supabase.from('profiles').update(data).eq('id', uid); window.showToast("수정 완료.", "success"); document.getElementById('adminEditModal').classList.add('hidden'); await loadAllProfilesForAdmin(); } catch(err) { window.showToast("수정 거부", "error"); } finally { hideLoading(); }
+            window.showLoading("반영 중...");
+            try { await supabase.from('profiles').update(data).eq('id', uid); window.showToast("수정 완료.", "success"); document.getElementById('adminEditModal').classList.add('hidden'); await loadAllProfilesForAdmin(); } catch(err) { window.showToast("수정 거부", "error"); } finally { window.hideLoading(); }
         });
 
         window.adminResetPassword = async (userId, name) => {
-            const confirmed = await customConfirm(`'${name}' 회원의 비밀번호를 '123456'으로 강제 초기화하시겠습니까?`, "비밀번호 초기화"); if (!confirmed) return;
-            showLoading("처리 중...");
-            try { await supabase.from('profiles').update({ updated_at: new Date().toISOString() }).eq('id', userId); window.showToast(`🎉 초기화 완료! 임시 비밀번호는 '123456'입니다.`, "success"); } catch(err) { window.showToast("초기화 실패", "error"); } finally { hideLoading(); }
+            const confirmed = await window.customConfirm(`'${name}' 회원의 비밀번호를 '123456'으로 강제 초기화하시겠습니까?`, "비밀번호 초기화"); if (!confirmed) return;
+            window.showLoading("처리 중...");
+            try { await supabase.from('profiles').update({ updated_at: new Date().toISOString() }).eq('id', userId); window.showToast(`🎉 초기화 완료! 임시 비밀번호는 '123456'입니다.`, "success"); } catch(err) { window.showToast("초기화 실패", "error"); } finally { window.hideLoading(); }
         };
 
         window.adminDeleteUser = async (userId, name) => {
-            const confirmed = await customConfirm(`'${name}' 회원을 영구 제명하시겠습니까?\n모든 데이터가 삭제됩니다.`, "회원 영구 탈퇴"); if (!confirmed) return;
-            showLoading("제명 중...");
-            try { await supabase.from('profiles').delete().eq('id', userId); window.showToast("삭제되었습니다.", "success"); await loadAllProfilesForAdmin(); } catch(err) { window.showToast("삭제 거부", "error"); } finally { hideLoading(); }
+            const confirmed = await window.customConfirm(`'${name}' 회원을 영구 제명하시겠습니까?\n모든 데이터가 삭제됩니다.`, "회원 영구 탈퇴"); if (!confirmed) return;
+            window.showLoading("제명 중...");
+            try { await supabase.from('profiles').delete().eq('id', userId); window.showToast("삭제되었습니다.", "success"); await loadAllProfilesForAdmin(); } catch(err) { window.showToast("삭제 거부", "error"); } finally { window.hideLoading(); }
         };
 
     </script>

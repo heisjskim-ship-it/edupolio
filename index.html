@@ -181,6 +181,7 @@
         </nav>
 
         <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+            <!-- 🌟 진로 및 진학 희망 입력 섹션 -->
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b border-slate-100 pb-4">
                     <h2 class="font-black text-lg text-slate-900 tracking-tight">🎯 희망 진로 및 진학 목표 (인쇄 시 표지 반영)</h2>
@@ -260,7 +261,7 @@
                     
                     <div class="pt-2 flex justify-end gap-3">
                         <button type="button" id="cancelEditBtn" class="hidden px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition min-h-[44px]">수정 취소</button>
-                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black tracking-wide py-3.5 px-8 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-600/20 text-sm min-h-[44px]">포트폴리오 영구 등록 ➔</button>
+                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black py-3.5 px-8 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-600/20 text-sm min-h-[44px]">포트폴리오 영구 등록 ➔</button>
                     </div>
                 </form>
             </section>
@@ -376,7 +377,7 @@
                         </div>
                     </div>
                     <!-- 🌟 모바일에서 명부가 끊임없이 스크롤 되도록 유동성 보장 -->
-                    <ul id="studentListContainer" class="px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[200px] lg:min-h-0">
+                    <ul id="studentListContainer" class="px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[300px] lg:min-h-0">
                         <li class="text-xs text-slate-400 text-center py-10 font-medium">데이터를 취합하고 있습니다...</li>
                     </ul>
                 </div>
@@ -546,7 +547,6 @@
                 <tr><th colspan="1">희망 학과 (1~3)</th><td colspan="3" id="pdfPrintMajor">-</td></tr>
             </table>
         </div>
-        <!-- 🌟 인쇄용 통계 테이블 탑재 -->
         <div id="pdfExportStats" class="mb-4"></div>
         <div id="pdfExportContent"></div>
     </div>
@@ -555,7 +555,59 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
-        // 🌟 전역 렌더링 함수 등록 (인쇄 시 "not defined" 에러 원천 방지)
+        // 🌟 전역 함수 명시적 할당으로 Hoisting 및 ReferenceError를 완벽 차단합니다.
+        window.loadHomeLiveBoard = async () => {
+            const feedContainer = document.getElementById('homeTimelineFeed'); const eventContainer = document.getElementById('homeEventsList');
+            try {
+                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(6);
+                if (error) throw error;
+                let finalData = data || [];
+                
+                if (finalData.length === 0) {
+                    feedContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10 font-medium">최근 업데이트된 진로 기록이 없습니다.</p>';
+                } else {
+                    let html = '';
+                    finalData.forEach(item => {
+                        const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at || new Date());
+                        const formatUpdate = `${String(updateDate.getMonth()+1).padStart(2, '0')}/${String(updateDate.getDate()).padStart(2, '0')}`;
+                        const maskedName = blindName(item.profiles?.name || '학생');
+                        html += `
+                            <div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1 transition hover:bg-slate-800/60">
+                                <div class="flex items-center justify-between text-[9px]"><span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span><span class="text-slate-500 font-medium">${formatUpdate}</span></div>
+                                <h4 class="text-xs font-bold text-slate-200 truncate">${item.activity_name}</h4>
+                                <p class="text-[10px] text-slate-400 truncate">${formatContentSummary(item.content)}</p>
+                                <div class="text-[9px] text-slate-500 flex justify-between pt-1 border-t border-slate-800/50 font-medium">
+                                    <span>작성자: ${maskedName}</span>
+                                    <span class="text-emerald-400">실시간 연동 성공 ✓</span>
+                                </div>
+                            </div>`;
+                    });
+                    feedContainer.innerHTML = html;
+                }
+            } catch (err) { feedContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-10 font-medium">데이터 지연: ${err.message}</p>`; }
+
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                if (!response.ok) throw new Error("Google sync issue");
+                const csvData = await response.text();
+                const rows = csvData.split('\n').slice(1);
+                let html = ''; let successCount = 0;
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i].trim(); if (!row) continue;
+                    const cols = row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim());
+                    if (cols.length < 2) continue;
+                    const eventName = cols[1], recordArea = cols[2], startMonth = cols[3], mainContent = cols[6] || '세부내용 참조';
+                    html += `
+                        <div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1">
+                            <div class="flex items-center justify-between mb-1"><h4 class="text-xs font-bold text-white truncate max-w-[160px]">[${recordArea}] ${eventName}</h4><span class="text-[9px] bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2 py-0.5 rounded">${startMonth||'3'}월</span></div>
+                            <p class="text-[10px] text-slate-400 line-clamp-1 leading-relaxed">${mainContent}</p>
+                        </div>`;
+                    successCount++; if (successCount >= 5) break; 
+                }
+                eventContainer.innerHTML = html || '<p class="text-xs text-slate-500 text-center py-10">일정이 없습니다.</p>';
+            } catch (err) { eventContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">네트워크 연동 대기 중...</p>'; }
+        };
+
         window.generatePdfHtml = (portfolios) => {
             let pdfHtml = '';
             portfolios.forEach((item) => {
@@ -583,9 +635,7 @@
                 3: { 1: { '교과': 0, '자율': 0, '동아리': 0, '진로': 0 }, 2: { '교과': 0, '자율': 0, '동아리': 0, '진로': 0 } }
             };
             pfs.forEach(item => {
-                const g = parseInt(item.grade);
-                const s = parseInt(item.semester);
-                const a = item.area;
+                const g = parseInt(item.grade); const s = parseInt(item.semester); const a = item.area;
                 if (stats[g] && stats[g][s] && stats[g][s][a] !== undefined) stats[g][s][a]++;
             });
             return stats;
@@ -666,7 +716,7 @@
         let cachedEventsData = []; let cachedAllUsersForAdmin = []; let cachedTimelineData = [];
 
         let isAuthenticating = false; let editingPortfolioId = null;
-        let isAppReady = false; // 앱 초기 기동 여부 판단 락
+        let lastSessionId = null; 
 
         // UI 헬퍼
         const showLoading = (text = "연결을 준비하고 있습니다...") => { document.getElementById('loadingText').innerText = text; document.getElementById('loadingOverlay').classList.remove('hidden'); setTimeout(() => document.getElementById('loadingOverlay').classList.remove('opacity-0'), 10); };
@@ -696,16 +746,16 @@
 
         function switchView(viewName) {
             document.getElementById('authView').classList.add('hidden'); document.getElementById('studentView').classList.add('hidden'); document.getElementById('teacherView').classList.add('hidden'); document.getElementById('adminPanelModal').classList.add('hidden');
-            if (viewName === 'auth') { document.getElementById('authView').classList.remove('hidden'); loadHomeLiveBoard(); }
+            if (viewName === 'auth') { 
+                document.getElementById('authView').classList.remove('hidden'); 
+                window.loadHomeLiveBoard(); 
+            }
             else if (viewName === 'student') document.getElementById('studentView').classList.remove('hidden');
             else if (viewName === 'teacher') { 
                 const tv = document.getElementById('teacherView');
                 tv.classList.remove('hidden'); tv.classList.add('flex');
-                
-                // 모바일 디바이스 탭 제어 시스템
-                if (window.innerWidth < 1024) {
-                    setMobileActiveTab('list');
-                } else {
+                if (window.innerWidth < 1024) { setMobileActiveTab('list'); } 
+                else {
                     document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex'); 
                     document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
                     document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); 
@@ -714,9 +764,20 @@
             }
         }
 
-        // =========================================================================
-        // 📱 [모바일 전용 탭 바 스위치 제어 엔진]
-        // =========================================================================
+        function blindName(name) {
+            if (!name) return '학생'; const len = name.length;
+            if (len <= 2) return name.charAt(0) + '*';
+            return name.charAt(0) + '*'.repeat(len - 2) + name.charAt(len - 1);
+        }
+
+        function formatContentSummary(contentStr) {
+            try { const parsed = JSON.parse(contentStr); return `[${parsed.execution || '참여함'}] ${parsed.simple_content || ''}`; } catch(e) { return contentStr; }
+        }
+
+        setInterval(async () => {
+            try { await supabase.from('school_events').select('id').limit(1); } catch (e) {}
+        }, 1000 * 60 * 3);
+
         const tabBtnList = document.getElementById('tabBtnList');
         const tabBtnEvents = document.getElementById('tabBtnEvents');
         const tabBtnTimeline = document.getElementById('tabBtnTimeline');
@@ -724,15 +785,11 @@
 
         function setMobileActiveTab(tab) {
             if (window.innerWidth >= 1024) return;
-
             const inactiveClass = "flex-1 whitespace-nowrap px-2 text-[11px] font-bold text-slate-400 transition-all";
             const activeClass = "flex-1 whitespace-nowrap px-2 text-[11px] font-black text-blue-600 border-b-4 border-blue-600 transition-all bg-blue-50/30";
-            
             tabBtnList.className = inactiveClass; tabBtnEvents.className = inactiveClass; tabBtnTimeline.className = inactiveClass; tabBtnDetail.className = inactiveClass;
-
             const cardList = document.getElementById('teacherListCard'); const cardEvents = document.getElementById('teacherEventsCard');
             const cardTimeline = document.getElementById('teacherTimelineCard'); const cardDetail = document.getElementById('teacherDetailCard');
-
             cardList.classList.add('hidden'); cardList.classList.remove('flex');
             cardEvents.classList.add('hidden'); cardEvents.classList.remove('flex');
             cardTimeline.classList.add('hidden'); cardTimeline.classList.remove('flex');
@@ -753,7 +810,6 @@
             if (window.innerWidth >= 1024 && document.getElementById('teacherView').classList.contains('flex')) {
                 document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex');
                 document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
-                
                 if (selectedStudentUid) {
                     document.getElementById('teacherTimelineCard').classList.add('hidden');
                     document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex');
@@ -767,39 +823,21 @@
             }
         });
 
-        // =========================================================================
-        // 🔒 [서버 지연 없는 0.1초 즉시 부팅(Offline-First) 및 런타임 제어 엔진]
-        // =========================================================================
-        
+        // 🌟 0.1초 오프라인 캐시 및 자가 부팅
         async function runZeroLatencyBoot() {
             showLoading("연결 상태를 확인 중입니다...");
-            
-            // 1. 브라우저 캐시에 세션 증거가 있는지 1차 검사
             const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
             const hasAuthTokens = Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
             
-            if (!cachedProfileStr || !hasAuthTokens) {
-                switchView('auth');
-                hideLoading();
-                return;
-            }
+            if (!cachedProfileStr || !hasAuthTokens) { switchView('auth'); hideLoading(); return; }
 
-            // 2. 서버와의 실제 인증 상태를 비동기로 신속하게 질의
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
             if (sessionError || !session) {
-                // 토큰 만료 및 꼬임 현상 원천 삭제
                 console.warn("로그인 세션 만료. 안전하게 캐시를 비우고 홈으로 돌아갑니다.");
-                forceClearLocalSession();
-                switchView('auth');
-                hideLoading();
-                return;
+                forceClearLocalSession(); switchView('auth'); hideLoading(); return;
             }
 
-            // 3. 인증 통과 시 오프라인 캐시를 이용해 화면을 0.01초만에 즉시 렌더링
-            currentUser = session.user;
-            currentUserProfile = JSON.parse(cachedProfileStr);
-            isAppReady = true;
+            currentUser = session.user; currentUserProfile = JSON.parse(cachedProfileStr); isAppReady = true;
 
             if (currentUserProfile.role === 'student') {
                 initStudentDashboard();
@@ -811,55 +849,39 @@
                 if (cachedSts) { cachedStudents = JSON.parse(cachedSts); renderStudentList(cachedStudents); }
             }
             
-            hideLoading(); // 🌟 사용자 화면 즉시 활성화 완료
-
-            // 4. 백그라운드 무중단 동기화 (Silent Sync)
+            hideLoading();
             syncProfileBackground();
         }
 
         async function syncProfileBackground() {
             try {
-                // 15초 제한으로 서버가 깊이 잠들어있을 경우 빠른 포기 유도
                 const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 15000));
                 const fetchProfile = supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
                 let { data: profile, error } = await Promise.race([fetchProfile, timeout]);
                 
-                // 유실 시 자가 치유 재생성
                 if (error || !profile) {
                     const meta = currentUser.user_metadata || {};
-                    const fallbackProfile = {
-                        id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email,
-                        role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null
-                    };
+                    const fallbackProfile = { id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
                     const { data: inserted, error: insertError } = await supabase.from('profiles').insert([fallbackProfile]).select().maybeSingle();
                     profile = (!insertError && inserted) ? inserted : fallbackProfile;
                 }
-
-                currentUserProfile = profile;
-                localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
-                console.log("백그라운드 프로필 동기화 완료");
-            } catch (e) {
-                console.warn("오프라인 모드 유지 (서버 지연 중):", e.message);
-            }
+                currentUserProfile = profile; localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
+            } catch (e) { console.warn("오프라인 모드 유지 (서버 지연 중):", e.message); }
         }
 
-        // 초기 앱 구동 엔진 실행
         runZeroLatencyBoot();
 
-        // 단순 로그인 성공 및 로그아웃 트리거 전용 옵저버
         supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_OUT') { 
-                currentUser = null; currentUserProfile = null; forceClearLocalSession();
-                switchView('auth'); hideLoading(); 
-            } else if (event === 'SIGNED_IN' && !isAppReady) {
-                // 로그인 폼에서 새롭게 로그인한 경우
-                runZeroLatencyBoot();
-            }
+            try {
+                if (event === 'SIGNED_OUT') { 
+                    currentUser = null; currentUserProfile = null; forceClearLocalSession();
+                    switchView('auth'); hideLoading(); 
+                } else if (event === 'SIGNED_IN' && !isAppReady) {
+                    runZeroLatencyBoot();
+                }
+            } catch (e) { hideLoading(); }
         });
 
-        // =========================================================================
-        // 🔒 [인증 및 폼 액션 제어]
-        // =========================================================================
         document.getElementById('showSignupBtn').onclick = (e) => { e.preventDefault(); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('signupForm').classList.remove('hidden'); };
         document.getElementById('showLoginBtn').onclick = (e) => { e.preventDefault(); document.getElementById('signupForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); };
         document.getElementById('roleStudentBtn').onclick = () => { document.getElementById('signupRole').value = 'student'; document.getElementById('roleStudentBtn').className = "w-1/2 py-2 bg-white text-blue-600 shadow-sm font-black rounded-lg transition text-xs"; document.getElementById('roleTeacherBtn').className = "w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.remove('hidden'); };
@@ -878,10 +900,7 @@
         });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const emailField = document.getElementById('loginEmail').value.trim();
-            const passwordField = document.getElementById('loginPassword').value;
-
+            e.preventDefault(); const emailField = document.getElementById('loginEmail').value.trim(); const passwordField = document.getElementById('loginPassword').value;
             if ((emailField === 'admin' || emailField === 'admin@school.hs.kr') && passwordField === 'tlagkr1!') {
                 showLoading("최고관리자 인증 중...");
                 try {
@@ -895,57 +914,36 @@
                 } catch (err) { showToast("권한 처리 장애", "error"); hideLoading(); }
                 return; 
             }
-
             showLoading("인증 중...");
             try {
-                let loginTargetEmail = emailField;
-                if (!loginTargetEmail.includes('@') && loginTargetEmail !== 'admin') loginTargetEmail = loginTargetEmail + '@school.hs.kr';
+                let loginTargetEmail = emailField; if (!loginTargetEmail.includes('@') && loginTargetEmail !== 'admin') loginTargetEmail = loginTargetEmail + '@school.hs.kr';
                 const { error } = await supabase.auth.signInWithPassword({ email: loginTargetEmail, password: passwordField });
                 if (error) { showToast(`인증 실패: ${error.message}`, 'error'); hideLoading(); }
             } catch (err) { showToast("통신 실패.", 'error'); hideLoading(); }
         });
 
-        // =========================================================================
-        // 🔒 [로그아웃 버튼 100% 무중단 퓨즈 제어]
-        // =========================================================================
+        // 🌟 무한 로딩 차단 완벽 로그아웃 퓨즈
         document.querySelectorAll('.logoutBtn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                showLoading("로그아웃을 처리하고 있습니다...");
-                
-                // 1. 브라우저 로컬 데이터 먼저 파괴 (가장 빠르고 확실한 락 해제)
-                forceClearLocalSession();
-                currentUser = null;
-                currentUserProfile = null;
-                isAppReady = false;
-                
+                e.preventDefault(); showLoading("로그아웃을 처리하고 있습니다...");
                 try {
-                    // 2. 서버 로그아웃은 비동기로 조용하게 던지고 최대 0.5초만 기다립니다.
+                    forceClearLocalSession(); currentUser = null; currentUserProfile = null; isAppReady = false; lastSessionId = null;
                     await Promise.race([ supabase.auth.signOut(), new Promise(r => setTimeout(r, 500)) ]);
-                } catch(err) {}
-                
-                // 3. 홈 화면 즉시 렌더링
-                switchView('auth');
-                hideLoading();
-                showToast("안전하게 로그아웃 되었습니다.", "success");
+                } catch(err) { console.error(err); } finally {
+                    switchView('auth'); hideLoading(); showToast("안전하게 로그아웃 되었습니다.", "success");
+                }
             });
         });
 
-        // =========================================================================
-        // 🎓 [학생 대시보드]
-        // =========================================================================
         function initStudentDashboard() {
             switchView('student');
             document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year || ''}년 입학 | ${currentUserProfile.student_id || ''} | ${currentUserProfile.name}`;
-            
             document.getElementById('pdfExportStudentId').innerText = currentUserProfile.student_id || '-';
             document.getElementById('pdfExportStudentName').innerText = currentUserProfile.name || '-';
             document.getElementById('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
             document.getElementById('pfGrade').value = currentStudentGrade;
 
-            loadCareerInfo();
-            loadStudentPortfolios(currentStudentGrade);
-            loadSchoolEventsForStudents();
+            loadCareerInfo(); loadStudentPortfolios(currentStudentGrade); loadSchoolEventsForStudents();
 
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
@@ -957,7 +955,6 @@
                     loadStudentPortfolios(currentStudentGrade);
                 }
             });
-            
             document.getElementById('syncSheetStudentBtn').onclick = () => syncGoogleSheetEvents();
             document.getElementById('studentSearchInput').addEventListener('input', renderStudentPortfoliosFiltered);
             document.getElementById('studentAreaFilter').addEventListener('change', renderStudentPortfoliosFiltered);
@@ -974,10 +971,7 @@
         }
 
         function loadCareerInfo() {
-            let info = {};
-            if (currentUserProfile.career_info) {
-                try { info = JSON.parse(currentUserProfile.career_info); } catch(e) {}
-            }
+            let info = {}; if (currentUserProfile.career_info) { try { info = JSON.parse(currentUserProfile.career_info); } catch(e) {} }
             document.getElementById('pdfInputCareer').value = info.career || '';
             document.getElementById('pdfInputUniv1').value = info.univ1 || ''; document.getElementById('pdfInputUniv2').value = info.univ2 || ''; document.getElementById('pdfInputUniv3').value = info.univ3 || '';
             document.getElementById('pdfInputMajor1').value = info.major1 || ''; document.getElementById('pdfInputMajor2').value = info.major2 || ''; document.getElementById('pdfInputMajor3').value = info.major3 || '';
@@ -985,17 +979,10 @@
 
         document.getElementById('saveCareerInfoBtn').addEventListener('click', async () => {
             showLoading("저장 중...");
-            const careerInfo = {
-                career: document.getElementById('pdfInputCareer').value,
-                univ1: document.getElementById('pdfInputUniv1').value, univ2: document.getElementById('pdfInputUniv2').value, univ3: document.getElementById('pdfInputUniv3').value,
-                major1: document.getElementById('pdfInputMajor1').value, major2: document.getElementById('pdfInputMajor2').value, major3: document.getElementById('pdfInputMajor3').value
-            };
+            const careerInfo = { career: document.getElementById('pdfInputCareer').value, univ1: document.getElementById('pdfInputUniv1').value, univ2: document.getElementById('pdfInputUniv2').value, univ3: document.getElementById('pdfInputUniv3').value, major1: document.getElementById('pdfInputMajor1').value, major2: document.getElementById('pdfInputMajor2').value, major3: document.getElementById('pdfInputMajor3').value };
             try {
                 const { error } = await supabase.from('profiles').update({ career_info: JSON.stringify(careerInfo) }).eq('id', currentUser.id);
-                if (error) throw error;
-                currentUserProfile.career_info = JSON.stringify(careerInfo);
-                localStorage.setItem('eduport-cached-profile', JSON.stringify(currentUserProfile));
-                showToast("진로 정보가 보존되었습니다.", "success");
+                if (error) throw error; currentUserProfile.career_info = JSON.stringify(careerInfo); localStorage.setItem('eduport-cached-profile', JSON.stringify(currentUserProfile)); showToast("진로 정보 보존 완료.", "success");
             } catch (err) { showToast("저장 실패", "error"); } finally { hideLoading(); }
         });
 
@@ -1007,68 +994,48 @@
             try {
                 if (editingPortfolioId) { await supabase.from('portfolios').update(data).eq('id', editingPortfolioId); showToast("수정 완료!", 'success'); } 
                 else { await supabase.from('portfolios').insert([data]); showToast("등록 완료!", 'success'); }
-                
                 currentStudentGrade = inputGrade;
                 document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
                 document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
-
                 document.getElementById('cancelEditBtn').click(); await loadStudentPortfolios(currentStudentGrade); 
             } catch (err) { showToast("오류 발생", 'error'); } finally { hideLoading(); }
         });
 
         async function loadStudentPortfolios(grade) {
-            const container = document.getElementById('portfolioList');
-            container.innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 font-bold">이력을 동기화하고 있습니다...</p></div>';
+            const container = document.getElementById('portfolioList'); container.innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 font-bold">이력을 동기화하고 있습니다...</p></div>';
             try {
                 const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', currentUser.id).order('updated_at', { ascending: false });
-                if (error) throw error; 
-                cachedPortfolios = data || [];
-                localStorage.setItem('eduport-cached-portfolios', JSON.stringify(cachedPortfolios));
-                
-                const stats = window.calculateStats(cachedPortfolios);
-                const statsContainer = document.getElementById('studentStatsSection');
-                statsContainer.innerHTML = window.renderStatsHTML(stats);
-                statsContainer.classList.remove('hidden');
-
+                if (error) throw error; cachedPortfolios = data || []; localStorage.setItem('eduport-cached-portfolios', JSON.stringify(cachedPortfolios));
+                const stats = window.calculateStats(cachedPortfolios); const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(stats); statsContainer.classList.remove('hidden');
                 renderStudentPortfoliosFiltered();
             } catch (err) { 
                 container.innerHTML = `<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">오프라인 모드로 기록을 표시합니다.</p></div>`; 
                 const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
                 if (cachedPfs) {
-                    cachedPortfolios = JSON.parse(cachedPfs);
-                    const stats = window.calculateStats(cachedPortfolios);
-                    const statsContainer = document.getElementById('studentStatsSection');
-                    statsContainer.innerHTML = window.renderStatsHTML(stats);
-                    statsContainer.classList.remove('hidden');
+                    cachedPortfolios = JSON.parse(cachedPfs); const stats = window.calculateStats(cachedPortfolios); const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(stats); statsContainer.classList.remove('hidden');
                     renderStudentPortfoliosFiltered();
                 }
             }
         }
 
         function renderStudentPortfoliosFiltered() {
-            const container = document.getElementById('portfolioList');
-            const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim();
-            const areaFilter = document.getElementById('studentAreaFilter').value;
-            
+            const container = document.getElementById('portfolioList'); const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim(); const areaFilter = document.getElementById('studentAreaFilter').value;
             let filtered = cachedPortfolios.filter(item => item.grade === currentStudentGrade);
             if (areaFilter) { if (areaFilter === "교과") filtered = filtered.filter(item => item.area === "교과"); else filtered = filtered.filter(item => item.area === areaFilter); }
             if (keyword) {
                 filtered = filtered.filter(item => {
                     let text = (item.activity_name || '') + ' ' + (item.self_evaluation || '');
-                    try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || '') + ' ' + (p.reading || ''); } catch(e) {}
+                    try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || '') + ' ' + (p.reading || ''); } catch(e) { text += ' ' + (item.content || ''); }
                     return text.toLowerCase().includes(keyword);
                 });
             }
-            
             if (filtered.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 text-sm font-bold">내역이 없습니다.</p></div>'; return; }
-
             let html = '';
             filtered.forEach(item => {
                 let execution = '참여함', year = '', simpleContent = item.content, reading = '';
                 try { const parsed = JSON.parse(item.content); execution = parsed.execution || '참여함'; year = parsed.year || ''; simpleContent = parsed.simple_content || ''; reading = parsed.reading || ''; } catch (e) { simpleContent = item.content; }
                 const areaColor = item.area === '교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
                 const fbText = (item.feedbacks && item.feedbacks.feedback_content) ? item.feedbacks.feedback_content : null;
-
                 html += `
                     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative group flex flex-col hover:border-blue-300 transition">
                         <div class="absolute top-3 right-3 flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity no-print">
@@ -1076,9 +1043,7 @@
                             <button onclick="window.deleteActivity('${item.id}')" class="text-[10px] bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600 px-2 py-1 rounded font-bold transition">삭제</button>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 pr-16 mb-2">
-                            <span class="px-2 py-0.5 ${areaColor} border rounded text-[10px] font-bold">${item.area}</span>
-                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${year ? year+'년 ' : ''}${item.semester}학기 / ${execution}</span>
-                            <h3 class="text-sm font-black text-slate-900 ml-1 truncate max-w-[200px]">${item.activity_name}</h3>
+                            <span class="px-2 py-0.5 ${areaColor} border rounded text-[10px] font-bold">${item.area}</span><span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${year ? year+'년 ' : ''}${item.semester}학기 / ${execution}</span><h3 class="text-sm font-black text-slate-900 ml-1 truncate max-w-[200px]">${item.activity_name}</h3>
                         </div>
                         <div class="text-xs text-slate-600 leading-relaxed font-medium"><span class="font-bold text-slate-400">요약:</span> ${simpleContent}</div>
                         ${reading ? `<div class="text-xs text-blue-700 leading-relaxed font-medium"><span class="font-bold text-blue-400">독서:</span> ${reading}</div>` : ''}
@@ -1090,13 +1055,11 @@
         }
 
         window.editActivity = (id) => {
-            const item = cachedPortfolios.find(p => p.id === id); if(!item) return;
-            editingPortfolioId = id;
+            const item = cachedPortfolios.find(p => p.id === id); if(!item) return; editingPortfolioId = id;
             document.getElementById('portfolioFormTitle').innerHTML = `✍️ <span class="text-blue-600">수정 모드</span> - ${item.activity_name}`;
-            document.getElementById('submitPortfolioBtn').innerText = '수정 내용 적용하기 ✓';
-            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('submitPortfolioBtn').innerText = '수정 내용 적용하기 ✓'; document.getElementById('cancelEditBtn').classList.remove('hidden');
             document.getElementById('pfSemester').value = item.semester; document.getElementById('pfGrade').value = item.grade; document.getElementById('pfArea').value = item.area; document.getElementById('pfActivityName').value = item.activity_name; document.getElementById('pfSelfEval').value = item.self_evaluation;
-            try { const p = JSON.parse(item.content); document.getElementById('pfExecution').value = p.execution || '참여함'; document.getElementById('pfYearInput').value = p.year || new Date().getFullYear(); document.getElementById('pfSimpleContent').value = p.simple_content || ''; document.getElementById('pfReading').value = p.reading || ''; } catch(e) {}
+            try { const p = JSON.parse(item.content); document.getElementById('pfExecution').value = p.execution || '참여함'; document.getElementById('pfYearInput').value = p.year || new Date().getFullYear(); document.getElementById('pfSimpleContent').value = p.simple_content || ''; document.getElementById('pfReading').value = p.reading || ''; } catch(e) { document.getElementById('pfSimpleContent').value = item.content; }
             window.scrollTo({top: 0, behavior: 'smooth'}); showToast("수정 모드로 전환되었습니다.", "success");
         };
 
@@ -1107,13 +1070,11 @@
         };
 
         async function loadSchoolEventsForStudents() {
-            const { data } = await supabase.from('school_events').select('*').in('target_grade', [0, currentStudentGrade]).order('event_date', { ascending: true });
-            cachedEventsData = data || []; renderEventsFiltered();
+            const { data } = await supabase.from('school_events').select('*').in('target_grade', [0, currentStudentGrade]).order('event_date', { ascending: true }); cachedEventsData = data || []; renderEventsFiltered();
         }
 
         function renderEventsFiltered() {
-            const container = document.getElementById('studentEventsList');
-            const keyword = document.getElementById('studentEventSearch') ? document.getElementById('studentEventSearch').value.toLowerCase().trim() : '';
+            const container = document.getElementById('studentEventsList'); const keyword = document.getElementById('studentEventSearch') ? document.getElementById('studentEventSearch').value.toLowerCase().trim() : '';
             let filtered = cachedEventsData;
             if(keyword) filtered = filtered.filter(ev => ev.event_name.toLowerCase().includes(keyword) || ev.main_content.toLowerCase().includes(keyword));
             if(filtered.length === 0) { container.innerHTML = '<p class="text-xs text-slate-400 col-span-full py-4 font-bold">일치하는 행사가 없습니다.</p>'; return; }
@@ -1121,10 +1082,7 @@
             filtered.forEach(ev => {
                 html += `
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 hover:bg-slate-700 hover:border-blue-500/50 transition flex flex-col cursor-pointer group shadow-sm" onclick="window.autofillEvent('${ev.id}')">
-                        <div class="flex items-center justify-between mb-2">
-                            <h4 class="text-xs font-black text-white truncate w-2/3 group-hover:text-blue-300 transition">${ev.event_name}</h4>
-                            <span class="text-[9px] bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-600">${ev.event_date}</span>
-                        </div>
+                        <div class="flex items-center justify-between mb-2"><h4 class="text-xs font-black text-white truncate w-2/3 group-hover:text-blue-300 transition">${ev.event_name}</h4><span class="text-[9px] bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-600">${ev.event_date}</span></div>
                         <p class="text-[10px] text-slate-400 leading-relaxed line-clamp-2 mb-3 flex-1">${ev.main_content}</p>
                         <div class="text-[9px] text-slate-500 flex justify-between border-t border-slate-700 pt-2 font-semibold"><span>주관: ${ev.organizer}</span><span class="text-emerald-400 group-hover:underline">자동기입 ➔</span></div>
                     </div>`;
@@ -1133,13 +1091,11 @@
         }
 
         window.autofillEvent = (eventId) => {
-            const ev = cachedEventsData.find(e => e.id === eventId); if(!ev) return;
-            const match = ev.event_name.match(/^\[(.*?)\]\s*(.*)$/);
+            const ev = cachedEventsData.find(e => e.id === eventId); if(!ev) return; const match = ev.event_name.match(/^\[(.*?)\]\s*(.*)$/);
             if(match) { const areaSelect = document.getElementById('pfArea'); for (let i=0; i<areaSelect.options.length; i++) { if(areaSelect.options[i].value === match[1]) { areaSelect.selectedIndex = i; break; } } document.getElementById('pfActivityName').value = match[2]; } else { document.getElementById('pfActivityName').value = ev.event_name; }
             document.getElementById('pfSimpleContent').value = ev.main_content.substring(0, 100); document.getElementById('pfExecution').value = "참여함";
             showToast("✨ 행사 정보가 입력창에 자동으로 채워졌습니다!", "success"); window.scrollTo({top: 0, behavior: 'smooth'});
         };
-
 
         // =========================================================================
         // 👨‍🏫 [지도 교사 관제탑 엔진]
@@ -1148,86 +1104,52 @@
             switchView('teacher');
             document.getElementById('teacherNavInfo').innerText = `${currentUserProfile.name} 교사`;
             
-            loadStudentList();
-            loadGlobalTimelineFeed();
-            loadTeacherEvents();
+            loadStudentList(); loadGlobalTimelineFeed(); loadTeacherEvents();
 
-            document.getElementById('teacherStudentSearch').addEventListener('input', applyTeacherFilters);
-            document.getElementById('filterGradeSelect').addEventListener('change', applyTeacherFilters);
-            document.getElementById('filterYearSelect').addEventListener('change', applyTeacherFilters);
-
-            document.getElementById('timelineAreaFilter').addEventListener('change', applyTimelineFilters);
-            document.getElementById('timelineSearchInput').addEventListener('input', applyTimelineFilters);
-
-            document.getElementById('openEventModalBtn').onclick = () => document.getElementById('eventModal').classList.remove('hidden');
-            document.getElementById('closeEventModalBtn').onclick = () => document.getElementById('eventModal').classList.add('hidden');
+            document.getElementById('teacherStudentSearch').addEventListener('input', applyTeacherFilters); document.getElementById('filterGradeSelect').addEventListener('change', applyTeacherFilters); document.getElementById('filterYearSelect').addEventListener('change', applyTeacherFilters);
+            document.getElementById('timelineAreaFilter').addEventListener('change', applyTimelineFilters); document.getElementById('timelineSearchInput').addEventListener('input', applyTimelineFilters);
+            document.getElementById('openEventModalBtn').onclick = () => document.getElementById('eventModal').classList.remove('hidden'); document.getElementById('closeEventModalBtn').onclick = () => document.getElementById('eventModal').classList.add('hidden');
             
             document.getElementById('closeStudentDetailBtn').onclick = () => {
                 document.getElementById('teacherDetailCard').classList.add('hidden');
-                if (window.innerWidth < 1024) {
-                    setMobileActiveTab('list'); tabBtnDetail.disabled = true; tabBtnDetail.innerText = "🔍 분석";
-                } else {
-                    document.getElementById('teacherTimelineCard').classList.remove('hidden');
-                }
+                if (window.innerWidth < 1024) { setMobileActiveTab('list'); tabBtnDetail.disabled = true; tabBtnDetail.innerText = "🔍 분석"; } 
+                else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); }
                 loadGlobalTimelineFeed();
             };
 
             document.getElementById('syncSheetTeacherBtn').onclick = () => syncGoogleSheetEvents();
-            document.getElementById('editGoogleSheetBtn').onclick = () => {
-                if(GOOGLE_SHEET_EDIT_URL) window.open(GOOGLE_SHEET_EDIT_URL, '_blank');
-                else showToast("⚠️ 소스코드 상단의 GOOGLE_SHEET_EDIT_URL에 실제 구글 시트 주소를 입력해주세요.", "error");
-            };
+            document.getElementById('editGoogleSheetBtn').onclick = () => { if(GOOGLE_SHEET_EDIT_URL) window.open(GOOGLE_SHEET_EDIT_URL, '_blank'); else showToast("⚠️ 소스코드 상단의 GOOGLE_SHEET_EDIT_URL에 실제 구글 시트 주소를 입력해주세요.", "error"); };
             
             document.getElementById('teacherDownloadPdfBtn').onclick = () => {
                 if (!teacherCachedPortfolios || teacherCachedPortfolios.length === 0) { showToast("출력할 내역이 존재하지 않습니다.", "error"); return; }
-                document.getElementById('pdfExportStudentId').innerText = teacherSelectedStudentId || '-';
-                document.getElementById('pdfExportStudentName').innerText = teacherSelectedStudentName || '-';
-                
+                document.getElementById('pdfExportStudentId').innerText = teacherSelectedStudentId || '-'; document.getElementById('pdfExportStudentName').innerText = teacherSelectedStudentName || '-';
                 let cInfo = {}; try { if(teacherSelectedStudentCareerInfo) cInfo = JSON.parse(teacherSelectedStudentCareerInfo); } catch(e){}
-                document.getElementById('pdfPrintCareer').innerText = cInfo.career || '-'; 
-                document.getElementById('pdfPrintCollege').innerText = [cInfo.univ1, cInfo.univ2, cInfo.univ3].filter(Boolean).join(' / ') || '-';
-                document.getElementById('pdfPrintMajor').innerText = [cInfo.major1, cInfo.major2, cInfo.major3].filter(Boolean).join(' / ') || '-';
+                document.getElementById('pdfPrintCareer').innerText = cInfo.career || '-'; document.getElementById('pdfPrintCollege').innerText = [cInfo.univ1, cInfo.univ2, cInfo.univ3].filter(Boolean).join(' / ') || '-'; document.getElementById('pdfPrintMajor').innerText = [cInfo.major1, cInfo.major2, cInfo.major3].filter(Boolean).join(' / ') || '-';
                 
-                const stats = window.calculateStats(teacherCachedPortfolios);
-                document.getElementById('pdfExportStats').innerHTML = window.renderPdfStatsHTML(stats);
-                
+                const stats = window.calculateStats(teacherCachedPortfolios); document.getElementById('pdfExportStats').innerHTML = window.renderPdfStatsHTML(stats);
                 const sortedPortfolios = [...teacherCachedPortfolios].sort((a, b) => { if(a.grade !== b.grade) return a.grade - b.grade; return a.semester - b.semester; });
-                
                 let html = '';
                 [1, 2, 3].forEach(g => {
                     const gradePortfolios = sortedPortfolios.filter(item => item.grade === g);
-                    if (gradePortfolios.length > 0) {
-                        html += `<div style="margin-top: 25px; page-break-before: auto;"><h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a; page-break-after: avoid;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gradePortfolios)}</div>`;
-                    }
+                    if (gradePortfolios.length > 0) { html += `<div style="margin-top: 25px; page-break-before: auto;"><h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a; page-break-after: avoid;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gradePortfolios)}</div>`; }
                 });
-
-                document.getElementById('pdfExportContent').innerHTML = html;
-                setTimeout(() => window.print(), 200);
+                document.getElementById('pdfExportContent').innerHTML = html; setTimeout(() => window.print(), 200);
             };
 
             const isAdmin = currentUserProfile.role === 'admin' || (currentUserProfile.role === 'teacher' && currentUserProfile.email === 'admin@school.hs.kr');
-            if (isAdmin) document.getElementById('openAdminPanelBtn').classList.remove('hidden');
-            else document.getElementById('openAdminPanelBtn').classList.add('hidden');
-
+            if (isAdmin) document.getElementById('openAdminPanelBtn').classList.remove('hidden'); else document.getElementById('openAdminPanelBtn').classList.add('hidden');
             document.getElementById('openAdminPanelBtn').onclick = () => { document.getElementById('adminPanelModal').classList.remove('hidden'); loadAllProfilesForAdmin(); };
             document.getElementById('closeAdminPanelBtn').onclick = () => document.getElementById('adminPanelModal').classList.add('hidden');
-            document.getElementById('adminUserSearch').addEventListener('input', applyAdminFilters);
-            document.getElementById('adminRoleFilter').addEventListener('change', applyAdminFilters);
+            document.getElementById('adminUserSearch').addEventListener('input', applyAdminFilters); document.getElementById('adminRoleFilter').addEventListener('change', applyAdminFilters);
             document.getElementById('closeAdminEditModalBtn').onclick = () => document.getElementById('adminEditModal').classList.add('hidden');
-            document.getElementById('adminEditRole').onchange = (e) => {
-                const fields = document.getElementById('adminStudentOnlyFields');
-                if (e.target.value === 'student') fields.classList.remove('hidden'); else fields.classList.add('hidden');
-            };
+            document.getElementById('adminEditRole').onchange = (e) => { const fields = document.getElementById('adminStudentOnlyFields'); if (e.target.value === 'student') fields.classList.remove('hidden'); else fields.classList.add('hidden'); };
         }
 
         async function loadTeacherEvents() {
-            const { data } = await supabase.from('school_events').select('*').order('event_date', { ascending: true });
-            cachedEventsData = data || []; const container = document.getElementById('teacherEventsList');
+            const { data } = await supabase.from('school_events').select('*').order('event_date', { ascending: true }); cachedEventsData = data || []; const container = document.getElementById('teacherEventsList');
             if(cachedEventsData.length === 0) { container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-4">일정이 없습니다.</p>'; return; }
             let html = '';
-            cachedEventsData.forEach(ev => {
-                html += `<div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700 shadow-sm flex flex-col"><div class="flex justify-between items-center mb-1"><span class="text-xs font-bold text-white truncate max-w-[120px]">${ev.event_name}</span><span class="text-[9px] text-indigo-300">${ev.event_date}</span></div><span class="text-[9px] text-slate-400 truncate">${ev.organizer} | ${ev.target_grade===0?'공통':ev.target_grade+'학년'}</span></div>`;
-            });
+            cachedEventsData.forEach(ev => { html += `<div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700 shadow-sm flex flex-col"><div class="flex justify-between items-center mb-1"><span class="text-xs font-bold text-white truncate max-w-[120px]">${ev.event_name}</span><span class="text-[9px] text-indigo-300">${ev.event_date}</span></div><span class="text-[9px] text-slate-400 truncate">${ev.organizer} | ${ev.target_grade===0?'공통':ev.target_grade+'학년'}</span></div>`; });
             container.innerHTML = html;
         }
 
@@ -1256,24 +1178,19 @@
             const cachedSts = localStorage.getItem('eduport-cached-students');
             if (cachedSts) { cachedStudents = JSON.parse(cachedSts); renderStudentList(cachedStudents); }
             else { showLoading("명부 동기화 중..."); }
-
             try {
                 const { data, error } = await supabase.from('profiles').select('*').eq('role', 'student').order('admission_year', { ascending: false }).order('student_id', { ascending: true });
                 if (error) throw error;
                 cachedStudents = data || []; localStorage.setItem('eduport-cached-students', JSON.stringify(cachedStudents));
-                
                 const years = [...new Set(cachedStudents.map(s => s.admission_year).filter(Boolean))].sort((a,b)=>b-a);
-                const yearSelect = document.getElementById('filterYearSelect');
-                yearSelect.innerHTML = '<option value="">전체 입학</option>';
+                const yearSelect = document.getElementById('filterYearSelect'); yearSelect.innerHTML = '<option value="">전체 입학</option>';
                 years.forEach(y => { yearSelect.innerHTML += `<option value="${y}">${y}학년도</option>`; });
-                
                 renderStudentList(cachedStudents);
             } catch (e) { console.warn("명부 지연: 캐시 유지"); } finally { hideLoading(); }
         }
 
         function renderStudentList(students) {
-            const container = document.getElementById('studentListContainer');
-            document.getElementById('studentCountBadge').innerText = `${students.length}명`;
+            const container = document.getElementById('studentListContainer'); document.getElementById('studentCountBadge').innerText = `${students.length}명`;
             if (students.length === 0) { container.innerHTML = '<li class="text-xs text-slate-400 text-center py-10 font-bold">학생 없음</li>'; return; }
             let html = '';
             students.forEach(s => {
@@ -1286,20 +1203,15 @@
             container.innerHTML = html;
             document.querySelectorAll('.student-item').forEach(el => {
                 el.onclick = () => {
-                    if (window.innerWidth < 1024) {
-                        tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${el.dataset.name} 분석`; setMobileActiveTab('detail');
-                    } else {
-                        document.getElementById('teacherTimelineCard').classList.add('hidden'); 
-                        document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex');
-                    }
+                    if (window.innerWidth < 1024) { tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${el.dataset.name} 분석`; setMobileActiveTab('detail'); } 
+                    else { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); }
                     openStudentDetail(el.dataset.uid, el.dataset.name, el.dataset.info);
                 };
             });
         }
 
         function applyTeacherFilters() {
-            const searchKeyword = document.getElementById('teacherStudentSearch').value.toLowerCase().trim();
-            const yearFilter = document.getElementById('filterYearSelect').value; const gradeFilter = document.getElementById('filterGradeSelect').value;
+            const searchKeyword = document.getElementById('teacherStudentSearch').value.toLowerCase().trim(); const yearFilter = document.getElementById('filterYearSelect').value; const gradeFilter = document.getElementById('filterGradeSelect').value;
             let filtered = cachedStudents;
             if (searchKeyword) filtered = filtered.filter(s => s.name.toLowerCase().includes(searchKeyword) || (s.student_id && s.student_id.toLowerCase().includes(searchKeyword)));
             if (yearFilter) filtered = filtered.filter(s => s.admission_year === parseInt(yearFilter));
@@ -1312,12 +1224,11 @@
             try {
                 const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(15);
                 if (error) throw error; cachedTimelineData = data || []; applyTimelineFilters(); 
-            } catch (err) { feedContainer.innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">피드 로딩 중단</p>`; }
+            } catch (err) { feedContainer.innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">피드 연결 중단</p>`; }
         }
 
         function applyTimelineFilters() {
-            const feedContainer = document.getElementById('globalTimelineFeed');
-            const areaFilter = document.getElementById('timelineAreaFilter').value; const keyword = document.getElementById('timelineSearchInput').value.toLowerCase().trim();
+            const feedContainer = document.getElementById('globalTimelineFeed'); const areaFilter = document.getElementById('timelineAreaFilter').value; const keyword = document.getElementById('timelineSearchInput').value.toLowerCase().trim();
             let filtered = cachedTimelineData;
             if (areaFilter) filtered = filtered.filter(item => item.area === areaFilter);
             if (keyword) { filtered = filtered.filter(item => { let text = (item.activity_name || '') + ' ' + (item.profiles?.name || ''); try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || ''); } catch(e){} return text.toLowerCase().includes(keyword); }); }
@@ -1337,50 +1248,31 @@
 
         window.showDirectStudentDetail = async (studentUid) => {
             const student = cachedStudents.find(s => s.id === studentUid); if (!student) return;
-            if (window.innerWidth < 1024) {
-                tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${student.name} 분석`; setMobileActiveTab('detail');
-            } else {
-                document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex');
-            }
+            if (window.innerWidth < 1024) { tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${student.name} 분석`; setMobileActiveTab('detail'); } 
+            else { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); }
             openStudentDetail(studentUid, student.name, `학번: ${student.student_id || ''} | ${student.admission_year || ''}년도 입학`);
         };
 
         async function openStudentDetail(uid, name, info) {
-            selectedStudentUid = uid; teacherSelectedStudentName = name;
-            const student = cachedStudents.find(s => s.id === uid); 
-            teacherSelectedStudentId = student ? student.student_id : '-';
-            teacherSelectedStudentCareerInfo = student ? student.career_info : null;
-
+            selectedStudentUid = uid; teacherSelectedStudentName = name; const student = cachedStudents.find(s => s.id === uid); teacherSelectedStudentId = student ? student.student_id : '-'; teacherSelectedStudentCareerInfo = student ? student.career_info : null;
             document.getElementById('detailStudentName').innerText = name; document.getElementById('detailStudentInfo').innerText = info;
             const container = document.getElementById('teacherPortfolioList');
             try {
                 const { data, error } = await supabase.from('portfolios').select('*, feedbacks(id, feedback_content)').eq('student_uid', uid).order('updated_at', { ascending: false });
                 if (error) throw error;
-                if(!data || data.length === 0) { 
-                    container.innerHTML = '<div class="text-center py-16 bg-white rounded-2xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">기록이 없습니다.</p></div>'; 
-                    document.getElementById('teacherStatsContainer').classList.add('hidden');
-                    teacherCachedPortfolios = []; return; 
-                }
+                if(!data || data.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-2xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">기록이 없습니다.</p></div>'; document.getElementById('teacherStatsContainer').classList.add('hidden'); teacherCachedPortfolios = []; return; }
                 
-                teacherCachedPortfolios = data || [];
-                const stats = window.calculateStats(teacherCachedPortfolios);
-                const teacherStatsContainer = document.getElementById('teacherStatsContainer');
-                teacherStatsContainer.innerHTML = window.renderStatsHTML(stats);
-                teacherStatsContainer.classList.remove('hidden');
-
+                teacherCachedPortfolios = data || []; const stats = window.calculateStats(teacherCachedPortfolios); const teacherStatsContainer = document.getElementById('teacherStatsContainer'); teacherStatsContainer.innerHTML = window.renderStatsHTML(stats); teacherStatsContainer.classList.remove('hidden');
                 let html = '';
                 data.forEach(item => {
                     const fb = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : (item.feedbacks ? item.feedbacks.feedback_content : '');
                     let execution = '참여함', year = '', simpleContent = item.content, reading = '';
                     try { const p = JSON.parse(item.content); execution = p.execution || '참여함'; year = p.year || ''; simpleContent = p.simple_content || ''; reading = p.reading || ''; } catch (e) {}
                     const areaColor = item.area === '교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
-
                     html += `
                         <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-4 flex flex-col gap-2">
                             <div class="flex flex-wrap items-center gap-2 pr-2">
-                                <span class="px-2 py-0.5 ${areaColor} border rounded text-[10px] font-bold">${item.grade}학년 ${item.area}</span>
-                                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${item.semester}학기 / ${execution}</span>
-                                <h3 class="text-sm font-black text-slate-900 ml-1 truncate max-w-[150px] sm:max-w-xs">${item.activity_name}</h3>
+                                <span class="px-2 py-0.5 ${areaColor} border rounded text-[10px] font-bold">${item.grade}학년 ${item.area}</span><span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${item.semester}학기 / ${execution}</span><h3 class="text-sm font-black text-slate-900 ml-1 truncate max-w-[150px] sm:max-w-xs">${item.activity_name}</h3>
                             </div>
                             <div class="grid grid-cols-1 gap-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <div class="flex items-start gap-2"><span class="font-bold text-slate-400 min-w-[35px]">요약:</span> <span class="font-medium">${simpleContent}</span></div>
@@ -1408,10 +1300,7 @@
         // =========================================================================
         async function loadAllProfilesForAdmin() {
             showLoading("전체 회원 정보 취합 중...");
-            try {
-                const { data, error } = await supabase.from('profiles').select('*').order('role', { ascending: false }).order('name', { ascending: true });
-                if (error) throw error; cachedAllUsersForAdmin = data || []; renderAdminUserTable(cachedAllUsersForAdmin);
-            } catch(e) { showToast("명부 동기화 실패", "error"); } finally { hideLoading(); }
+            try { const { data, error } = await supabase.from('profiles').select('*').order('role', { ascending: false }).order('name', { ascending: true }); if (error) throw error; cachedAllUsersForAdmin = data || []; renderAdminUserTable(cachedAllUsersForAdmin); } catch(e) { showToast("명부 동기화 실패", "error"); } finally { hideLoading(); }
         }
 
         function renderAdminUserTable(users) {
@@ -1438,8 +1327,7 @@
         }
 
         function applyAdminFilters() {
-            const keyword = document.getElementById('adminUserSearch').value.toLowerCase().trim(); const roleFilter = document.getElementById('adminRoleFilter').value;
-            let filtered = cachedAllUsersForAdmin;
+            const keyword = document.getElementById('adminUserSearch').value.toLowerCase().trim(); const roleFilter = document.getElementById('adminRoleFilter').value; let filtered = cachedAllUsersForAdmin;
             if (roleFilter) filtered = filtered.filter(u => u.role === roleFilter);
             if (keyword) filtered = filtered.filter(u => u.name.toLowerCase().includes(keyword) || u.email.toLowerCase().includes(keyword) || (u.student_id && u.student_id.toLowerCase().includes(keyword)));
             renderAdminUserTable(filtered);

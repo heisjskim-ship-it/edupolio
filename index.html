@@ -2,21 +2,20 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>에듀포트 - 학교생활 진로 포트폴리오</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>에듀포트 - 진로 포트폴리오 플랫폼</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- html2pdf.js (A4 고화질 PDF 렌더링 엔진) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* 웹 UI 인쇄 방지 및 PDF 전용 레이아웃 분리 */
         @media print { 
             .no-print { display: none !important; } 
-            body { background-color: white !important; } 
+            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
         }
         /* 로딩 스피너 애니메이션 */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%; width: 44px; height: 44px; animation: spin 1s linear infinite; }
+        .loader { border: 4px solid #f1f5f9; border-top: 4px solid #2563eb; border-radius: 50%; width: 44px; height: 44px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* 스크롤바 숨김 (디자인 최적화) */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -24,41 +23,45 @@
         #pdfExportContainer { display: none; }
 
         /* ========================================================================= */
-        /* 🖨️ 브라우저 네이티브 인쇄(PDF) 전용 스타일 */
+        /* 🖨️ 브라우저 네이티브 인쇄(PDF) 전용 스타일 (상용 리포트 규격) */
         /* ========================================================================= */
         @media print { 
             body * { visibility: hidden; }
             #pdfExportContainer, #pdfExportContainer * { visibility: visible; }
-            #pdfExportContainer { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background-color: white; color: black; font-family: 'Malgun Gothic', dotum, sans-serif; padding: 5mm; }
-            .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; page-break-inside: avoid; }
-            .pdf-table th, .pdf-table td { border: 1px solid #94a3b8; padding: 6px 8px; font-size: 10pt; line-height: 1.4; text-align: left; vertical-align: middle; }
-            .pdf-table th { background-color: #f8fafc !important; font-weight: bold; text-align: center; white-space: nowrap; width: 12%; color: #1e293b; }
+            #pdfExportContainer { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background-color: white; color: black; font-family: 'Malgun Gothic', dotum, sans-serif; padding: 10mm; }
+            
+            .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; page-break-inside: avoid; }
+            .pdf-table th, .pdf-table td { border: 1px solid #94a3b8; padding: 8px 10px; font-size: 10.5pt; line-height: 1.5; text-align: left; vertical-align: middle; word-break: keep-all; }
+            .pdf-table th { background-color: #f8fafc !important; font-weight: bold; text-align: center; white-space: nowrap; width: 14%; color: #1e293b; }
             .pdf-table td { color: #0f172a; }
-            .pdf-header-table { width: 100%; margin: 0 auto 15px auto; border-collapse: collapse; border: 2px solid #000; }
-            .pdf-header-table th, .pdf-header-table td { border: 1px solid #000; padding: 6px 8px; font-size: 10pt; text-align: center; }
+            
+            .pdf-header-table { width: 100%; margin: 0 auto 20px auto; border-collapse: collapse; border: 2px solid #1e293b; }
+            .pdf-header-table th, .pdf-header-table td { border: 1px solid #1e293b; padding: 6px 8px; font-size: 10.5pt; text-align: center; }
             .pdf-header-table th { background-color: #e2e8f0 !important; font-weight: bold; }
+            
+            .page-break { page-break-before: always; }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased select-none overflow-x-hidden">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden">
 
     <!-- 전역 통합 로딩 오버레이 -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 z-50 flex flex-col justify-center items-center transition-opacity duration-300">
-        <div class="loader mb-5"></div>
-        <p id="loadingText" class="text-slate-800 font-extrabold text-sm tracking-tight text-center px-4 mt-4">데이터를 동기화하고 있습니다...</p>
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center transition-opacity duration-300">
+        <div class="loader mb-5 shadow-lg rounded-full"></div>
+        <p id="loadingText" class="text-slate-800 font-extrabold text-sm tracking-tight text-center px-4 mt-2">시스템을 연결하고 있습니다...</p>
     </div>
 
     <!-- 토스트 알림창 -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none flex flex-col items-end"></div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[9999] space-y-2 pointer-events-none flex flex-col items-end"></div>
 
     <!-- 확인 모달창 -->
-    <div id="confirmModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
-        <div class="bg-white p-7 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-100">
+    <div id="confirmModal" class="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white p-7 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-100 transform transition-all">
             <h3 class="text-lg font-black text-slate-900 mb-2" id="confirmTitle">확인</h3>
             <p id="confirmModalMessage" class="text-sm text-slate-500 mb-6 leading-relaxed"></p>
             <div class="flex gap-3">
-                <button id="confirmCancelBtn" type="button" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition">취소</button>
-                <button id="confirmOkBtn" type="button" class="w-1/2 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold transition shadow-md shadow-red-200">확인</button>
+                <button id="confirmCancelBtn" type="button" class="w-1/2 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition">취소</button>
+                <button id="confirmOkBtn" type="button" class="w-1/2 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold transition shadow-md shadow-red-200">확인</button>
             </div>
         </div>
     </div>
@@ -66,40 +69,40 @@
     <!-- ========================================== -->
     <!-- [1] 게이트웨이 및 홈 화면 -->
     <!-- ========================================== -->
-    <div id="authView" class="min-h-screen flex flex-col lg:flex-row hidden overflow-y-auto">
-        <div class="lg:w-2/3 bg-slate-900 text-white p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden shrink-0 min-h-[600px] lg:min-h-0">
+    <div id="authView" class="min-h-[100dvh] flex flex-col lg:flex-row hidden">
+        <!-- 왼쪽: 모니터링 보드 -->
+        <div class="lg:flex-1 bg-slate-900 text-white p-8 lg:p-16 flex flex-col justify-between relative overflow-hidden shrink-0 lg:min-h-0 min-h-[500px]">
             <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
             <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
 
-            <div class="relative z-10 space-y-8">
+            <div class="relative z-10 space-y-8 flex-1 flex flex-col">
                 <div class="flex items-center gap-3">
                     <span class="bg-blue-600 text-white font-extrabold text-[10px] sm:text-xs uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg shadow-blue-500/30">EDU PORTFOLIO</span>
                     <span class="text-slate-400 text-xs font-bold tracking-wide">공개 모니터링 보드</span>
                 </div>
                 <div class="space-y-4">
-                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter leading-tight text-white font-sans">에듀포트</h1>
-                    <p class="text-slate-400 text-xs sm:text-sm lg:text-base max-w-xl leading-relaxed font-medium">
-                        학생의 주도성 넘치는 3개년 학교생활 교과·비교과 탐구 이력을 스스로 설계하고, 지도 교사의 정밀 피드백을 수록하는 혁신형 진로 관리 플랫폼입니다.
+                    <h1 class="text-4xl lg:text-5xl font-black tracking-tighter leading-tight text-white font-sans">에듀포트</h1>
+                    <p class="text-slate-400 text-sm max-w-xl leading-relaxed font-medium">
+                        학생의 주도성 넘치는 학교생활 탐구 이력을 스스로 설계하고, 지도 교사의 정밀 피드백을 수록하는 혁신형 플랫폼입니다.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 flex-1">
-                    <div class="bg-slate-800/80 p-5 rounded-3xl border border-slate-700/50 backdrop-blur-md shadow-2xl flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold text-xs text-white flex items-center gap-2">🔥 최근 탐구 업데이트 현황</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 flex-1">
+                    <div class="bg-slate-800/80 p-6 rounded-3xl border border-slate-700/50 backdrop-blur-md shadow-2xl flex flex-col">
+                        <div class="flex items-center justify-between mb-4 shrink-0">
+                            <h3 class="font-bold text-sm text-white flex items-center gap-2">🔥 최근 탐구 업데이트 현황</h3>
                             <span class="animate-pulse w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                         </div>
-                        <div id="homeTimelineFeed" class="space-y-3 flex-1 overflow-y-auto pr-2 no-scrollbar min-h-[150px] max-h-[300px]">
+                        <div id="homeTimelineFeed" class="space-y-3 flex-1 overflow-y-auto pr-2 no-scrollbar min-h-[150px]">
                             <p class="text-xs text-slate-500 text-center py-10">데이터를 동기화하고 있습니다...</p>
                         </div>
                     </div>
 
-                    <div class="bg-slate-800/80 p-5 rounded-3xl border border-slate-700/50 backdrop-blur-md shadow-2xl flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold text-xs text-white flex items-center gap-2">🏫 학교 행사 리스트</h3>
-                            <span class="text-[9px] bg-slate-700 text-indigo-300 font-bold px-2 py-0.5 rounded border border-indigo-500/30">Google Sheet 연계</span>
+                    <div class="bg-slate-800/80 p-6 rounded-3xl border border-slate-700/50 backdrop-blur-md shadow-2xl flex flex-col">
+                        <div class="flex items-center justify-between mb-4 shrink-0">
+                            <h3 class="font-bold text-sm text-white flex items-center gap-2">🏫 학교 행사 리스트</h3>
                         </div>
-                        <div id="homeEventsList" class="space-y-3 flex-1 overflow-y-auto pr-2 no-scrollbar min-h-[150px] max-h-[300px]">
+                        <div id="homeEventsList" class="space-y-3 flex-1 overflow-y-auto pr-2 no-scrollbar min-h-[150px]">
                             <p class="text-xs text-slate-500 text-center py-10 font-bold">학교 권장 일정을 파악하고 있습니다...</p>
                         </div>
                     </div>
@@ -107,47 +110,48 @@
             </div>
         </div>
 
-        <div class="lg:w-1/3 bg-white p-6 sm:p-10 lg:p-12 flex flex-col justify-center border-l border-slate-100 shadow-[-20px_0_40px_rgba(0,0,0,0.05)] z-20 relative shrink-0 min-h-[500px] lg:min-h-0">
-            <div class="max-w-sm mx-auto w-full">
-                <form id="loginForm" class="space-y-5">
+        <!-- 오른쪽: 인증 패널 -->
+        <div class="lg:w-[480px] bg-white p-8 lg:p-12 flex flex-col justify-center border-l border-slate-100 shadow-[-20px_0_40px_rgba(0,0,0,0.05)] z-20 shrink-0">
+            <div class="w-full">
+                <form id="loginForm" class="space-y-6">
                     <div>
-                        <h2 class="text-3xl font-black text-slate-900 leading-tight mb-1">반갑습니다! 👋</h2>
-                        <p class="text-slate-500 text-xs font-medium">계정 이메일과 비밀번호로 안전하게 로그인하세요.</p>
+                        <h2 class="text-3xl font-black text-slate-900 leading-tight mb-2">반갑습니다! 👋</h2>
+                        <p class="text-slate-500 text-sm font-medium">계정 이메일과 비밀번호로 로그인하세요.</p>
                     </div>
-                    <div class="space-y-3.5">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학교 계정 이메일</label>
-                            <input type="text" id="loginEmail" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-sm font-semibold" required>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">학교 계정 이메일</label>
+                            <input type="text" id="loginEmail" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-sm font-semibold" placeholder="이메일 입력" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">비밀번호</label>
-                            <input type="password" id="loginPassword" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-sm font-semibold" required>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">비밀번호</label>
+                            <input type="password" id="loginPassword" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-sm font-semibold" placeholder="비밀번호 입력" required>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-black tracking-wide py-3.5 rounded-xl hover:bg-blue-700 transition shadow-lg text-sm">안전하게 로그인</button>
-                    <p class="text-center text-xs text-slate-500 font-medium pt-1">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-black tracking-wide py-4 rounded-xl hover:bg-blue-700 active:scale-[0.98] transition shadow-lg shadow-blue-600/20 text-sm">안전하게 로그인</button>
+                    <p class="text-center text-xs text-slate-500 font-medium pt-2">
                         플랫폼에 처음이신가요? <a href="#" onclick="window.showSignup(event)" class="text-blue-600 font-bold hover:underline ml-1">회원가입 신청</a>
                     </p>
                 </form>
 
-                <form id="signupForm" class="space-y-4 hidden">
+                <form id="signupForm" class="space-y-5 hidden">
                     <div><h2 class="text-2xl font-black text-slate-900 leading-tight mb-1">계정 생성 🚀</h2></div>
-                    <div class="flex gap-2 p-1 bg-slate-100 rounded-xl mb-1">
-                        <button type="button" id="roleStudentBtn" class="w-1/2 py-2 bg-white text-blue-600 shadow-sm font-black rounded-lg transition text-xs">학습자(학생)</button>
-                        <button type="button" id="roleTeacherBtn" class="w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800">지도 교사</button>
+                    <div class="flex gap-2 p-1.5 bg-slate-100 rounded-xl mb-2">
+                        <button type="button" id="roleStudentBtn" class="w-1/2 py-2.5 bg-white text-blue-600 shadow-sm font-black rounded-lg transition text-xs">학습자(학생)</button>
+                        <button type="button" id="roleTeacherBtn" class="w-1/2 py-2.5 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800">지도 교사</button>
                     </div>
                     <input type="hidden" id="signupRole" value="student">
                     <div class="space-y-3">
-                        <input type="text" id="signupName" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition text-xs font-medium" placeholder="실명 입력 (예: 홍길동)" required>
-                        <input type="email" id="signupEmail" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition text-xs font-medium" placeholder="이메일 주소" required>
-                        <input type="password" id="signupPassword" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition text-xs font-medium" placeholder="비밀번호 (6자 이상)" required minlength="6">
+                        <input type="text" id="signupName" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl transition text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="실명 입력 (예: 홍길동)" required>
+                        <input type="email" id="signupEmail" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl transition text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="이메일 주소" required>
+                        <input type="password" id="signupPassword" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl transition text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="비밀번호 (6자 이상)" required minlength="6">
                         <div id="studentOnlyFields" class="grid grid-cols-2 gap-3 pt-1">
-                            <input type="number" id="signupYear" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium" placeholder="입학년도">
-                            <input type="text" id="signupStudentId" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium" placeholder="학번 (5자리)">
+                            <input type="number" id="signupYear" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="입학년도">
+                            <input type="text" id="signupStudentId" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="학번 (5자리)">
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl transition shadow-lg text-xs mt-2">가입 완료</button>
-                    <p class="text-center text-xs text-slate-500 pt-1">이미 계정이 있으신가요? <a href="#" onclick="window.showLogin(event)" class="text-blue-600 font-bold hover:underline">로그인하기</a></p>
+                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl transition shadow-lg text-sm hover:bg-slate-800 active:scale-[0.98] mt-2">가입 완료</button>
+                    <p class="text-center text-xs text-slate-500 pt-2">이미 계정이 있으신가요? <a href="#" onclick="window.showLogin(event)" class="text-blue-600 font-bold hover:underline">로그인하기</a></p>
                 </form>
             </div>
         </div>
@@ -158,177 +162,181 @@
     <!-- ========================================== -->
     <div id="studentView" class="hidden min-h-[100dvh] pb-16 bg-slate-100 font-sans">
         <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
-            <div class="max-w-[1600px] mx-auto px-5 h-16 flex items-center justify-between">
+            <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <h1 class="text-2xl font-black text-blue-600 tracking-tighter">EduPort</h1>
                     <div class="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">학적 정보 확인 중...</span>
+                        <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">정보 확인 중...</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="window.printStudentPortfolio()" type="button" class="bg-slate-900 text-white px-4 sm:px-5 py-2.5 rounded-xl text-xs font-black tracking-wide hover:bg-slate-800 transition shadow-md flex items-center gap-2 min-h-[44px]">
-                        🖨️ 포트폴리오 인쇄
+                    <button onclick="window.execPrintStudent()" type="button" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-black tracking-wide hover:bg-slate-800 transition shadow-md flex items-center gap-2">
+                        🖨️ 인쇄하기
                     </button>
-                    <button onclick="window.execLogout()" class="text-slate-400 hover:text-red-600 text-xs font-bold transition px-2 min-h-[44px]">로그아웃</button>
+                    <button onclick="window.execLogout()" class="text-slate-400 hover:text-red-600 text-xs font-bold transition px-2 py-2">로그아웃</button>
                 </div>
             </div>
         </nav>
 
-        <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 space-y-8">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+            <!-- 희망 진로 입력 섹션 -->
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b border-slate-100 pb-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
                     <h2 class="font-black text-lg text-slate-900 tracking-tight">🎯 희망 진로 및 진학 목표 (인쇄 시 표지 반영)</h2>
-                    <button onclick="window.saveStudentCareerInfo()" type="button" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1 min-h-[44px]">
-                        💾 내용 저장 및 업데이트
+                    <button onclick="window.saveStudentCareerInfo()" type="button" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-3 rounded-xl transition shadow-sm flex items-center gap-2">
+                        💾 <span>저장 및 업데이트</span>
                     </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="md:col-span-3">
-                        <label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 전공 및 진로 분야</label>
-                        <input type="text" id="pdfInputCareer" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" placeholder="예: 컴퓨터공학 / 인공지능 개발자">
+                        <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">희망 전공 및 진로 분야</label>
+                        <input type="text" id="pdfInputCareer" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="예: 컴퓨터공학 / 인공지능 개발자">
                     </div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (1순위)</label><input type="text" id="pdfInputUniv1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="1순위 대학명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (2순위)</label><input type="text" id="pdfInputUniv2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="2순위 대학명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 대학 (3순위)</label><input type="text" id="pdfInputUniv3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="3순위 대학명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (1순위)</label><input type="text" id="pdfInputMajor1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="1순위 학과명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (2순위)</label><input type="text" id="pdfInputMajor2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="2순위 학과명"></div>
-                    <div><label class="block text-sm font-bold text-slate-700 mb-1 pl-1">희망 학과 (3순위)</label><input type="text" id="pdfInputMajor3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="3순위 학과명"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">희망 대학 (1순위)</label><input type="text" id="pdfInputUniv1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">희망 대학 (2순위)</label><input type="text" id="pdfInputUniv2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">희망 대학 (3순위)</label><input type="text" id="pdfInputUniv3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">희망 학과 (1순위)</label><input type="text" id="pdfInputMajor1" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">희망 학과 (2순위)</label><input type="text" id="pdfInputMajor2" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">희망 학과 (3순위)</label><input type="text" id="pdfInputMajor3" class="w-full p-4 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></div>
                 </div>
             </section>
 
+            <!-- 활동 등록 폼 -->
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
                 <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-lg">✍️</div>
-                        <h2 class="font-black text-xl text-slate-900 tracking-tight" id="portfolioFormTitle">학업 및 진로 탐구 활동 등록</h2>
+                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-xl shadow-inner">✍️</div>
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight" id="portfolioFormTitle">탐구 활동 신규 등록</h2>
                     </div>
                 </div>
                 
-                <form id="portfolioForm" class="space-y-5">
+                <form id="portfolioForm" class="space-y-6">
                     <input type="hidden" id="pfEditId" value="">
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                        <div class="md:col-span-3 space-y-5 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div class="lg:col-span-4 space-y-5 bg-slate-50 p-6 rounded-2xl border border-slate-100">
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">실행 상태</label>
-                                <select id="pfExecution" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
+                                <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">실행 상태</label>
+                                <select id="pfExecution" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
                                     <option value="참여함">✅ 참여함 (탐구 완료)</option><option value="계획함">🗓️ 계획함 (진행 예정)</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">학년도</label>
-                                <input type="number" id="pfYearInput" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">학년</label>
-                                    <select id="pfGrade" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">학년도</label>
+                                    <input type="number" id="pfYearInput" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition text-center" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">학년</label>
+                                    <select id="pfGrade" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition text-center" required>
                                         <option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">학기</label>
-                                    <select id="pfSemester" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">학기</label>
+                                    <select id="pfSemester" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition text-center" required>
                                         <option value="1">1학기</option><option value="2">2학기</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">기록 영역</label>
-                                <select id="pfArea" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required>
+                                <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">기록 영역</label>
+                                <select id="pfArea" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black focus:ring-2 focus:ring-blue-500 outline-none transition" required>
                                     <option value="교과">교과 (과목 세특)</option><option value="자율">창체 - 자율활동</option><option value="동아리">창체 - 동아리활동</option><option value="진로">창체 - 진로활동</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="md:col-span-9 space-y-5">
-                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required></div>
-                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" required></div>
-                            <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-4 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]"></div>
-                            <div><label class="block text-sm font-bold text-blue-700 mb-1.5 pl-1">🧠 자기 성찰 및 평가 <span class="text-red-500">*</span></label><textarea id="pfSelfEval" rows="4" class="w-full p-4 border border-blue-200 rounded-xl bg-blue-50/30 text-sm font-medium leading-relaxed focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none" required></textarea></div>
+                        <div class="lg:col-span-8 space-y-5">
+                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" required></div>
+                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-4 border border-slate-200 rounded-xl bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" required></div>
+                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-4 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition"></div>
+                            <div><label class="block text-sm font-bold text-blue-700 mb-2 pl-1">🧠 자기 성찰 및 평가 <span class="text-red-500">*</span></label><textarea id="pfSelfEval" rows="4" class="w-full p-4 border border-blue-200 rounded-xl bg-blue-50/30 text-sm font-medium leading-relaxed focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none" required></textarea></div>
                         </div>
                     </div>
                     
-                    <div class="pt-2 flex justify-end gap-3">
-                        <button type="button" id="cancelEditBtn" onclick="window.cancelEditPortfolio()" class="hidden px-6 py-4 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition min-h-[44px]">수정 취소</button>
-                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-600/20 text-sm min-h-[44px]">포트폴리오 영구 등록 ➔</button>
+                    <div class="pt-4 flex justify-end gap-3">
+                        <button type="button" id="cancelEditBtn" onclick="window.cancelEditPortfolio()" class="hidden px-8 py-4 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition">수정 취소</button>
+                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[280px] bg-blue-600 text-white font-black py-4 px-10 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-600/30 text-base">포트폴리오 영구 등록 ➔</button>
                     </div>
                 </form>
             </section>
 
+            <!-- 통계 섹션 -->
             <section id="studentStatsSection" class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print hidden"></section>
 
-            <section class="space-y-5 no-print">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-black text-xl text-slate-800 tracking-tight">📑 등록된 포트폴리오 종합 내역</h3>
+            <!-- 포트폴리오 리스트 -->
+            <section class="space-y-6 no-print">
+                <div class="flex items-center justify-between mb-2 pl-2">
+                    <h3 class="font-black text-xl text-slate-800 tracking-tight">📑 내 포트폴리오 관리</h3>
                 </div>
 
-                <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-3 justify-between items-center">
-                    <div class="flex overflow-x-auto whitespace-nowrap w-full md:w-auto no-scrollbar gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
-                        <button class="grade-tab active-tab px-6 py-3 text-center font-black text-sm text-blue-600 bg-white rounded-lg shadow-sm transition" data-grade="1">1학년</button>
-                        <button class="grade-tab px-6 py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="2">2학년</button>
-                        <button class="grade-tab px-6 py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="3">3학년</button>
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row gap-4 justify-between items-center">
+                    <div class="flex overflow-x-auto whitespace-nowrap w-full lg:w-auto no-scrollbar gap-2 p-1 bg-slate-50 rounded-xl border border-slate-100">
+                        <button class="grade-tab active-tab px-8 py-3 text-center font-black text-sm text-blue-600 bg-white rounded-lg shadow-sm transition" data-grade="1">1학년</button>
+                        <button class="grade-tab px-8 py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="2">2학년</button>
+                        <button class="grade-tab px-8 py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="3">3학년</button>
                     </div>
                     
-                    <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                        <select id="studentAreaFilter" class="px-4 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
-                            <option value="">전체 영역</option>
-                            <option value="교과">교과 활동</option>
-                            <option value="자율">자율 활동</option>
-                            <option value="동아리">동아리 활동</option>
-                            <option value="진로">진로 활동</option>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                        <select id="studentAreaFilter" class="px-5 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">영역 전체</option><option value="교과">교과 활동</option><option value="자율">자율 활동</option><option value="동아리">동아리 활동</option><option value="진로">진로 활동</option>
                         </select>
-                        <div class="relative w-full sm:w-[300px]">
-                            <input type="text" id="studentSearchInput" class="w-full p-3 pl-10 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition min-h-[44px]" placeholder="내용, 도서명 등 검색">
-                            <svg class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <div class="relative w-full sm:w-[320px]">
+                            <input type="text" id="studentSearchInput" class="w-full p-3 pl-11 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-white transition" placeholder="내용, 도서명 등 검색">
+                            <svg class="absolute left-4 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
                 </div>
 
-                <div id="portfolioList" class="flex flex-col gap-4">
-                    <div class="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm"><p class="text-slate-400 text-sm font-bold">동기화 중...</p></div>
+                <div id="portfolioList" class="flex flex-col gap-5">
+                    <div class="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm"><p class="text-slate-400 text-sm font-bold">기록을 불러오는 중입니다...</p></div>
                 </div>
             </section>
 
-            <section class="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden no-print">
+            <!-- 학교 행사 리스트 -->
+            <section class="bg-slate-900 text-white p-6 sm:p-10 rounded-3xl shadow-2xl relative overflow-hidden no-print">
                 <div class="absolute right-0 top-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
                 
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 relative z-10 gap-4 border-b border-slate-700 pb-4">
-                    <h3 class="font-black text-xl text-white flex items-center gap-2">🏫 학교 행사 리스트</h3>
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 relative z-10 gap-4 border-b border-slate-700 pb-5">
+                    <h3 class="font-black text-xl text-white flex items-center gap-2">🏫 학교 권장 행사 연동</h3>
                     
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <div class="relative flex-1 md:w-[300px]">
-                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-10 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none focus:border-blue-500 transition placeholder-slate-400 min-h-[44px]" placeholder="행사명 검색 (클릭 시 자동 기입)">
-                            <svg class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <div class="flex gap-3 w-full md:w-auto">
+                        <div class="relative flex-1 md:w-[320px]">
+                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-11 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <svg class="absolute left-4 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
-                        <button onclick="window.syncGoogleSheetEvents()" type="button" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-3 rounded-xl border border-slate-700 transition flex items-center gap-1 shrink-0 min-h-[44px]">
-                            🔄 동기화
+                        <button onclick="window.syncGoogleSheetEvents()" type="button" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-5 py-3 rounded-xl border border-slate-700 transition flex items-center gap-2 shrink-0">
+                            🔄 일정 동기화
                         </button>
                     </div>
                 </div>
                 
-                <div id="studentEventsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
-                    <p class="text-sm text-slate-500 py-4">일정을 불러오고 있습니다...</p>
+                <div id="studentEventsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
+                    <p class="text-sm text-slate-500 py-4">일정을 확인하고 있습니다...</p>
                 </div>
             </section>
         </main>
     </div>
 
     <!-- ========================================== -->
-    <!-- [3] 🌟 지도 교사용 관제 센터 (와이드 1600px 3:9 황금비율 적용) -->
+    <!-- [3] 🌟 지도 교사용 관제 센터 (100dvh 스크롤 고정 와이드 레이아웃) -->
     <!-- ========================================== -->
     <div id="teacherView" class="hidden h-[100dvh] bg-slate-100 flex-col overflow-hidden relative font-sans">
-        <nav class="bg-slate-900 text-white border-b border-slate-800 z-40 shadow-md no-print shrink-0 h-16">
-            <div class="max-w-[1600px] mx-auto px-5 h-full flex items-center justify-between">
-                <h1 class="text-base sm:text-xl font-black tracking-tight flex items-center gap-2">👨‍🏫 교사용 관제 센터</h1>
+        <!-- 상단 네비게이션 -->
+        <nav class="bg-slate-900 text-white border-b border-slate-800 z-40 shadow-md shrink-0 h-16 w-full">
+            <!-- 🌟 폭 제한 해제, 1600px 와이드 적용 -->
+            <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+                <h1 class="text-lg sm:text-xl font-black tracking-tight flex items-center gap-2">👨‍🏫 교사용 관제 센터</h1>
                 <div class="flex items-center gap-3">
-                    <button id="openAdminPanelBtn" class="hidden text-[10px] bg-red-900/80 hover:bg-red-800 text-red-100 border border-red-800 font-bold px-3 py-1.5 rounded-full transition shadow-sm">🛡️ 회원 관리</button>
-                    <span id="teacherNavInfo" class="text-xs font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full hidden sm:inline-block"></span>
-                    <button onclick="window.execLogout()" class="text-slate-400 hover:text-white text-xs font-bold transition px-2 min-h-[36px]">로그아웃</button>
+                    <button id="openAdminPanelBtn" class="hidden text-xs bg-red-900/80 hover:bg-red-800 text-red-100 border border-red-800 font-bold px-4 py-2 rounded-lg transition shadow-sm">🛡️ 관리자 설정</button>
+                    <span id="teacherNavInfo" class="text-[11px] font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-md hidden sm:inline-block"></span>
+                    <button onclick="window.execLogout()" class="text-slate-400 hover:text-red-500 text-sm font-bold transition px-2 py-2">로그아웃</button>
                 </div>
             </div>
         </nav>
 
+        <!-- 모바일 탭 바 (lg: 1024px 이상에서는 자동 숨김) -->
         <div id="mobileTabSelector" class="flex lg:hidden bg-white border-b border-slate-200 shrink-0 h-14 z-30 shadow-sm w-full">
             <button id="tabBtnList" class="flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all">👥 명부</button>
             <button id="tabBtnEvents" class="flex-1 text-sm font-bold text-slate-400 transition-all">🏫 일정</button>
@@ -336,10 +344,15 @@
             <button id="tabBtnDetail" class="flex-1 text-sm font-bold text-slate-400 transition-all" disabled>🔍 분석</button>
         </div>
 
-        <main class="max-w-[1600px] mx-auto w-full px-2 sm:px-6 py-4 lg:py-6 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-8 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden no-print">
+        <!-- 메인 플렉스 컨테이너 -->
+        <!-- 🌟 와이드 레이아웃 적용: max-w-[1600px] -->
+        <main class="max-w-[1600px] mx-auto w-full px-2 sm:px-6 py-4 flex flex-col lg:flex-row gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
             
-            <div id="teacherLeftWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-6 h-full min-h-0 shrink-0 hidden lg:flex">
-                <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[400px] lg:min-h-0 overflow-hidden flex">
+            <!-- [좌측 패널 래퍼 - 25% ~ 30% 비율 (w-80 등 고정 너비 기반 플렉스)] -->
+            <div id="teacherLeftWrapper" class="w-full lg:w-[380px] xl:w-[420px] flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden lg:flex">
+                
+                <!-- 학생 명부 카드 -->
+                <div id="teacherListCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-col flex-[3] min-h-[400px] lg:min-h-0 overflow-hidden flex">
                     <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
                         <h2 class="font-black text-slate-900 text-lg flex justify-between items-center">
                             <span>👥 학생 명부</span>
@@ -347,70 +360,76 @@
                         </h2>
                     </div>
                     <div class="px-4 sm:px-5 space-y-3 mb-2 shrink-0 pt-3">
-                        <input type="text" id="teacherStudentSearch" class="w-full p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition min-h-[44px]" placeholder="실명/학번 검색">
+                        <input type="text" id="teacherStudentSearch" class="w-full p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition" placeholder="실명/학번 검색">
                         <div class="flex gap-2">
-                            <select id="filterYearSelect" class="w-1/2 p-3 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]"><option value="">입학년도</option></select>
-                            <select id="filterGradeSelect" class="w-1/2 p-3 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
+                            <select id="filterYearSelect" class="w-1/2 p-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none"><option value="">입학 연도</option></select>
+                            <select id="filterGradeSelect" class="w-1/2 p-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
                                 <option value="">전체 학년</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                             </select>
                         </div>
                     </div>
-                    <ul id="studentListContainer" class="px-4 sm:px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[300px] lg:min-h-0">
-                        <li class="text-sm text-slate-400 text-center py-10 font-medium">데이터를 취합하고 있습니다...</li>
+                    <ul id="studentListContainer" class="px-4 sm:px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[250px] lg:min-h-0">
+                        <li class="text-sm text-slate-400 text-center py-10 font-medium">로딩 중...</li>
                     </ul>
                 </div>
 
-                <div id="teacherEventsCard" class="bg-slate-900 p-4 sm:p-6 rounded-2xl lg:rounded-3xl shadow-xl border border-slate-800 flex-col flex-1 lg:flex-[2] min-h-[300px] lg:min-h-0 relative overflow-hidden hidden lg:flex">
+                <!-- 학사 일정 카드 -->
+                <div id="teacherEventsCard" class="bg-slate-900 p-5 rounded-2xl shadow-xl border border-slate-800 flex-col flex-[2] min-h-[300px] lg:min-h-0 relative overflow-hidden hidden lg:flex">
                     <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
                     <div class="relative z-10 flex items-center justify-between mb-4 border-b border-slate-700 pb-3 shrink-0">
-                        <h2 class="font-black text-white text-base">🏫 학사 일정 관리</h2>
+                        <h2 class="font-black text-white text-base">🏫 학사 일정 연동</h2>
                     </div>
                     <div class="flex gap-2 mb-4 relative z-10 shrink-0">
-                        <button onclick="window.openGoogleSheet()" class="flex-1 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold text-center transition flex items-center justify-center min-h-[44px]">시트 편집</button>
-                        <button onclick="window.openEventModal()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">수동 등록</button>
-                        <button onclick="window.syncGoogleSheetEvents()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">동기화</button>
+                        <button onclick="window.openGoogleSheet()" class="flex-1 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold transition">시트 편집</button>
+                        <button onclick="window.openEventModal()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">수동 등록</button>
+                        <button onclick="window.syncGoogleSheetEvents()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition">동기화</button>
                     </div>
-                    <div id="teacherEventsList" class="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar relative z-10 min-h-[200px] lg:min-h-0">
+                    <div id="teacherEventsList" class="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar relative z-10 min-h-[150px] lg:min-h-0">
                         <p class="text-xs text-slate-500 text-center py-4">일정이 없습니다.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="teacherRightWrapper" class="lg:col-span-9 h-full min-h-0 relative flex flex-col w-full">
-                <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-1 flex-col overflow-hidden hidden lg:flex">
+            <!-- [우측 메인 패널 래퍼 - flex-1 로 남은 공간 모두 차지] -->
+            <div id="teacherRightWrapper" class="flex-1 h-full min-h-0 relative flex flex-col w-full">
+                
+                <!-- 대시보드 뷰 -->
+                <div id="teacherTimelineCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 flex-col overflow-hidden hidden lg:flex">
                     <div class="border-b border-slate-100 p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                         <div>
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">📊 실시간 탐구 관제보드</h2>
-                            <p class="text-slate-500 text-sm mt-1 font-medium">전체 학생의 최신 기록을 모니터링합니다.</p>
+                            <p class="text-slate-500 text-sm mt-1.5 font-medium">전체 학생의 최신 활동 기록을 모니터링합니다.</p>
                         </div>
-                        <div class="flex gap-2 w-full md:w-auto">
-                            <select id="timelineAreaFilter" class="px-4 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <select id="timelineAreaFilter" class="px-5 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">전체 영역</option><option value="교과">교과 활동</option><option value="자율">자율 활동</option><option value="동아리">동아리 활동</option><option value="진로">진로 활동</option>
                             </select>
-                            <input type="text" id="timelineSearchInput" class="p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:border-blue-500 w-full md:w-64 min-h-[44px]" placeholder="활동명/이름 검색">
+                            <input type="text" id="timelineSearchInput" class="p-3 pl-4 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-[280px]" placeholder="활동명 또는 이름 검색">
                         </div>
                     </div>
-                    <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-5 sm:p-8 space-y-4 no-scrollbar min-h-[300px] lg:min-h-0">
-                        <p class="text-sm text-slate-400 text-center py-20 font-bold">변경 이력을 파악하고 있습니다...</p>
+                    <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-5 sm:p-8 space-y-4 no-scrollbar min-h-[300px] lg:min-h-0 bg-slate-50/50">
+                        <p class="text-sm text-slate-400 text-center py-20 font-bold">변경 이력을 확인하고 있습니다...</p>
                     </div>
                 </div>
 
-                <!-- 🌟 [Absolute 완전 제거] UI 가려짐 원천 방지 및 안전한 Flex 블록 교체식 렌더링 -->
-                <div id="teacherDetailCard" class="bg-slate-50 rounded-2xl lg:rounded-3xl shadow-inner border border-slate-200 flex-1 flex-col overflow-hidden hidden">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200 p-5 sm:px-8 bg-white shrink-0 shadow-sm z-20 w-full lg:rounded-t-3xl">
-                        <div class="flex flex-col items-center sm:items-start w-full sm:w-auto text-center sm:text-left">
-                            <div class="flex items-center justify-center sm:justify-start gap-3">
+                <!-- 🌟 특정 학생 상세 보기 뷰 (Absolute를 제거하여 버튼 가려짐 원천 해결) -->
+                <div id="teacherDetailCard" class="bg-slate-50 rounded-2xl shadow-inner border border-slate-200 flex-1 flex-col overflow-hidden hidden">
+                    <!-- 상단 헤더: flex-col 대신 철저한 flex-row 랩핑 적용 -->
+                    <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 border-b border-slate-200 p-5 sm:px-8 bg-white shrink-0 shadow-sm z-20 w-full">
+                        <div class="flex flex-col w-full sm:w-auto">
+                            <div class="flex items-center gap-3">
                                 <h2 class="text-2xl font-black text-slate-900 tracking-tight" id="detailStudentName">로딩 중</h2>
-                                <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow-sm">포트폴리오 분석 모드</span>
+                                <span class="bg-blue-600 text-white font-bold text-xs px-3 py-1 rounded-md shadow-sm">포트폴리오 분석 모드</span>
                             </div>
                             <p class="text-sm font-bold text-slate-500 mt-1.5" id="detailStudentInfo"></p>
                         </div>
-                        <div class="flex gap-2 shrink-0 w-full sm:w-auto justify-center sm:justify-end">
-                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3 rounded-xl transition shadow-sm flex items-center gap-1.5 min-h-[44px]">🖨️ 학생 통합 인쇄</button>
-                            <button onclick="window.closeStudentDetail()" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-bold px-6 py-3 rounded-xl transition shadow-sm min-h-[44px]">🔙 관제보드로 복귀</button>
+                        <div class="flex gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
+                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center gap-2">🖨️ 통합 인쇄</button>
+                            <button onclick="window.closeStudentDetail()" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-bold px-6 py-3 rounded-xl transition shadow-sm">🔙 관제보드 복귀</button>
                         </div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 no-scrollbar bg-slate-50 w-full min-h-[300px] lg:min-h-0">
+                    <!-- 내부 스크롤 컨텐츠 -->
+                    <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 no-scrollbar w-full min-h-[300px] lg:min-h-0 bg-slate-50">
                         <div id="teacherStatsContainer" class="mb-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hidden"></div>
                         <div id="teacherPortfolioList" class="flex flex-col gap-6"></div>
                     </div>
@@ -420,35 +439,32 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- [4] 최고 관리자(Admin) 전용 회원 정보 관리 모달 -->
+    <!-- [4] 최고 관리자 모달 -->
     <!-- ========================================== -->
-    <div id="adminPanelModal" class="fixed inset-0 bg-slate-900 z-50 flex flex-col hidden transition-opacity duration-300 font-sans no-print">
-        <nav class="bg-red-950 text-white shadow-lg border-b border-red-900/50 h-16 shrink-0 flex items-center px-5 justify-between">
-            <h1 class="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">🛡️ 에듀포트 최고 관리자 센터</h1>
-            <div class="flex items-center gap-3">
-                <button onclick="window.execLogout()" class="text-red-200 hover:text-white text-xs font-black transition px-3 py-2 border border-red-800/80 rounded-xl bg-red-900/40 min-h-[44px]">로그아웃</button>
-                <button id="closeAdminPanelBtn" class="text-white bg-red-800 hover:bg-red-700 text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm min-h-[44px]">관제 화면 복귀 ✕</button>
-            </div>
+    <div id="adminPanelModal" class="fixed inset-0 bg-slate-900 z-50 flex flex-col hidden font-sans">
+        <nav class="bg-red-950 text-white shadow-lg border-b border-red-900/50 h-16 shrink-0 flex items-center px-6 justify-between">
+            <h1 class="text-lg font-black tracking-tight flex items-center gap-2">🛡️ 최고 관리자 센터</h1>
+            <button id="closeAdminPanelBtn" class="bg-red-800 hover:bg-red-700 text-sm font-bold px-5 py-2.5 rounded-xl transition shadow-sm">관제 화면 복귀 ✕</button>
         </nav>
         <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8 overflow-y-auto">
-            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-200">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5 mb-5">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
                     <div>
                         <h2 class="text-2xl font-black text-slate-900 tracking-tight">👤 전체 회원 제어</h2>
-                        <p class="text-slate-500 text-xs mt-1">학적 정보 수정, 비밀번호 강제 초기화 및 영구 탈퇴 처리.</p>
+                        <p class="text-slate-500 text-sm mt-1">학적 정보 수정, 비밀번호 강제 초기화 및 영구 탈퇴 처리.</p>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <input type="text" id="adminUserSearch" class="p-2.5 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-red-800 bg-slate-50 focus:bg-white min-h-[44px]" placeholder="이름/이메일 검색">
-                        <select id="adminRoleFilter" class="p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
+                    <div class="flex gap-3">
+                        <input type="text" id="adminUserSearch" class="p-3 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:ring-2 focus:ring-red-800 bg-slate-50 focus:bg-white" placeholder="이름/이메일 검색">
+                        <select id="adminRoleFilter" class="p-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
                             <option value="">전체 권한</option><option value="student">학생</option><option value="teacher">교사</option>
                         </select>
                     </div>
                 </div>
                 <div class="overflow-x-auto rounded-2xl border border-slate-200">
-                    <table class="w-full text-left border-collapse text-xs">
+                    <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider font-extrabold border-b border-slate-200">
-                                <th class="p-4">역할</th><th class="p-4">이름</th><th class="p-4">이메일</th><th class="p-4">입학년도</th><th class="p-4">학번</th><th class="p-4 text-center">제어</th>
+                            <tr class="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
+                                <th class="p-4">권한</th><th class="p-4">이름</th><th class="p-4">이메일</th><th class="p-4">입학년도</th><th class="p-4">학번</th><th class="p-4 text-center">동작</th>
                             </tr>
                         </thead>
                         <tbody id="adminUserTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
@@ -458,66 +474,67 @@
         </main>
     </div>
 
-    <!-- [관리자 회원 수정 모달] -->
-    <div id="adminEditModal" class="fixed inset-0 bg-slate-900/60 z-[60] flex items-center justify-center p-4 hidden backdrop-blur-sm no-print">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-100">
-            <h2 class="text-xl font-black text-slate-900 mb-4 tracking-tight">👤 회원 정보 수정</h2>
-            <form id="adminEditForm" class="space-y-4">
+    <!-- 관리자 수정 모달 -->
+    <div id="adminEditModal" class="fixed inset-0 bg-slate-900/70 z-[60] flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-100">
+            <h2 class="text-2xl font-black text-slate-900 mb-6 tracking-tight">👤 회원 정보 수정</h2>
+            <form id="adminEditForm" class="space-y-5">
                 <input type="hidden" id="adminEditUserId">
-                <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">실명</label><input type="text" id="adminEditName" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]" required></div>
-                <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">이메일</label><input type="email" id="adminEditEmail" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]" required></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">실명</label><input type="text" id="adminEditName" class="w-full p-3.5 border border-slate-200 rounded-xl text-sm font-bold" required></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">이메일</label><input type="email" id="adminEditEmail" class="w-full p-3.5 border border-slate-200 rounded-xl text-sm font-bold" required></div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">권한</label>
-                    <select id="adminEditRole" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold bg-slate-50 min-h-[44px]">
-                        <option value="student">student (학생)</option><option value="teacher">teacher (교사)</option>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">권한</label>
+                    <select id="adminEditRole" class="w-full p-3.5 border border-slate-200 rounded-xl text-sm font-bold bg-slate-50">
+                        <option value="student">학생 (Student)</option><option value="teacher">교사 (Teacher)</option>
                     </select>
                 </div>
-                <div class="grid grid-cols-2 gap-3" id="adminStudentOnlyFields">
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">입학연도</label><input type="number" id="adminEditYear" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]"></div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학번</label><input type="text" id="adminEditStudentId" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-bold min-h-[44px]"></div>
+                <div class="grid grid-cols-2 gap-4" id="adminStudentOnlyFields">
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">입학연도</label><input type="number" id="adminEditYear" class="w-full p-3.5 border border-slate-200 rounded-xl text-sm font-bold"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1.5 pl-1">학번</label><input type="text" id="adminEditStudentId" class="w-full p-3.5 border border-slate-200 rounded-xl text-sm font-bold"></div>
                 </div>
-                <div class="flex gap-2 pt-2">
-                    <button type="button" id="closeAdminEditModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-xs hover:bg-slate-200 transition min-h-[44px]">취소</button>
-                    <button type="submit" class="w-2/3 bg-red-950 text-white font-black py-3 rounded-xl text-xs hover:bg-red-900 transition min-h-[44px]">저장 ➔</button>
+                <div class="flex gap-3 pt-3">
+                    <button type="button" id="closeAdminEditModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl text-sm hover:bg-slate-200 transition">취소</button>
+                    <button type="submit" class="w-2/3 bg-red-950 text-white font-black py-4 rounded-xl text-sm hover:bg-red-900 transition">저장 ➔</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- [학교 행사 생성 모달] -->
-    <div id="eventModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm no-print">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-100">
+    <!-- 행사 등록 모달 -->
+    <div id="eventModal" class="fixed inset-0 bg-slate-900/70 z-[60] flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-100">
             <h2 class="text-2xl font-black text-slate-900 mb-6 tracking-tight">🏫 행사 수동 등록</h2>
-            <form id="eventForm" class="space-y-4">
-                <input type="text" id="evName" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" placeholder="행사명" required>
+            <form id="eventForm" class="space-y-5">
+                <input type="text" id="evName" class="w-full p-4 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="행사명" required>
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="evDate" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required>
-                    <select id="evTarget" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]">
-                        <option value="0">공통</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
+                    <input type="date" id="evDate" class="w-full p-4 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                    <select id="evTarget" class="w-full p-4 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+                        <option value="0">공통(전체)</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                     </select>
                 </div>
-                <input type="text" id="evOrganizer" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" placeholder="주관 부서" required>
-                <textarea id="evContent" rows="3" class="w-full p-3.5 border border-slate-200 bg-slate-50 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="요약 기입" required></textarea>
-                <div class="flex gap-2 pt-2">
-                    <button type="button" id="closeEventModalBtn" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-3.5 rounded-xl text-sm hover:bg-slate-200 transition min-h-[44px]">취소</button>
-                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-black py-3.5 rounded-xl text-sm hover:bg-blue-700 transition min-h-[44px]">등록</button>
+                <input type="text" id="evOrganizer" class="w-full p-4 border border-slate-200 bg-slate-50 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="주관 부서" required>
+                <textarea id="evContent" rows="3" class="w-full p-4 border border-slate-200 bg-slate-50 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="요약 내용 기입" required></textarea>
+                <div class="flex gap-3 pt-3">
+                    <button type="button" onclick="window.closeEventModal()" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl text-sm hover:bg-slate-200 transition">취소</button>
+                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-black py-4 rounded-xl text-sm hover:bg-blue-700 transition">등록하기</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 🖨️ 보고서 출력을 위한 네이티브 인쇄 전용 템플릿 영역 -->
+    <!-- 🖨️ 보고서 출력을 위한 네이티브 인쇄 템플릿 영역 -->
     <div id="pdfExportContainer" class="print:block">
-        <div style="text-align: center; margin-bottom: 15px; border-bottom: 2px solid #334155; padding-bottom: 5px;">
-            <h1 style="font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: 5px; margin: 0 0 10px 0;">학생 진로 포트폴리오 종합 보고서</h1>
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #1e293b; padding-bottom: 10px;">
+            <h1 style="font-size: 24px; font-weight: 900; color: #0f172a; letter-spacing: 4px; margin: 0 0 15px 0;">학생 진로 포트폴리오 종합 보고서</h1>
             <table class="pdf-header-table">
-                <tr><th style="width: 25%;">학 번</th><td id="pdfExportStudentId" style="width: 25%; font-weight: bold;">-</td><th style="width: 25%;">성 명</th><td id="pdfExportStudentName" style="width: 25%; font-weight: bold;">-</td></tr>
-                <tr><th colspan="1">희망 전공/분야</th><td colspan="3" id="pdfPrintCareer" style="font-weight: bold;">-</td></tr>
-                <tr><th colspan="1">희망 대학 (1~3)</th><td colspan="3" id="pdfPrintCollege">-</td></tr>
-                <tr><th colspan="1">희망 학과 (1~3)</th><td colspan="3" id="pdfPrintMajor">-</td></tr>
+                <tr><th style="width: 20%;">학 번</th><td id="pdfExportStudentId" style="width: 30%; font-weight: bold; font-size: 11pt;">-</td><th style="width: 20%;">성 명</th><td id="pdfExportStudentName" style="width: 30%; font-weight: bold; font-size: 11pt;">-</td></tr>
+                <tr><th colspan="1">희망 전공/분야</th><td colspan="3" id="pdfPrintCareer" style="font-weight: bold; font-size: 11pt;">-</td></tr>
+                <tr><th colspan="1">희망 대학 (1~3)</th><td colspan="3" id="pdfPrintCollege" style="font-size: 11pt;">-</td></tr>
+                <tr><th colspan="1">희망 학과 (1~3)</th><td colspan="3" id="pdfPrintMajor" style="font-size: 11pt;">-</td></tr>
             </table>
         </div>
-        <div id="pdfExportStats" class="mb-4"></div>
+        <!-- 인쇄용 통계 요약 -->
+        <div id="pdfExportStats" class="mb-6"></div>
         <div id="pdfExportContent"></div>
     </div>
 
@@ -525,25 +542,10 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
-        // 🌟 메모리 변수군 (isAppReady 강제 초기화로 무한로딩 방어)
-        window.currentUser = null; 
-        window.currentUserProfile = null; 
-        window.currentStudentGrade = 1; 
-        window.selectedStudentUid = null;
-        window.cachedStudents = []; 
-        window.cachedPortfolios = []; 
-        window.teacherCachedPortfolios = []; 
-        window.teacherSelectedStudentName = ''; 
-        window.teacherSelectedStudentId = '';
-        window.teacherSelectedStudentCareerInfo = null; 
-        window.cachedEventsData = []; 
-        window.cachedAllUsersForAdmin = []; 
-        window.cachedTimelineData = [];
-        window.isAuthenticating = false; 
-        window.editingPortfolioId = null;
-        window.isAppReady = false; 
-
-        // 🌟 시스템 전역 함수 선언
+        // =========================================================================
+        // 🌟 1. 글로벌 스크립트 파이프라인 (인쇄 에러 및 참조 참조 방어)
+        // =========================================================================
+        
         window.generatePdfHtml = (portfolios) => {
             let pdfHtml = '';
             portfolios.forEach((item) => {
@@ -554,7 +556,7 @@
                 pdfHtml += `
                     <table class="pdf-table">
                         <tr><th>영 역</th><td style="width:20%; font-weight:bold;">${item.area}</td><th>기 간</th><td style="width:20%; font-weight:bold;">${year ? year+'학년도 ' : ''}${item.semester}학기</td><th>상 태</th><td style="width:20%; font-weight:bold; color: #475569;">${execution}</td></tr>
-                        <tr><th>활 동 명</th><td colspan="5" style="font-size:11pt; font-weight:900;">${item.activity_name}</td></tr>
+                        <tr><th>활 동 명</th><td colspan="5" style="font-size:11.5pt; font-weight:900; color: #0f172a;">${item.activity_name}</td></tr>
                         <tr><th>주 요 내 용</th><td colspan="5">${simpleContent}</td></tr>
                         ${reading ? `<tr><th>연 계 독 서</th><td colspan="5" style="font-weight:bold; color:#1d4ed8;">${reading}</td></tr>` : ''}
                         <tr><th>자 기 평 가</th><td colspan="5" style="white-space:pre-wrap;">${item.self_evaluation}</td></tr>
@@ -579,27 +581,27 @@
 
         window.renderStatsHTML = (stats) => {
             let html = `
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="text-lg">📊</span>
-                    <h3 class="font-black text-base text-slate-800 tracking-tight">학년-학기별 탐구 활동 누적 통계</h3>
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="text-xl">📊</span>
+                    <h3 class="font-black text-lg text-slate-900 tracking-tight">학년-학기별 탐구 활동 누적 통계</h3>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
             for (let g = 1; g <= 3; g++) {
                 const gTotal = stats[g][1]['교과']+stats[g][1]['자율']+stats[g][1]['동아리']+stats[g][1]['진로'] + stats[g][2]['교과']+stats[g][2]['자율']+stats[g][2]['동아리']+stats[g][2]['진로'];
                 html += `
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/60 flex flex-col justify-between">
-                        <div class="text-sm font-black text-slate-700 mb-4 border-b border-slate-200 pb-2 flex justify-between items-center"><span>고등학교 ${g}학년</span><span class="text-blue-600 bg-blue-50 px-2 py-1 rounded font-bold">총 ${gTotal}건</span></div>
+                    <div class="bg-slate-50 p-5 rounded-3xl border border-slate-200/80 flex flex-col justify-between shadow-sm">
+                        <div class="text-sm font-black text-slate-800 mb-4 border-b border-slate-200 pb-2 flex justify-between items-center"><span>고등학교 ${g}학년</span><span class="text-blue-700 bg-blue-100 px-2.5 py-1 rounded font-black">총 ${gTotal}건</span></div>
                         <div class="space-y-4">`;
                 for (let s = 1; s <= 2; s++) {
                     const total = stats[g][s]['교과'] + stats[g][s]['자율'] + stats[g][s]['동아리'] + stats[g][s]['진로'];
                     html += `
                         <div>
-                            <div class="text-xs font-bold text-slate-500 mb-2 flex justify-between items-center"><span>${s}학기 기록</span><span class="bg-slate-200/80 text-slate-700 px-2 py-0.5 rounded-md font-extrabold text-[10px]">${total}건</span></div>
+                            <div class="text-xs font-bold text-slate-500 mb-2 flex justify-between items-center"><span>${s}학기 기록</span><span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md font-extrabold">${total}건</span></div>
                             <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                                <div class="bg-blue-50/50 border border-blue-100 rounded-xl py-1.5"><div class="text-blue-600 font-bold text-[10px] mb-0.5">교과</div><div class="font-black text-blue-900 text-sm">${stats[g][s]['교과']}</div></div>
-                                <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl py-1.5"><div class="text-emerald-600 font-bold text-[10px] mb-0.5">자율</div><div class="font-black text-emerald-900 text-sm">${stats[g][s]['자율']}</div></div>
-                                <div class="bg-amber-50/50 border border-amber-100 rounded-xl py-1.5"><div class="text-amber-600 font-bold text-[10px] mb-0.5">동아리</div><div class="font-black text-amber-900 text-sm">${stats[g][s]['동아리']}</div></div>
-                                <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl py-1.5"><div class="text-indigo-600 font-bold text-[10px] mb-0.5">진로</div><div class="font-black text-indigo-900 text-sm">${stats[g][s]['진로']}</div></div>
+                                <div class="bg-blue-50/50 border border-blue-100 rounded-xl py-2"><div class="text-blue-600 font-bold text-[10px] mb-1">교과</div><div class="font-black text-blue-900 text-sm">${stats[g][s]['교과']}</div></div>
+                                <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl py-2"><div class="text-emerald-600 font-bold text-[10px] mb-1">자율</div><div class="font-black text-emerald-900 text-sm">${stats[g][s]['자율']}</div></div>
+                                <div class="bg-amber-50/50 border border-amber-100 rounded-xl py-2"><div class="text-amber-600 font-bold text-[10px] mb-1">동아리</div><div class="font-black text-amber-900 text-sm">${stats[g][s]['동아리']}</div></div>
+                                <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl py-2"><div class="text-indigo-600 font-bold text-[10px] mb-1">진로</div><div class="font-black text-indigo-900 text-sm">${stats[g][s]['진로']}</div></div>
                             </div>
                         </div>`;
                 }
@@ -611,8 +613,8 @@
 
         window.renderPdfStatsHTML = (stats) => {
             let html = `
-                <div style="margin-bottom: 12px; page-break-inside: avoid;">
-                    <h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 6px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a;">■ 학년-학기별 탐구 활동 통계 요약</h2>
+                <div style="margin-bottom: 20px; page-break-inside: avoid;">
+                    <h2 style="font-size: 12pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 8px; color: #0f172a;">■ 학년-학기별 탐구 활동 통계 요약</h2>
                     <table class="pdf-table" style="margin-bottom: 0;">
                         <thead>
                             <tr style="background-color: #f1f5f9 !important;">
@@ -625,13 +627,13 @@
                     const total = stats[g][s]['교과'] + stats[g][s]['자율'] + stats[g][s]['동아리'] + stats[g][s]['진로'];
                     html += `
                         <tr>
-                            ${s === 1 ? `<td rowspan="2" style="text-align: center; font-weight: bold; vertical-align: middle; background-color: #fafbfb;">${g}학년</td>` : ''}
+                            ${s === 1 ? `<td rowspan="2" style="text-align: center; font-weight: 900; font-size:11pt; vertical-align: middle; background-color: #fafbfb;">${g}학년</td>` : ''}
                             <td style="text-align: center; font-weight: bold; background-color: #fafbfb;">${s}학기</td>
                             <td style="text-align: center; font-weight: bold; color: ${stats[g][s]['교과'] > 0 ? '#1e40af' : '#94a3b8'};">${stats[g][s]['교과']}건</td>
                             <td style="text-align: center; font-weight: bold; color: ${stats[g][s]['자율'] > 0 ? '#065f46' : '#94a3b8'};">${stats[g][s]['자율']}건</td>
                             <td style="text-align: center; font-weight: bold; color: ${stats[g][s]['동아리'] > 0 ? '#b45309' : '#94a3b8'};">${stats[g][s]['동아리']}건</td>
                             <td style="text-align: center; font-weight: bold; color: ${stats[g][s]['진로'] > 0 ? '#4338ca' : '#94a3b8'};">${stats[g][s]['진로']}건</td>
-                            <td style="text-align: center; font-weight: 900; background-color: #f8fafc;">${total}건</td>
+                            <td style="text-align: center; font-weight: 900; background-color: #f8fafc; font-size:11pt;">${total}건</td>
                         </tr>`;
                 }
             }
@@ -645,6 +647,15 @@
         const GOOGLE_SHEET_EDIT_URL = 'https://docs.google.com/spreadsheets/d/1dOpzZP_TG2wslL8LzT0DFCoz5YIEPPHQ/edit?usp=sharing&ouid=109071059180505445413&rtpof=true&sd=true'; 
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 🌟 앱 메모리
+        window.currentUser = null; window.currentUserProfile = null; window.currentStudentGrade = 1; window.selectedStudentUid = null;
+        window.cachedStudents = []; window.cachedPortfolios = []; window.teacherCachedPortfolios = []; 
+        window.teacherSelectedStudentName = ''; window.teacherSelectedStudentId = ''; window.teacherSelectedStudentCareerInfo = null; 
+        window.cachedEventsData = []; window.cachedAllUsersForAdmin = []; window.cachedTimelineData = [];
+        window.editingPortfolioId = null; 
+        window.isAuthenticating = false; // 로그인 중복 방어
+        window.isBooted = false; // 무한 로딩 방어 플래그
 
         // UI 헬퍼
         let loadingTimeout;
@@ -665,7 +676,7 @@
         
         window.showToast = function(message, type = 'info') {
             const container = document.getElementById('toastContainer'); const toast = document.createElement('div');
-            toast.className = `p-4 rounded-2xl shadow-xl text-white text-xs font-bold transition-all duration-300 transform translate-y-4 opacity-0 flex items-center justify-between min-w-[250px] max-w-sm z-50 ${type === 'error' ? 'bg-red-600 shadow-red-600/20' : type === 'success' ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-slate-900'}`;
+            toast.className = `p-5 rounded-2xl shadow-2xl text-white text-sm font-bold transition-all duration-300 transform translate-y-4 opacity-0 flex items-center justify-between min-w-[280px] max-w-sm z-50 ${type === 'error' ? 'bg-red-600 shadow-red-600/30' : type === 'success' ? 'bg-emerald-600 shadow-emerald-600/30' : 'bg-slate-900'}`;
             toast.innerHTML = `<span>${message.replace(/\n/g, '<br>')}</span><button class="ml-4 text-white/50 hover:text-white font-black">&times;</button>`;
             toast.querySelector('button').onclick = () => { toast.classList.add('opacity-0', 'translate-y-4'); setTimeout(() => toast.remove(), 300); };
             container.appendChild(toast); setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-4'), 20);
@@ -680,7 +691,7 @@
         document.getElementById('confirmCancelBtn').onclick = () => { document.getElementById('confirmModal').classList.add('hidden'); if (confirmResolve) confirmResolve(false); };
         document.getElementById('confirmOkBtn').onclick = () => { document.getElementById('confirmModal').classList.add('hidden'); if (confirmResolve) confirmResolve(true); };
 
-        // 🌟 메모리 초강력 소거 (좀비 계정 차단)
+        // 🌟 메모리 초강력 파괴 (좀비 계정 차단)
         window.forceClearLocalSession = function() {
             localStorage.removeItem('eduport-cached-profile'); localStorage.removeItem('eduport-cached-portfolios'); localStorage.removeItem('eduport-cached-students');
             const keysToRemove = [];
@@ -689,17 +700,16 @@
             
             window.currentUser = null; window.currentUserProfile = null; window.cachedStudents = []; window.cachedPortfolios = []; 
             window.teacherCachedPortfolios = []; window.cachedEventsData = []; window.cachedTimelineData = []; 
-            window.selectedStudentUid = null; window.isAuthenticating = false; window.isAppReady = false;
+            window.selectedStudentUid = null; window.isAuthenticating = false; window.isBooted = false;
         };
 
         window.execLogout = async function() {
             window.showLoading("로그아웃 중...");
             window.forceClearLocalSession();
-            try { await Promise.race([ supabase.auth.signOut(), new Promise(r => setTimeout(r, 500)) ]); } catch(err) {}
-            switchView('auth'); window.hideLoading(); window.showToast("안전하게 로그아웃 되었습니다.", "success");
+            try { await supabase.auth.signOut(); } catch(err) {}
+            // 완벽한 초기화를 위해 브라우저 강제 리로드 탑재
+            window.location.reload(); 
         };
-        // HTML 상의 모든 logoutBtn에 강제 할당
-        document.querySelectorAll('.logoutBtn').forEach(btn => { btn.onclick = window.execLogout; });
 
         window.loadHomeLiveBoard = async () => {
             const feedContainer = document.getElementById('homeTimelineFeed'); const eventContainer = document.getElementById('homeEventsList');
@@ -713,11 +723,11 @@
                         const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at || new Date());
                         const formatUpdate = `${String(updateDate.getMonth()+1).padStart(2, '0')}/${String(updateDate.getDate()).padStart(2, '0')}`;
                         const maskedName = blindName(item.profiles?.name || '학생');
-                        html += `<div class="p-4 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-2 transition hover:bg-slate-800/60"><div class="flex items-center justify-between text-xs"><span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span><span class="text-slate-500 font-medium">${formatUpdate}</span></div><h4 class="text-sm font-bold text-slate-200 truncate">${item.activity_name}</h4><p class="text-xs text-slate-400 truncate">${formatContentSummary(item.content)}</p><div class="text-[10px] text-slate-500 flex justify-between pt-2 border-t border-slate-800/50 font-medium"><span>작성자: ${maskedName}</span><span class="text-emerald-400">실시간 연동 성공 ✓</span></div></div>`;
+                        html += `<div class="p-5 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-2.5 transition hover:bg-slate-800/60"><div class="flex items-center justify-between text-xs"><span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span><span class="text-slate-500 font-medium">${formatUpdate}</span></div><h4 class="text-sm font-bold text-slate-200 truncate">${item.activity_name}</h4><p class="text-xs text-slate-400 truncate">${formatContentSummary(item.content)}</p><div class="text-[10px] text-slate-500 flex justify-between pt-2 border-t border-slate-800/50 font-medium"><span>작성자: ${maskedName}</span><span class="text-emerald-400">실시간 연동 성공 ✓</span></div></div>`;
                     });
                     feedContainer.innerHTML = html;
                 }
-            } catch (err) { feedContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-10 font-medium">데이터 지연: ${err.message}</p>`; }
+            } catch (err) { feedContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-10 font-medium">데이터 지연</p>`; }
 
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL); if (!response.ok) throw new Error("Google sync issue");
@@ -726,7 +736,7 @@
                 for (let i = 0; i < rows.length; i++) {
                     const row = rows[i].trim(); if (!row) continue; const cols = row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()); if (cols.length < 2) continue;
                     const eventName = cols[1], recordArea = cols[2], startMonth = cols[3], mainContent = cols[6] || '세부내용 참조';
-                    html += `<div class="p-4 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1.5"><div class="flex items-center justify-between mb-1"><h4 class="text-sm font-bold text-white truncate max-w-[160px]">[${recordArea}] ${eventName}</h4><span class="text-xs bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2 py-0.5 rounded">${startMonth||'3'}월</span></div><p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">${mainContent}</p></div>`;
+                    html += `<div class="p-5 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-2"><div class="flex items-center justify-between mb-1"><h4 class="text-sm font-bold text-white truncate max-w-[160px]">[${recordArea}] ${eventName}</h4><span class="text-xs bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2 py-0.5 rounded">${startMonth||'3'}월</span></div><p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">${mainContent}</p></div>`;
                     successCount++; if (successCount >= 5) break; 
                 }
                 eventContainer.innerHTML = html || '<p class="text-sm text-slate-500 text-center py-10 font-bold">일정이 없습니다.</p>';
@@ -742,8 +752,7 @@
                 tv.classList.remove('hidden'); tv.classList.add('flex');
                 if (window.innerWidth < 1024) { window.setMobileActiveTab('list'); } 
                 else {
-                    document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex'); 
-                    document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
+                    document.getElementById('teacherLeftWrapper').classList.remove('hidden'); document.getElementById('teacherLeftWrapper').classList.add('flex');
                     document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); 
                     document.getElementById('teacherDetailCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('flex');
                 }
@@ -758,20 +767,29 @@
 
         window.setMobileActiveTab = function(tab) {
             if (window.innerWidth >= 1024) return;
-            const inactiveClass = "flex-1 text-sm font-bold text-slate-400 transition-all py-3";
-            const activeClass = "flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all bg-blue-50/30 py-3";
+            const inactiveClass = "flex-1 text-sm font-bold text-slate-400 transition-all py-3 border-b-4 border-transparent";
+            const activeClass = "flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all bg-blue-50/50 py-3";
             
             tabBtnList.className = inactiveClass; tabBtnEvents.className = inactiveClass; tabBtnTimeline.className = inactiveClass; tabBtnDetail.className = inactiveClass;
             
-            const cardList = document.getElementById('teacherListCard'); const cardEvents = document.getElementById('teacherEventsCard');
-            const cardTimeline = document.getElementById('teacherTimelineCard'); const cardDetail = document.getElementById('teacherDetailCard');
-            cardList.classList.add('hidden'); cardList.classList.remove('flex'); cardEvents.classList.add('hidden'); cardEvents.classList.remove('flex');
-            cardTimeline.classList.add('hidden'); cardTimeline.classList.remove('flex'); cardDetail.classList.add('hidden'); cardDetail.classList.remove('flex');
+            // 모바일 탭 제어를 위해 전체 컨테이너 블록을 세분화하여 on/off
+            const wLeft = document.getElementById('teacherLeftWrapper'); const wRight = document.getElementById('teacherRightWrapper');
+            const cList = document.getElementById('teacherListCard'); const cEvents = document.getElementById('teacherEventsCard');
+            const cTime = document.getElementById('teacherTimelineCard'); const cDetail = document.getElementById('teacherDetailCard');
+            
+            wLeft.classList.add('hidden'); wLeft.classList.remove('flex'); wRight.classList.add('hidden'); wRight.classList.remove('flex');
+            cList.classList.add('hidden'); cList.classList.remove('flex'); cEvents.classList.add('hidden'); cEvents.classList.remove('flex');
+            cTime.classList.add('hidden'); cTime.classList.remove('flex'); cDetail.classList.add('hidden'); cDetail.classList.remove('flex');
 
-            if (tab === 'list') { tabBtnList.className = activeClass; cardList.classList.remove('hidden'); cardList.classList.add('flex'); } 
-            else if (tab === 'events') { tabBtnEvents.className = activeClass; cardEvents.classList.remove('hidden'); cardEvents.classList.add('flex'); } 
-            else if (tab === 'timeline') { tabBtnTimeline.className = activeClass; cardTimeline.classList.remove('hidden'); cardTimeline.classList.add('flex'); } 
-            else if (tab === 'detail') { tabBtnDetail.className = activeClass; cardDetail.classList.remove('hidden'); cardDetail.classList.add('flex'); }
+            if (tab === 'list') { 
+                tabBtnList.className = activeClass; wLeft.classList.remove('hidden'); wLeft.classList.add('flex'); cList.classList.remove('hidden'); cList.classList.add('flex');
+            } else if (tab === 'events') { 
+                tabBtnEvents.className = activeClass; wLeft.classList.remove('hidden'); wLeft.classList.add('flex'); cEvents.classList.remove('hidden'); cEvents.classList.add('flex'); 
+            } else if (tab === 'timeline') { 
+                tabBtnTimeline.className = activeClass; wRight.classList.remove('hidden'); wRight.classList.add('flex'); cTime.classList.remove('hidden'); cTime.classList.add('flex'); 
+            } else if (tab === 'detail') { 
+                tabBtnDetail.className = activeClass; wRight.classList.remove('hidden'); wRight.classList.add('flex'); cDetail.classList.remove('hidden'); cDetail.classList.add('flex'); 
+            }
         }
 
         tabBtnList.addEventListener('click', () => window.setMobileActiveTab('list')); tabBtnEvents.addEventListener('click', () => window.setMobileActiveTab('events'));
@@ -779,117 +797,103 @@
 
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024 && document.getElementById('teacherView').classList.contains('flex')) {
-                document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex');
-                document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
-                if (window.selectedStudentUid) { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherTimelineCard').classList.remove('flex'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); } 
-                else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); document.getElementById('teacherDetailCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('flex');}
+                const wLeft = document.getElementById('teacherLeftWrapper'); const wRight = document.getElementById('teacherRightWrapper');
+                const cList = document.getElementById('teacherListCard'); const cEvents = document.getElementById('teacherEventsCard');
+                const cTime = document.getElementById('teacherTimelineCard'); const cDetail = document.getElementById('teacherDetailCard');
+                
+                wLeft.classList.remove('hidden'); wLeft.classList.add('flex'); wRight.classList.remove('hidden'); wRight.classList.add('flex');
+                cList.classList.remove('hidden'); cList.classList.add('flex'); cEvents.classList.remove('hidden'); cEvents.classList.add('flex');
+                
+                if (window.selectedStudentUid) { cTime.classList.add('hidden'); cTime.classList.remove('flex'); cDetail.classList.remove('hidden'); cDetail.classList.add('flex'); } 
+                else { cTime.classList.remove('hidden'); cTime.classList.add('flex'); cDetail.classList.add('hidden'); cDetail.classList.remove('flex');}
             } else if (window.innerWidth < 1024 && document.getElementById('teacherView').classList.contains('flex')) {
                 if(!window.selectedStudentUid) window.setMobileActiveTab('list'); else window.setMobileActiveTab('detail');
             }
         });
 
-        // =========================================================================
-        // 🚀 [최종 진화형 단일 Auth 통합 파이프라인 (무한로딩 및 좀비 제거)]
-        // =========================================================================
-        
-        window.bootApp = async () => {
-            window.showLoading("시스템 연결 중...");
-            try {
-                const { data: { session }, error } = await supabase.auth.getSession();
-                
-                if (error || !session) {
-                    window.forceClearLocalSession();
-                    switchView('auth');
-                    window.hideLoading();
-                    return;
-                }
 
-                window.currentUser = session.user;
-                
-                // 1. 오프라인 캐시를 통한 즉각 화면 렌더링 (Zero-Latency)
-                const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
-                if (cachedProfileStr) {
-                    try {
-                        window.currentUserProfile = JSON.parse(cachedProfileStr);
-                        if (window.currentUserProfile.role === 'student') {
-                            initStudentDashboard();
-                            const pC = localStorage.getItem('eduport-cached-portfolios');
-                            if (pC) { window.cachedPortfolios = JSON.parse(pC); renderStudentPortfoliosFiltered(); const st = document.getElementById('studentStatsSection'); st.innerHTML = window.renderStatsHTML(window.calculateStats(window.cachedPortfolios)); st.classList.remove('hidden'); }
-                        } else {
-                            initTeacherDashboard();
-                            const sC = localStorage.getItem('eduport-cached-students');
-                            if (sC) { window.cachedStudents = JSON.parse(sC); renderStudentList(window.cachedStudents); }
-                        }
-                        window.hideLoading(); // 화면 개방
-                    } catch(e) { console.error("Cache parsing error", e); }
-                }
+        // =========================================================================
+        // 🚀 [단일 Auth 파이프라인: 무한 로딩 및 서버 Sleep 에러 원천 극복]
+        // =========================================================================
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_OUT' || !session) { 
+                if (window.isBooted) window.forceClearLocalSession(); 
+                switchView('auth'); window.hideLoading(); window.isBooted = true; return; 
+            }
+            
+            // 로그인/새로고침 시 오직 1번만 실행 (동기화 경합 방지 락)
+            if (window.isAuthenticating) return;
+            window.isAuthenticating = true;
+            window.currentUser = session.user;
 
-                // 2. 백그라운드 동기화 (화면이 이미 열려있어도 조용히 최신화)
-                const fetchProfile = supabase.from('profiles').select('*').eq('id', window.currentUser.id).limit(1);
-                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
-                
-                let profileData;
+            const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
+            let hasCache = false;
+            if (cachedProfileStr) {
                 try {
-                    const result = await Promise.race([fetchProfile, timeout]);
-                    profileData = result.data;
-                } catch(e) { profileData = null; }
+                    const parsed = JSON.parse(cachedProfileStr);
+                    if (parsed && parsed.id === window.currentUser.id) { hasCache = true; window.currentUserProfile = parsed; }
+                } catch(e) {}
+            }
 
+            // 🌟 오프라인 캐시가 있다면 서버를 기다리지 않고 화면부터 즉각 개방! (0.01초 부팅)
+            if (hasCache) {
+                if (window.currentUserProfile.role === 'student') {
+                    initStudentDashboard();
+                    const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
+                    if (cachedPfs) { window.cachedPortfolios = JSON.parse(cachedPfs); renderStudentPortfoliosFiltered(); const st = document.getElementById('studentStatsSection'); st.innerHTML = window.renderStatsHTML(window.calculateStats(window.cachedPortfolios)); st.classList.remove('hidden'); }
+                } else {
+                    initTeacherDashboard();
+                    const cachedSts = localStorage.getItem('eduport-cached-students');
+                    if (cachedSts) { window.cachedStudents = JSON.parse(cachedSts); renderStudentList(window.cachedStudents); }
+                }
+                window.hideLoading(); 
+            } else {
+                window.showLoading("초기 학적 정보를 구성하고 있습니다...");
+            }
+
+            // 백그라운드 동기화 (Sleep 서버 강제 갱신 - 최대 6초만 대기 후 포기)
+            try {
+                const fetchProfile = supabase.from('profiles').select('*').eq('id', window.currentUser.id).limit(1);
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+                
+                let { data: profileData, error } = await Promise.race([fetchProfile, timeout]);
                 let profile = profileData && profileData.length > 0 ? profileData[0] : null;
 
-                if (!profile) {
+                if (error || !profile) {
                     const meta = window.currentUser.user_metadata || {};
                     const fallbackProfile = { id: window.currentUser.id, name: meta.name || window.currentUser.email.split('@')[0], email: window.currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
-                    try {
-                        const { data: inserted } = await supabase.from('profiles').insert([fallbackProfile]).select().limit(1);
-                        profile = (inserted && inserted.length > 0) ? inserted[0] : fallbackProfile;
-                    } catch(e) { profile = fallbackProfile; }
+                    const { data: inserted } = await supabase.from('profiles').insert([fallbackProfile]).select().limit(1);
+                    profile = (inserted && inserted.length > 0) ? inserted[0] : fallbackProfile;
                 }
 
-                const previousRole = window.currentUserProfile ? window.currentUserProfile.role : null;
                 window.currentUserProfile = profile;
                 localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
 
-                // 캐시가 없었거나 역할이 변경되었다면 뷰를 최신화
-                if (!cachedProfileStr || previousRole !== profile.role) {
-                    if (profile.role === 'student') initStudentDashboard();
-                    else initTeacherDashboard();
-                    window.hideLoading();
+                if (!hasCache) {
+                    if (profile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
                 }
-
-            } catch (err) {
-                console.warn("Boot error:", err);
-                if (!window.currentUserProfile) {
-                    window.forceClearLocalSession();
-                    switchView('auth');
+            } catch (e) {
+                console.warn("서버 접속 지연. 오프라인 모드 상태를 유지합니다.", e.message);
+                if (!hasCache) {
+                    window.showToast("네트워크 지연으로 오프라인 전용 모드로 시작합니다.", "info");
+                    const meta = window.currentUser.user_metadata || {};
+                    window.currentUserProfile = { id: window.currentUser.id, name: meta.name || window.currentUser.email.split('@')[0], email: window.currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
+                    if (window.currentUserProfile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
                 }
-                window.hideLoading();
-            } finally {
-                window.isAppReady = true;
-            }
-        };
-
-        // 🌟 최초 부팅 시작
-        window.bootApp();
-
-        supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_OUT') {
-                window.forceClearLocalSession();
-                switchView('auth');
-                window.hideLoading();
-            } else if (event === 'SIGNED_IN' && !window.isAppReady) {
-                window.bootApp();
+            } finally { 
+                window.isAuthenticating = false; window.isBooted = true; window.hideLoading(); 
             }
         });
 
 
         // =========================================================================
-        // 🔒 [인증 및 폼 제어 로직]
+        // 🔒 [인증 폼 제어 로직]
         // =========================================================================
         window.showSignup = function(e) { e.preventDefault(); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('signupForm').classList.remove('hidden'); };
         window.showLogin = function(e) { e.preventDefault(); document.getElementById('signupForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); };
 
-        document.getElementById('roleStudentBtn').onclick = () => { document.getElementById('signupRole').value = 'student'; document.getElementById('roleStudentBtn').className = "w-1/2 py-2 bg-white text-blue-600 shadow-sm font-black rounded-lg transition text-xs"; document.getElementById('roleTeacherBtn').className = "w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.remove('hidden'); };
-        document.getElementById('roleTeacherBtn').onclick = () => { document.getElementById('signupRole').value = 'teacher'; document.getElementById('roleTeacherBtn').className = "w-1/2 py-2 bg-white text-slate-900 shadow-sm font-black rounded-lg transition text-xs"; document.getElementById('roleStudentBtn').className = "w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.add('hidden'); };
+        document.getElementById('roleStudentBtn').onclick = () => { document.getElementById('signupRole').value = 'student'; document.getElementById('roleStudentBtn').className = "w-1/2 py-3 bg-white text-blue-600 shadow-sm font-black rounded-lg transition text-xs"; document.getElementById('roleTeacherBtn').className = "w-1/2 py-3 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.remove('hidden'); };
+        document.getElementById('roleTeacherBtn').onclick = () => { document.getElementById('signupRole').value = 'teacher'; document.getElementById('roleTeacherBtn').className = "w-1/2 py-3 bg-white text-slate-900 shadow-sm font-black rounded-lg transition text-xs"; document.getElementById('roleStudentBtn').className = "w-1/2 py-3 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.add('hidden'); };
 
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault(); window.showLoading("가입 처리 중...");
@@ -931,8 +935,8 @@
 
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
-                    document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
-                    e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
+                    document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
+                    e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
                     window.currentStudentGrade = parseInt(e.target.dataset.grade); document.getElementById('pfGrade').value = window.currentStudentGrade; loadStudentPortfolios(window.currentStudentGrade);
                 }
             });
@@ -961,7 +965,7 @@
             try {
                 if (window.editingPortfolioId) { await supabase.from('portfolios').update(data).eq('id', window.editingPortfolioId); window.showToast("수정 완료!", 'success'); } 
                 else { await supabase.from('portfolios').insert([data]); window.showToast("등록 완료!", 'success'); }
-                window.currentStudentGrade = inputGrade; document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition"); document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
+                window.currentStudentGrade = inputGrade; document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition"); document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
                 window.cancelEditPortfolio(); await loadStudentPortfolios(window.currentStudentGrade); 
             } catch (err) { window.showToast("오류 발생", 'error'); } finally { window.hideLoading(); }
         });
@@ -993,16 +997,16 @@
             filtered.forEach(item => {
                 let execution = '참여함', year = '', simpleContent = item.content, reading = ''; try { const parsed = JSON.parse(item.content); execution = parsed.execution || '참여함'; year = parsed.year || ''; simpleContent = parsed.simple_content || ''; reading = parsed.reading || ''; } catch (e) { simpleContent = item.content; }
                 const areaColor = item.area === '교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'; const fbText = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : (item.feedbacks ? item.feedbacks.feedback_content : null);
-                html += `<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm relative group flex flex-col hover:border-blue-300 transition">
+                html += `<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group flex flex-col hover:border-blue-300 transition">
                             <div class="absolute top-4 right-4 flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity no-print">
                                 <button onclick="window.editActivity('${item.id}')" class="text-xs bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-600 px-3 py-1.5 rounded font-bold transition">수정</button>
                                 <button onclick="window.deleteActivity('${item.id}')" class="text-xs bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600 px-3 py-1.5 rounded font-bold transition">삭제</button>
                             </div>
-                            <div class="flex flex-wrap items-center gap-2 pr-20 mb-3"><span class="px-2 py-1 ${areaColor} border rounded text-xs font-bold">${item.area}</span><span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">${year ? year+'년 ' : ''}${item.semester}학기 / ${execution}</span><h3 class="text-base font-black text-slate-900 ml-1 truncate">${item.activity_name}</h3></div>
-                            <div class="text-sm text-slate-600 leading-relaxed font-medium mb-1"><span class="font-bold text-slate-400">요약:</span> ${simpleContent}</div>
-                            ${reading ? `<div class="text-sm text-blue-700 leading-relaxed font-medium mb-1"><span class="font-bold text-blue-400">독서:</span> ${reading}</div>` : ''}
+                            <div class="flex flex-wrap items-center gap-3 pr-20 mb-3"><span class="px-2.5 py-1 ${areaColor} border rounded text-xs font-bold">${item.area}</span><span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">${year ? year+'년 ' : ''}${item.semester}학기 / ${execution}</span><h3 class="text-base font-black text-slate-900 ml-1 truncate">${item.activity_name}</h3></div>
+                            <div class="text-sm text-slate-600 leading-relaxed font-medium mb-1.5"><span class="font-bold text-slate-400">요약:</span> ${simpleContent}</div>
+                            ${reading ? `<div class="text-sm text-blue-700 leading-relaxed font-medium mb-1.5"><span class="font-bold text-blue-400">독서:</span> ${reading}</div>` : ''}
                             <div class="text-sm text-slate-700 leading-relaxed mt-2"><span class="font-bold text-slate-400">성찰:</span> <span class="whitespace-pre-wrap">${item.self_evaluation}</span></div>
-                            ${fbText ? `<div class="mt-3 text-xs text-indigo-700 bg-indigo-50 px-3 py-2 rounded-lg font-medium"><strong class="mr-1">교사피드백:</strong>${fbText}</div>` : ''}
+                            ${fbText ? `<div class="mt-4 text-xs text-indigo-700 bg-indigo-50 px-4 py-3 rounded-xl font-medium"><strong class="mr-1">교사피드백:</strong>${fbText}</div>` : ''}
                         </div>`;
             });
             container.innerHTML = html;
@@ -1030,7 +1034,7 @@
             if(filtered.length === 0) { container.innerHTML = '<p class="text-sm text-slate-400 col-span-full py-4 font-bold">일치하는 행사가 없습니다.</p>'; return; }
             let html = '';
             filtered.forEach(ev => {
-                html += `<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 hover:bg-slate-700 hover:border-blue-500/50 transition flex flex-col cursor-pointer group shadow-sm" onclick="window.autofillEvent('${ev.id}')"><div class="flex items-center justify-between mb-2"><h4 class="text-sm font-black text-white truncate w-2/3 group-hover:text-blue-300 transition">${ev.event_name}</h4><span class="text-[10px] bg-slate-900 text-slate-300 px-2 py-1 rounded border border-slate-600">${ev.event_date}</span></div><p class="text-xs text-slate-400 leading-relaxed line-clamp-2 mb-4 flex-1">${ev.main_content}</p><div class="text-[10px] text-slate-500 flex justify-between border-t border-slate-700 pt-3 font-semibold"><span>주관: ${ev.organizer}</span><span class="text-emerald-400 group-hover:underline">자동기입 ➔</span></div></div>`;
+                html += `<div class="bg-slate-800 p-5 rounded-3xl border border-slate-700 hover:bg-slate-700 hover:border-blue-500/50 transition flex flex-col cursor-pointer group shadow-sm" onclick="window.autofillEvent('${ev.id}')"><div class="flex items-center justify-between mb-3"><h4 class="text-sm font-black text-white truncate w-2/3 group-hover:text-blue-300 transition">${ev.event_name}</h4><span class="text-[10px] bg-slate-900 text-slate-300 px-2.5 py-1 rounded border border-slate-600">${ev.event_date}</span></div><p class="text-xs text-slate-400 leading-relaxed line-clamp-2 mb-4 flex-1">${ev.main_content}</p><div class="text-[10px] text-slate-500 flex justify-between border-t border-slate-700 pt-3 font-semibold"><span>주관: ${ev.organizer}</span><span class="text-emerald-400 group-hover:underline">자동기입 ➔</span></div></div>`;
             });
             container.innerHTML = html;
         }
@@ -1042,9 +1046,9 @@
             window.showToast("✨ 행사 정보가 입력창에 자동으로 채워졌습니다!", "success"); window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
-        // 🌟 명시적 인쇄 버튼 이벤트 연결 (HTML onclick 연계로 유실 불가 보장)
+        // 🌟 명시적 인쇄 버튼 이벤트 연결 (DOM 안전 렌더링 후 호출)
         window.printStudentPortfolio = async () => {
-            window.showLoading("3개년 전체 포트폴리오 데이터를 취합하고 있습니다...");
+            window.showLoading("3개년 전체 포트폴리오를 취합하고 있습니다...");
             try {
                 let dataToPrint = window.cachedPortfolios;
                 try {
@@ -1063,10 +1067,10 @@
                 let html = '';
                 [1, 2, 3].forEach(g => {
                     const gradePortfolios = dataToPrint.filter(item => item.grade === g);
-                    if (gradePortfolios.length > 0) html += `<div style="margin-top: 25px; page-break-before: auto;"><h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a; page-break-after: avoid;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gradePortfolios)}</div>`;
+                    if (gradePortfolios.length > 0) html += `<div style="margin-top: 30px; page-break-before: auto;"><h2 style="font-size: 12pt; font-weight: bold; margin-bottom: 10px; border-left: 5px solid #0f172a; padding-left: 8px; color: #0f172a; page-break-after: avoid;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gradePortfolios)}</div>`;
                 });
                 document.getElementById('pdfExportContent').innerHTML = html;
-                window.hideLoading(); setTimeout(() => window.print(), 300);
+                window.hideLoading(); setTimeout(() => window.print(), 500);
             } catch (err) { window.showToast("인쇄 중 오류 발생", "error"); window.hideLoading(); }
         };
 
@@ -1085,7 +1089,7 @@
             const isAdmin = window.currentUserProfile.role === 'admin' || (window.currentUserProfile.role === 'teacher' && window.currentUserProfile.email === 'admin@school.hs.kr');
             if (isAdmin) document.getElementById('openAdminPanelBtn').classList.remove('hidden'); else document.getElementById('openAdminPanelBtn').classList.add('hidden');
             document.getElementById('openAdminPanelBtn').onclick = () => { document.getElementById('adminPanelModal').classList.remove('hidden'); loadAllProfilesForAdmin(); };
-            document.getElementById('closeAdminPanelBtn').onclick = () => document.getElementById('adminPanelModal').classList.add('hidden');
+            document.getElementById('closeAdminPanelBtn').onclick = () => { document.getElementById('adminPanelModal').classList.add('hidden'); };
             document.getElementById('adminUserSearch').addEventListener('input', applyAdminFilters); document.getElementById('adminRoleFilter').addEventListener('change', applyAdminFilters);
         }
 
@@ -1094,6 +1098,7 @@
 
         window.closeStudentDetail = () => {
             document.getElementById('teacherDetailCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('flex');
+            window.selectedStudentUid = null;
             if (window.innerWidth < 1024) { window.setMobileActiveTab('list'); tabBtnDetail.disabled = true; tabBtnDetail.innerText = "🔍 분석"; } 
             else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); }
             loadGlobalTimelineFeed();
@@ -1127,16 +1132,16 @@
             let html = '';
             [1, 2, 3].forEach(g => {
                 const gradePortfolios = sortedPortfolios.filter(item => item.grade === g);
-                if (gradePortfolios.length > 0) { html += `<div style="margin-top: 25px; page-break-before: auto;"><h2 style="font-size: 11pt; font-weight: bold; margin-bottom: 8px; border-left: 4px solid #0f172a; padding-left: 6px; color: #0f172a; page-break-after: avoid;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gradePortfolios)}</div>`; }
+                if (gradePortfolios.length > 0) { html += `<div style="margin-top: 30px; page-break-before: auto;"><h2 style="font-size: 12pt; font-weight: bold; margin-bottom: 10px; border-left: 5px solid #0f172a; padding-left: 8px; color: #0f172a; page-break-after: avoid;">■ 고등학교 ${g}학년 진로 및 학업 탐구 내역</h2>${window.generatePdfHtml(gradePortfolios)}</div>`; }
             });
-            document.getElementById('pdfExportContent').innerHTML = html; setTimeout(() => window.print(), 200);
+            document.getElementById('pdfExportContent').innerHTML = html; setTimeout(() => window.print(), 500);
         };
 
         async function loadTeacherEvents() {
             const { data } = await supabase.from('school_events').select('*').order('event_date', { ascending: true }); window.cachedEventsData = data || []; const container = document.getElementById('teacherEventsList');
-            if(window.cachedEventsData.length === 0) { container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-4">일정이 없습니다.</p>'; return; }
+            if(window.cachedEventsData.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">일정이 없습니다.</p>'; return; }
             let html = '';
-            window.cachedEventsData.forEach(ev => { html += `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex flex-col"><div class="flex justify-between items-center mb-1"><span class="text-sm font-bold text-white truncate max-w-[160px]">${ev.event_name}</span><span class="text-[10px] text-indigo-300">${ev.event_date}</span></div><span class="text-xs text-slate-400 truncate">${ev.organizer} | ${ev.target_grade===0?'공통':ev.target_grade+'학년'}</span></div>`; });
+            window.cachedEventsData.forEach(ev => { html += `<div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm flex flex-col"><div class="flex justify-between items-center mb-2"><span class="text-sm font-bold text-white truncate max-w-[200px]">${ev.event_name}</span><span class="text-[10px] text-indigo-300">${ev.event_date}</span></div><span class="text-xs text-slate-400 truncate">${ev.organizer} | ${ev.target_grade===0?'공통':ev.target_grade+'학년'}</span></div>`; });
             container.innerHTML = html;
         }
 
@@ -1167,9 +1172,9 @@
             let html = '';
             students.forEach(s => {
                 html += `
-                    <li class="p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition bg-white shadow-sm student-item" data-uid="${s.id}" data-name="${s.name}" data-info="학번: ${s.student_id || ''} | ${s.admission_year || ''}입학">
-                        <div class="flex justify-between items-center mb-1"><span class="font-bold text-slate-900 text-sm">${s.name}</span><span class="text-[10px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded border border-slate-200">${s.student_id || '-'}</span></div>
-                        <div class="text-[10px] text-slate-400 flex justify-between"><span class="text-blue-500 font-bold">상세 분석 ➔</span></div>
+                    <li class="p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition bg-white shadow-sm student-item" data-uid="${s.id}" data-name="${s.name}" data-info="학번: ${s.student_id || ''} | ${s.admission_year || ''}입학">
+                        <div class="flex justify-between items-center mb-1.5"><span class="font-bold text-slate-900 text-sm">${s.name}</span><span class="text-[10px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded border border-slate-200">${s.student_id || '-'}</span></div>
+                        <div class="text-xs text-slate-400 flex justify-between"><span class="text-blue-600 font-bold">상세 분석 ➔</span></div>
                     </li>`;
             });
             container.innerHTML = html;
@@ -1194,16 +1199,15 @@
         async function loadGlobalTimelineFeed() {
             const feedContainer = document.getElementById('globalTimelineFeed');
             try {
-                // 🌟 RLS 조인 에러 완전 차단: profiles 조인을 빼고 순수 portfolios 테이블만 호출 후 로컬 명부와 매핑
-                const { data, error } = await supabase.from('portfolios').select('*').order('updated_at', { ascending: false }).limit(25);
+                // 🌟 피드 로딩 중단 에러의 주범인 조인 쿼리 제거 및 로컬 매핑 (No-Join 아키텍처)
+                const { data, error } = await supabase.from('portfolios').select('*').order('updated_at', { ascending: false }).limit(30);
                 if (error) throw error; window.cachedTimelineData = data || []; window.applyTimelineFilters(); 
-            } catch (err) { feedContainer.innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">피드 로딩 지연</p>`; }
+            } catch (err) { feedContainer.innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">피드 업데이트 지연</p>`; }
         }
 
         window.applyTimelineFilters = function() {
             const feedContainer = document.getElementById('globalTimelineFeed'); const areaFilter = document.getElementById('timelineAreaFilter').value; const keyword = document.getElementById('timelineSearchInput').value.toLowerCase().trim();
             
-            // 수동으로 이름 및 학번 매핑 (DB Join 에러 대체 기술)
             let filtered = window.cachedTimelineData.map(item => {
                 const stu = window.cachedStudents.find(s => s.id === item.student_uid);
                 return { ...item, st_name: stu ? stu.name : '학생', st_id: stu ? stu.student_id : '' };
@@ -1217,9 +1221,9 @@
             filtered.forEach(item => {
                 const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at); const formatUpdate = `${updateDate.getFullYear()}.${String(updateDate.getMonth()+1).padStart(2, '0')}.${String(updateDate.getDate()).padStart(2, '0')}`; const displaySummary = formatContentSummary(item.content);
                 html += `
-                    <div class="p-5 border border-slate-200 bg-slate-50 rounded-2xl flex flex-col gap-2 cursor-pointer hover:bg-blue-50/50 hover:border-blue-300 transition shadow-sm" onclick="window.showDirectStudentDetail('${item.student_uid}')">
-                        <div class="flex items-center gap-2"><span class="bg-blue-600 text-white font-bold text-[10px] px-2.5 py-1 rounded shadow-sm">${item.grade}학년 ${item.area}</span><span class="text-sm text-slate-800 font-extrabold ml-1">${item.st_name} (${item.st_id || '미지정'})</span><span class="text-xs text-slate-400 font-medium ml-auto">${formatUpdate}</span></div>
-                        <h4 class="text-base font-black text-slate-900 truncate mt-1">${item.activity_name}</h4><p class="text-sm text-slate-600 truncate font-semibold">${displaySummary}</p><div class="text-xs text-blue-600 font-black mt-2 self-end tracking-wide flex items-center bg-blue-100/50 px-3 py-1.5 rounded-lg">기록 검토 ➔</div>
+                    <div class="p-6 border border-slate-200 bg-white rounded-3xl flex flex-col gap-3 cursor-pointer hover:bg-blue-50/50 hover:border-blue-300 transition shadow-sm" onclick="window.showDirectStudentDetail('${item.student_uid}')">
+                        <div class="flex items-center gap-3"><span class="bg-blue-600 text-white font-bold text-xs px-3 py-1 rounded shadow-sm">${item.grade}학년 ${item.area}</span><span class="text-base text-slate-800 font-extrabold ml-1">${item.st_name} (${item.st_id || '미지정'})</span><span class="text-xs text-slate-400 font-medium ml-auto">${formatUpdate}</span></div>
+                        <h4 class="text-lg font-black text-slate-900 truncate mt-1">${item.activity_name}</h4><p class="text-sm text-slate-600 truncate font-semibold">${displaySummary}</p><div class="text-sm text-blue-600 font-black mt-2 self-end tracking-wide flex items-center bg-blue-50 px-4 py-2 rounded-xl transition hover:bg-blue-100">기록 검토 및 피드백 ➔</div>
                     </div>`;
             });
             feedContainer.innerHTML = html;
@@ -1235,12 +1239,11 @@
         window.openStudentDetail = async (uid, name, info) => {
             window.selectedStudentUid = uid; window.teacherSelectedStudentName = name; const student = window.cachedStudents.find(s => s.id === uid); window.teacherSelectedStudentId = student ? student.student_id : '-'; window.teacherSelectedStudentCareerInfo = student ? student.career_info : null;
             document.getElementById('detailStudentName').innerText = name; document.getElementById('detailStudentInfo').innerText = info;
-            const container = document.getElementById('teacherPortfolioList'); container.innerHTML = '<p class="text-center py-10 text-sm font-bold text-slate-400">불러오는 중...</p>';
+            const container = document.getElementById('teacherPortfolioList'); container.innerHTML = '<p class="text-center py-10 text-sm font-bold text-slate-400">데이터를 분석하고 있습니다...</p>';
             try {
-                // RLS 조인 에러 원천 차단: feedbacks는 본인 데이터 종속이므로 허용됨
                 const { data, error } = await supabase.from('portfolios').select('*, feedbacks(id, feedback_content)').eq('student_uid', uid).order('updated_at', { ascending: false });
                 if (error) throw error;
-                if(!data || data.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-sm text-slate-400 font-bold">기록이 없습니다.</p></div>'; document.getElementById('teacherStatsContainer').classList.add('hidden'); window.teacherCachedPortfolios = []; return; }
+                if(!data || data.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-sm text-slate-400 font-bold">작성된 기록이 없습니다.</p></div>'; document.getElementById('teacherStatsContainer').classList.add('hidden'); window.teacherCachedPortfolios = []; return; }
                 
                 window.teacherCachedPortfolios = data || []; const stats = window.calculateStats(window.teacherCachedPortfolios); const teacherStatsContainer = document.getElementById('teacherStatsContainer'); teacherStatsContainer.innerHTML = window.renderStatsHTML(stats); teacherStatsContainer.classList.remove('hidden');
                 let html = '';
@@ -1250,21 +1253,21 @@
                     try { const p = JSON.parse(item.content); execution = p.execution || '참여함'; year = p.year || ''; simpleContent = p.simple_content || ''; reading = p.reading || ''; } catch (e) {}
                     const areaColor = item.area === '교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
                     html += `
-                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-5 flex flex-col gap-3">
-                            <div class="flex flex-wrap items-center gap-2 pr-2">
-                                <span class="px-3 py-1 ${areaColor} border rounded text-xs font-bold">${item.grade}학년 ${item.area}</span>
-                                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded border border-slate-200">${item.semester}학기 / ${execution}</span>
-                                <h3 class="text-base font-black text-slate-900 ml-1 truncate max-w-[200px] sm:max-w-md">${item.activity_name}</h3>
+                        <div class="bg-white border border-slate-200 rounded-3xl p-6 lg:p-8 shadow-sm mb-6 flex flex-col gap-4">
+                            <div class="flex flex-wrap items-center gap-3 pr-2">
+                                <span class="px-3 py-1.5 ${areaColor} border rounded-lg text-xs font-bold">${item.grade}학년 ${item.area}</span>
+                                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">${item.semester}학기 / ${execution}</span>
+                                <h3 class="text-lg font-black text-slate-900 ml-1 w-full mt-2 sm:mt-0 sm:w-auto">${item.activity_name}</h3>
                             </div>
-                            <div class="grid grid-cols-1 gap-2 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                <div class="flex items-start gap-2"><span class="font-bold text-slate-400 min-w-[35px]">요약:</span> <span class="font-medium">${simpleContent}</span></div>
-                                ${reading ? `<div class="flex items-start gap-2"><span class="font-bold text-blue-400 min-w-[35px]">독서:</span> <span class="font-bold text-blue-700">${reading}</span></div>` : ''}
-                                <div class="flex items-start gap-2"><span class="font-bold text-slate-400 min-w-[35px]">성찰:</span> <span class="font-medium whitespace-pre-wrap leading-relaxed">${item.self_evaluation}</span></div>
+                            <div class="grid grid-cols-1 gap-3 text-sm text-slate-600 bg-slate-50 p-5 rounded-2xl border border-slate-100 mt-2">
+                                <div class="flex items-start gap-3"><span class="font-bold text-slate-400 min-w-[40px]">요약:</span> <span class="font-medium">${simpleContent}</span></div>
+                                ${reading ? `<div class="flex items-start gap-3"><span class="font-bold text-blue-400 min-w-[40px]">독서:</span> <span class="font-bold text-blue-700">${reading}</span></div>` : ''}
+                                <div class="flex items-start gap-3"><span class="font-bold text-slate-400 min-w-[40px]">성찰:</span> <span class="font-medium whitespace-pre-wrap leading-relaxed text-slate-800">${item.self_evaluation}</span></div>
                             </div>
-                            <div class="pt-3">
+                            <div class="pt-4">
                                 <label class="block text-xs font-black text-blue-600 mb-2">💬 교사 피드백 조언</label>
-                                <textarea id="fb_${item.id}" class="w-full p-4 border border-slate-200 text-sm rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition leading-relaxed" rows="3" placeholder="피드백 작성...">${fb || ''}</textarea>
-                                <div class="flex justify-end mt-2"><button type="button" onclick="window.saveFeedback('${item.id}')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-6 py-3 rounded-xl transition shadow-md">저장 및 전송 ➔</button></div>
+                                <textarea id="fb_${item.id}" class="w-full p-4 border border-slate-200 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition leading-relaxed" rows="3" placeholder="피드백 작성...">${fb || ''}</textarea>
+                                <div class="flex justify-end mt-3"><button type="button" onclick="window.saveFeedback('${item.id}')" class="bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold px-8 py-3.5 rounded-xl transition shadow-md">저장 및 전송 ➔</button></div>
                             </div>
                         </div>`;
                 });
@@ -1299,9 +1302,9 @@
                         <td class="p-4">${u.admission_year || '-'}</td>
                         <td class="p-4 font-mono">${u.student_id || '-'}</td>
                         <td class="p-4 text-center space-x-1.5 whitespace-nowrap">
-                            <button onclick="window.openAdminEditModal('${u.id}')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition font-black">수정</button>
-                            <button onclick="window.adminResetPassword('${u.id}', '${u.name}')" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition font-black">초기화</button>
-                            <button onclick="window.adminDeleteUser('${u.id}', '${u.name}')" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition font-black">삭제</button>
+                            <button onclick="window.openAdminEditModal('${u.id}')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition font-black">수정</button>
+                            <button onclick="window.adminResetPassword('${u.id}', '${u.name}')" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition font-black">초기화</button>
+                            <button onclick="window.adminDeleteUser('${u.id}', '${u.name}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition font-black">삭제</button>
                         </td>
                     </tr>`;
             });
@@ -1341,7 +1344,6 @@
             window.showLoading("제명 중...");
             try { await supabase.from('profiles').delete().eq('id', userId); window.showToast("삭제되었습니다.", "success"); await loadAllProfilesForAdmin(); } catch(err) { window.showToast("삭제 거부", "error"); } finally { window.hideLoading(); }
         };
-
     </script>
 </body>
 </html>

@@ -24,19 +24,16 @@
         #pdfExportContainer { display: none; }
 
         /* ========================================================================= */
-        /* 🖨️ 브라우저 네이티브 인쇄(PDF) 전용 스타일 (페이지 절약 및 가독성 극대화) */
+        /* 🖨️ 브라우저 네이티브 인쇄(PDF) 전용 스타일 */
         /* ========================================================================= */
         @media print { 
             body * { visibility: hidden; }
             #pdfExportContainer, #pdfExportContainer * { visibility: visible; }
             #pdfExportContainer { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background-color: white; color: black; font-family: 'Malgun Gothic', dotum, sans-serif; padding: 5mm; }
-            
-            /* 고밀도 압축 테이블 규격 */
             .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; page-break-inside: avoid; }
             .pdf-table th, .pdf-table td { border: 1px solid #94a3b8; padding: 4px 6px; font-size: 9pt; line-height: 1.3; text-align: left; vertical-align: middle; }
             .pdf-table th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; white-space: nowrap; width: 12%; color: #1e293b; }
             .pdf-table td { color: #0f172a; }
-            
             .pdf-header-table { width: 100%; margin: 0 auto 15px auto; border-collapse: collapse; border: 2px solid #000; }
             .pdf-header-table th, .pdf-header-table td { border: 1px solid #000; padding: 4px 6px; font-size: 9pt; text-align: center; }
             .pdf-header-table th { background-color: #e2e8f0 !important; font-weight: bold; }
@@ -48,7 +45,7 @@
     <!-- 전역 통합 로딩 오버레이 -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white/90 z-50 flex flex-col justify-center items-center transition-opacity duration-300">
         <div class="loader mb-5"></div>
-        <p id="loadingText" class="text-slate-800 font-extrabold text-sm tracking-tight text-center px-4">서버와 통신 중입니다...</p>
+        <p id="loadingText" class="text-slate-800 font-extrabold text-sm tracking-tight text-center px-4 mt-4">시스템을 연결하고 있습니다...</p>
     </div>
 
     <!-- 토스트 알림창 -->
@@ -69,8 +66,7 @@
     <!-- ========================================== -->
     <!-- [1] 게이트웨이 및 홈 화면 -->
     <!-- ========================================== -->
-    <div id="authView" class="h-[100dvh] flex flex-col lg:flex-row hidden overflow-y-auto">
-        <!-- 왼쪽: 모니터링 보드 -->
+    <div id="authView" class="min-h-screen flex flex-col lg:flex-row hidden overflow-y-auto">
         <div class="lg:w-2/3 bg-slate-900 text-white p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden shrink-0 min-h-[600px] lg:min-h-0">
             <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
             <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
@@ -111,7 +107,6 @@
             </div>
         </div>
 
-        <!-- 오른쪽: 인증 패널 -->
         <div class="lg:w-1/3 bg-white p-6 sm:p-10 lg:p-12 flex flex-col justify-center border-l border-slate-100 shadow-[-20px_0_40px_rgba(0,0,0,0.05)] z-20 relative shrink-0 min-h-[500px] lg:min-h-0">
             <div class="max-w-sm mx-auto w-full">
                 <form id="loginForm" class="space-y-5">
@@ -121,7 +116,7 @@
                     </div>
                     <div class="space-y-3.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학교 계정 이메일 (관리자는 admin)</label>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">학교 계정 이메일</label>
                             <input type="text" id="loginEmail" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-sm font-semibold" required>
                         </div>
                         <div>
@@ -151,7 +146,7 @@
                             <input type="text" id="signupStudentId" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium" placeholder="학번 (5자리)">
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl transition shadow-lg text-xs mt-2">가입 완료 및 승인 요청</button>
+                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl transition shadow-lg text-xs mt-2">가입 완료</button>
                     <p class="text-center text-xs text-slate-500 pt-1">이미 계정이 있으신가요? <a href="#" id="showLoginBtn" class="text-blue-600 font-bold hover:underline">로그인하기</a></p>
                 </form>
             </div>
@@ -168,7 +163,7 @@
                     <h1 class="text-2xl font-black text-blue-600 tracking-tighter">EduPort</h1>
                     <div class="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">학적 정보 동기화 중...</span>
+                        <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">학적 정보 확인 중...</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -257,7 +252,7 @@
                     
                     <div class="pt-2 flex justify-end gap-3">
                         <button type="button" id="cancelEditBtn" class="hidden px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition min-h-[44px]">수정 취소</button>
-                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black tracking-wide py-3.5 px-8 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-600/20 text-sm min-h-[44px]">포트폴리오 영구 등록 ➔</button>
+                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black tracking-wide py-3.5 px-8 rounded-xl hover:bg-blue-700 active:scale-[0.98] transition shadow-md shadow-blue-600/20 text-sm min-h-[44px]">포트폴리오 영구 등록 ➔</button>
                     </div>
                 </form>
             </section>
@@ -289,7 +284,6 @@
                         </select>
                         <div class="relative w-full sm:w-[250px]">
                             <input type="text" id="studentSearchInput" class="w-full p-2.5 pl-9 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition min-h-[44px]" placeholder="내용, 도서명 등 검색">
-                            <svg class="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
                 </div>
@@ -299,7 +293,7 @@
                 </div>
             </section>
 
-            <!-- [학교 행사 리스트 및 자동 기입] -->
+            <!-- [학교 행사 리스트] -->
             <section class="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden no-print">
                 <div class="absolute right-0 top-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
                 
@@ -309,7 +303,6 @@
                     <div class="flex gap-2 w-full md:w-auto">
                         <div class="relative flex-1 md:w-[250px]">
                             <input type="text" id="studentEventSearch" class="w-full p-2 pl-8 border border-slate-700 bg-slate-800/80 text-xs font-medium text-white rounded-lg outline-none focus:border-blue-500 transition placeholder-slate-400 min-h-[44px]" placeholder="행사명 검색 (클릭 시 자동 기입)">
-                            <svg class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         <button id="syncSheetStudentBtn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1 shrink-0 min-h-[44px]">
                             🔄 동기화
@@ -325,7 +318,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- [3] 🌟 지도 교사용 관제 센터 (모바일 100dvh 완전 대응 UI) -->
+    <!-- [3] 🌟 지도 교사용 관제 센터 (반응형 모바일 탭 & 박스 레이아웃 정렬 완벽화) -->
     <!-- ========================================== -->
     <div id="teacherView" class="hidden h-[100dvh] bg-slate-100 flex-col overflow-hidden relative">
         <nav class="bg-slate-900 text-white border-b border-slate-800 z-40 shadow-md no-print shrink-0 h-16">
@@ -347,8 +340,8 @@
             <button id="tabBtnDetail" class="flex-1 text-xs font-bold text-slate-400 transition-all" disabled>🔍 분석</button>
         </div>
 
-        <!-- 🌟 모바일 반응형 완전 격리 구조 -->
-        <main class="max-w-7xl mx-auto w-full px-2 sm:px-4 py-4 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-hidden no-print">
+        <!-- 🌟 모바일 반응형 완전 격리 구조 (Absolute 제거 및 토글 구조) -->
+        <main class="max-w-7xl mx-auto w-full px-2 sm:px-4 py-4 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden no-print">
             
             <!-- [Card 1]: 학생 명부 카드 -->
             <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:col-span-4 min-h-0 overflow-hidden hidden lg:flex">
@@ -367,8 +360,8 @@
                         </select>
                     </div>
                 </div>
-                <!-- 부드러운 스크롤을 위한 100% 가득 찬 영역 보장 -->
-                <ul id="studentListContainer" class="px-4 sm:px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4">
+                <!-- 부드러운 스크롤을 위한 min-h 보장 -->
+                <ul id="studentListContainer" class="px-4 sm:px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[300px] lg:min-h-0">
                     <li class="text-xs text-slate-400 text-center py-10 font-medium">데이터를 취합하고 있습니다...</li>
                 </ul>
             </div>
@@ -403,13 +396,13 @@
                         <input type="text" id="timelineSearchInput" class="p-2 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 min-h-[44px]" placeholder="활동명/이름 검색">
                     </div>
                 </div>
-                <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-4 sm:p-6 sm:px-8 space-y-3 no-scrollbar">
+                <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-4 sm:p-6 sm:px-8 space-y-3 no-scrollbar min-h-[300px] lg:min-h-0">
                     <p class="text-xs text-slate-400 text-center py-20 font-bold">변경 이력을 파악하고 있습니다...</p>
                 </div>
             </div>
 
-            <!-- [Card 4]: 특정 학생 상세 보기 뷰 -->
-            <div id="teacherDetailCard" class="bg-slate-50 rounded-2xl lg:rounded-3xl shadow-inner border border-slate-200 flex-1 flex-col lg:col-span-8 min-h-0 overflow-hidden hidden lg:absolute lg:inset-0 lg:z-10 lg:m-4 lg:mt-0">
+            <!-- 🌟 [Card 4]: 특정 학생 상세 보기 뷰 (Absolute를 완전히 제거하여 헤더 버튼 겹침 및 가려짐 완벽 해결) -->
+            <div id="teacherDetailCard" class="bg-slate-50 rounded-2xl lg:rounded-3xl shadow-inner border border-slate-200 flex-1 flex-col lg:col-span-8 min-h-0 overflow-hidden hidden">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-200 p-4 sm:p-5 sm:px-8 bg-white shrink-0 shadow-sm z-20 w-full lg:rounded-t-3xl">
                     <div class="flex flex-col items-center sm:items-start w-full sm:w-auto text-center sm:text-left">
                         <div class="flex items-center justify-center sm:justify-start gap-2">
@@ -419,11 +412,11 @@
                         <p class="text-xs font-bold text-slate-500 mt-1" id="detailStudentInfo"></p>
                     </div>
                     <div class="flex gap-2 shrink-0 w-full sm:w-auto justify-center sm:justify-end">
-                        <button id="teacherDownloadPdfBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5 min-h-[44px]">🖨️ 인쇄</button>
+                        <button id="teacherDownloadPdfBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5 min-h-[44px]">🖨️ 통합 인쇄</button>
                         <button id="closeStudentDetailBtn" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm min-h-[44px]">🔙 복귀</button>
                     </div>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 sm:p-5 sm:p-8 no-scrollbar bg-slate-50 w-full">
+                <div class="flex-1 overflow-y-auto p-4 sm:p-5 sm:p-8 no-scrollbar bg-slate-50 w-full min-h-[300px] lg:min-h-0">
                     <div id="teacherStatsContainer" class="mb-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hidden"></div>
                     <div id="teacherPortfolioList" class="flex flex-col gap-4"></div>
                 </div>
@@ -537,7 +530,7 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
-        // 🌟 전역 함수 명시적 할당으로 Hoisting 및 ReferenceError를 완벽 차단
+        // 🌟 참조 오류를 막기 위한 렌더링 전역 함수군
         window.generatePdfHtml = (portfolios) => {
             let pdfHtml = '';
             portfolios.forEach((item) => {
@@ -640,22 +633,19 @@
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // 🌟 메모리 초기화 변수군
         let currentUser = null; let currentUserProfile = null; let currentStudentGrade = 1; let selectedStudentUid = null;
         let cachedStudents = []; let cachedPortfolios = []; let teacherCachedPortfolios = []; let teacherSelectedStudentName = ''; let teacherSelectedStudentId = '';
         let teacherSelectedStudentCareerInfo = null;
         let cachedEventsData = []; let cachedAllUsersForAdmin = []; let cachedTimelineData = [];
-
-        // 🌟 참조 오류를 막기 위해 최상단 글로벌 스코프에 선언 완료
-        let isAppReady = false; 
-        let isAuthenticating = false; 
-        let editingPortfolioId = null;
+        let isAuthenticating = false; let editingPortfolioId = null; let isAppReady = false; 
 
         // UI 헬퍼
-        const showLoading = (text = "연결 상태를 확인 중입니다...") => { document.getElementById('loadingText').innerText = text; document.getElementById('loadingOverlay').classList.remove('hidden'); setTimeout(() => document.getElementById('loadingOverlay').classList.remove('opacity-0'), 10); };
+        const showLoading = (text = "요청을 처리 중입니다...") => { document.getElementById('loadingText').innerText = text; document.getElementById('loadingOverlay').classList.remove('hidden'); setTimeout(() => document.getElementById('loadingOverlay').classList.remove('opacity-0'), 10); };
         const hideLoading = () => { document.getElementById('loadingOverlay').classList.add('opacity-0'); setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 300); };
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer'); const toast = document.createElement('div');
-            toast.className = `p-4 rounded-2xl shadow-xl text-white text-xs font-bold transition-all duration-300 transform translate-y-4 opacity-0 flex items-center justify-between min-w-[250px] max-w-sm ${type === 'error' ? 'bg-red-600 shadow-lg shadow-red-600/20' : type === 'success' ? 'bg-emerald-600 shadow-lg shadow-emerald-600/20' : 'bg-slate-900'}`;
+            toast.className = `p-4 rounded-2xl shadow-xl text-white text-xs font-bold transition-all duration-300 transform translate-y-4 opacity-0 flex items-center justify-between min-w-[250px] max-w-sm z-50 ${type === 'error' ? 'bg-red-600 shadow-red-600/20' : type === 'success' ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-slate-900'}`;
             toast.innerHTML = `<span>${message.replace(/\n/g, '<br>')}</span><button class="ml-4 text-white/50 hover:text-white font-black">&times;</button>`;
             toast.querySelector('button').onclick = () => { toast.classList.add('opacity-0', 'translate-y-4'); setTimeout(() => toast.remove(), 300); };
             container.appendChild(toast); setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-4'), 20);
@@ -670,46 +660,25 @@
         document.getElementById('confirmCancelBtn').onclick = () => { document.getElementById('confirmModal').classList.add('hidden'); if (confirmResolve) confirmResolve(false); };
         document.getElementById('confirmOkBtn').onclick = () => { document.getElementById('confirmModal').classList.add('hidden'); if (confirmResolve) confirmResolve(true); };
 
-        function forceClearLocalSession() {
+        // 🌟 메모리 및 스토리지 초강력 소거 퓨즈 (계정 간 잔재/좀비 세션 원천 삭제)
+        function clearAllData() {
+            localStorage.removeItem('eduport-cached-profile');
+            localStorage.removeItem('eduport-cached-portfolios');
+            localStorage.removeItem('eduport-cached-students');
+            
+            // Supabase Auth 토큰 강제 탐색 삭제
             const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) { const key = localStorage.key(i); if (key && key.startsWith('sb-')) keysToRemove.push(key); }
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sb-')) keysToRemove.push(key);
+            }
             keysToRemove.forEach(k => localStorage.removeItem(k));
-        }
 
-        function switchView(viewName) {
-            document.getElementById('authView').classList.add('hidden'); document.getElementById('studentView').classList.add('hidden'); document.getElementById('teacherView').classList.add('hidden'); document.getElementById('adminPanelModal').classList.add('hidden');
-            if (viewName === 'auth') { 
-                document.getElementById('authView').classList.remove('hidden'); 
-                window.loadHomeLiveBoard(); 
-            }
-            else if (viewName === 'student') document.getElementById('studentView').classList.remove('hidden');
-            else if (viewName === 'teacher') { 
-                const tv = document.getElementById('teacherView');
-                tv.classList.remove('hidden'); tv.classList.add('flex');
-                
-                // 모바일 디바이스 분기 대응: 초기화 시 탭1(리스트) 기본 활성화
-                if (window.innerWidth < 1024) {
-                    setMobileActiveTab('list');
-                } else {
-                    document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex'); 
-                    document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
-                    document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); 
-                    document.getElementById('teacherDetailCard').classList.add('hidden'); 
-                }
-            }
+            currentUser = null; currentUserProfile = null;
+            cachedStudents = []; cachedPortfolios = []; teacherCachedPortfolios = [];
+            cachedEventsData = []; cachedAllUsersForAdmin = []; cachedTimelineData = [];
+            selectedStudentUid = null; isAppReady = false; isAuthenticating = false;
         }
-
-        function blindName(name) {
-            if (!name) return '학생'; const len = name.length;
-            if (len <= 2) return name.charAt(0) + '*';
-            return name.charAt(0) + '*'.repeat(len - 2) + name.charAt(len - 1);
-        }
-
-        function formatContentSummary(contentStr) {
-            try { const parsed = JSON.parse(contentStr); return `[${parsed.execution || '참여함'}] ${parsed.simple_content || ''}`; } catch(e) { return contentStr; }
-        }
-
-        setInterval(async () => { try { await supabase.from('school_events').select('id').limit(1); } catch (e) {} }, 1000 * 60 * 3);
 
         window.loadHomeLiveBoard = async () => {
             const feedContainer = document.getElementById('homeTimelineFeed'); const eventContainer = document.getElementById('homeEventsList');
@@ -717,25 +686,14 @@
                 const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(6);
                 if (error) throw error;
                 let finalData = data || [];
-                
-                if (finalData.length === 0) {
-                    feedContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10 font-medium">최근 업데이트된 진로 기록이 없습니다.</p>';
-                } else {
+                if (finalData.length === 0) { feedContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10 font-medium">최근 업데이트된 진로 기록이 없습니다.</p>'; } 
+                else {
                     let html = '';
                     finalData.forEach(item => {
                         const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at || new Date());
                         const formatUpdate = `${String(updateDate.getMonth()+1).padStart(2, '0')}/${String(updateDate.getDate()).padStart(2, '0')}`;
                         const maskedName = blindName(item.profiles?.name || '학생');
-                        html += `
-                            <div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1 transition hover:bg-slate-800/60">
-                                <div class="flex items-center justify-between text-[9px]"><span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span><span class="text-slate-500 font-medium">${formatUpdate}</span></div>
-                                <h4 class="text-xs font-bold text-slate-200 truncate">${item.activity_name}</h4>
-                                <p class="text-[10px] text-slate-400 truncate">${formatContentSummary(item.content)}</p>
-                                <div class="text-[9px] text-slate-500 flex justify-between pt-1 border-t border-slate-800/50 font-medium">
-                                    <span>작성자: ${maskedName}</span>
-                                    <span class="text-emerald-400">실시간 연동 성공 ✓</span>
-                                </div>
-                            </div>`;
+                        html += `<div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1 transition hover:bg-slate-800/60"><div class="flex items-center justify-between text-[9px]"><span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span><span class="text-slate-500 font-medium">${formatUpdate}</span></div><h4 class="text-xs font-bold text-slate-200 truncate">${item.activity_name}</h4><p class="text-[10px] text-slate-400 truncate">${formatContentSummary(item.content)}</p><div class="text-[9px] text-slate-500 flex justify-between pt-1 border-t border-slate-800/50 font-medium"><span>작성자: ${maskedName}</span><span class="text-emerald-400">실시간 연동 성공 ✓</span></div></div>`;
                     });
                     feedContainer.innerHTML = html;
                 }
@@ -748,23 +706,39 @@
                 const rows = csvData.split('\n').slice(1);
                 let html = ''; let successCount = 0;
                 for (let i = 0; i < rows.length; i++) {
-                    const row = rows[i].trim(); if (!row) continue;
-                    const cols = row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim());
-                    if (cols.length < 2) continue;
+                    const row = rows[i].trim(); if (!row) continue; const cols = row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()); if (cols.length < 2) continue;
                     const eventName = cols[1], recordArea = cols[2], startMonth = cols[3], mainContent = cols[6] || '세부내용 참조';
-                    html += `
-                        <div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1">
-                            <div class="flex items-center justify-between mb-1"><h4 class="text-xs font-bold text-white truncate max-w-[160px]">[${recordArea}] ${eventName}</h4><span class="text-[9px] bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2 py-0.5 rounded">${startMonth||'3'}월</span></div>
-                            <p class="text-[10px] text-slate-400 line-clamp-1 leading-relaxed">${mainContent}</p>
-                        </div>`;
+                    html += `<div class="p-3 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1"><div class="flex items-center justify-between mb-1"><h4 class="text-xs font-bold text-white truncate max-w-[160px]">[${recordArea}] ${eventName}</h4><span class="text-[9px] bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2 py-0.5 rounded">${startMonth||'3'}월</span></div><p class="text-[10px] text-slate-400 line-clamp-1 leading-relaxed">${mainContent}</p></div>`;
                     successCount++; if (successCount >= 5) break; 
                 }
                 eventContainer.innerHTML = html || '<p class="text-xs text-slate-500 text-center py-10">일정이 없습니다.</p>';
             } catch (err) { eventContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">네트워크 연동 대기 중...</p>'; }
         };
 
+        function switchView(viewName) {
+            document.getElementById('authView').classList.add('hidden'); document.getElementById('studentView').classList.add('hidden'); document.getElementById('teacherView').classList.add('hidden'); document.getElementById('adminPanelModal').classList.add('hidden');
+            if (viewName === 'auth') { 
+                document.getElementById('authView').classList.remove('hidden'); 
+                window.loadHomeLiveBoard(); 
+            }
+            else if (viewName === 'student') document.getElementById('studentView').classList.remove('hidden');
+            else if (viewName === 'teacher') { 
+                const tv = document.getElementById('teacherView');
+                tv.classList.remove('hidden'); tv.classList.add('flex');
+                
+                // 모바일 디바이스 탭 제어 시스템 연동
+                if (window.innerWidth < 1024) { setMobileActiveTab('list'); } 
+                else {
+                    document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex'); 
+                    document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
+                    document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); 
+                    document.getElementById('teacherDetailCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('flex');
+                }
+            }
+        }
+
         // =========================================================================
-        // 📱 [모바일 탭 바 100dvh 화면 꽉 참 제어 및 스크롤 완벽 해결]
+        // 📱 [모바일 탭 바 토글 엔진] (가려짐 및 UI 겹침 완벽 해결)
         // =========================================================================
         const tabBtnList = document.getElementById('tabBtnList'); const tabBtnEvents = document.getElementById('tabBtnEvents');
         const tabBtnTimeline = document.getElementById('tabBtnTimeline'); const tabBtnDetail = document.getElementById('tabBtnDetail');
@@ -796,98 +770,118 @@
             if (window.innerWidth >= 1024 && document.getElementById('teacherView').classList.contains('flex')) {
                 document.getElementById('teacherListCard').classList.remove('hidden'); document.getElementById('teacherListCard').classList.add('flex');
                 document.getElementById('teacherEventsCard').classList.remove('hidden'); document.getElementById('teacherEventsCard').classList.add('flex');
-                if (selectedStudentUid) { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); } 
-                else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); document.getElementById('teacherDetailCard').classList.add('hidden'); }
+                if (selectedStudentUid) { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherTimelineCard').classList.remove('flex'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); } 
+                else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); document.getElementById('teacherDetailCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('flex');}
             } else if (window.innerWidth < 1024 && document.getElementById('teacherView').classList.contains('flex')) {
                 if(!selectedStudentUid) setMobileActiveTab('list'); else setMobileActiveTab('detail');
             }
         });
 
         // =========================================================================
-        // 🚀 [제로-레이턴시 인증 파이프라인 (무한 로딩 및 406 방어 시스템 완비)]
+        // 🚀 [제로-레이턴시 오프라인 퍼스트 부팅(Offline-First Booting) 시스템]
         // =========================================================================
-        
         supabase.auth.onAuthStateChange(async (event, session) => {
-            // 로그아웃 혹은 토큰 소실 시 무조건 로그인 창으로 강제 환원 (좀비 로직 박멸)
-            if (event === 'SIGNED_OUT' || !session) {
-                isAppReady = false; currentUser = null; currentUserProfile = null;
-                forceClearLocalSession(); switchView('auth'); hideLoading();
-                return;
+            
+            if (event === 'SIGNED_OUT' || !session) { 
+                clearAllData(); switchView('auth'); hideLoading(); return; 
             }
+            
+            // 중복 실행 및 레이스 컨디션 방어
+            if (isAuthenticating || isAppReady) { hideLoading(); return; }
+            
+            isAuthenticating = true;
+            currentUser = session.user;
 
-            // 최초 로그인 또는 새로고침(INITIAL_SESSION) 상황에서 오직 1번만 부팅 프로세스 진행
-            if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !isAppReady) {
-                isAppReady = true; // 무한 중복 호출 락 온
-                currentUser = session.user;
-                showLoading("서버와 보안 세션을 연동 중입니다...");
-
-                const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
-                
+            const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
+            let hasCache = false;
+            
+            // 🌟 토큰과 캐시의 일치 여부 정밀 판독
+            if (cachedProfileStr) {
                 try {
-                    // 1. 오프라인 퍼스트: 로컬 캐시가 있으면 즉각 화면부터 띄움 (0.05초 대기)
-                    if (cachedProfileStr) {
-                        currentUserProfile = JSON.parse(cachedProfileStr);
-                        if (currentUserProfile.role === 'student') {
-                            initStudentDashboard();
-                            const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
-                            if (cachedPfs) { cachedPortfolios = JSON.parse(cachedPfs); renderStudentPortfoliosFiltered(); }
-                        } else {
-                            initTeacherDashboard();
-                            const cachedSts = localStorage.getItem('eduport-cached-students');
-                            if (cachedSts) { cachedStudents = JSON.parse(cachedSts); renderStudentList(cachedStudents); }
-                        }
-                        hideLoading(); // 🌟 사용자에게 지연을 느끼지 않게 바로 가림막 제거
+                    const parsedProfile = JSON.parse(cachedProfileStr);
+                    if (parsedProfile && parsedProfile.id === currentUser.id) {
+                        hasCache = true;
+                        currentUserProfile = parsedProfile;
                     }
-
-                    // 2. 조용한 백그라운드 서버 동기화 (최대 15초 기다려보고 잠들어 있으면 포기)
-                    const fetchProfile = supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 15000));
-                    
-                    let { data: profile, error } = await Promise.race([fetchProfile, timeout]);
-
-                    // 자가 치유 프로필 복원 로직
-                    if (error || !profile) {
-                        console.log("학적 정보가 유실되어 자동 복구를 실행합니다.");
-                        const meta = currentUser.user_metadata || {};
-                        const fallbackProfile = { id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
-                        const { data: inserted, error: insertError } = await supabase.from('profiles').insert([fallbackProfile]).select().maybeSingle();
-                        profile = (!insertError && inserted) ? inserted : fallbackProfile;
-                    }
-
-                    currentUserProfile = profile;
-                    localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
-
-                    // 3. 캐시가 없어서 가림막이 쳐져 있던 신규 로그인 유저를 위해 화면 개방
-                    if (!cachedProfileStr) {
-                        if (profile.role === 'student') initStudentDashboard();
-                        else initTeacherDashboard();
-                        hideLoading();
-                    }
-
-                } catch (e) {
-                    console.warn("서버 접속 지연. 오프라인 모드를 유지합니다.", e);
-                    // 타임아웃 발생 시, 캐시가 없던 쌩초기 유저라면 가짜 오프라인 환경을 제공하여 먹통 방지
-                    if (!cachedProfileStr) {
-                        showToast("서버 응답이 지연되어 오프라인 모드로 진입합니다.", "info");
-                        const meta = currentUser.user_metadata || {};
-                        currentUserProfile = { id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
-                        if (currentUserProfile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
-                        hideLoading();
-                    }
-                }
+                } catch(e) {}
             }
+
+            if (!hasCache) {
+                showLoading("학적 프로필을 동기화하고 있습니다...");
+            } else {
+                // 🌟 제로 레이턴시 렌더링 (0.05초 진입)
+                isAppReady = true;
+                if (currentUserProfile.role === 'student') {
+                    initStudentDashboard();
+                    const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
+                    if (cachedPfs) { cachedPortfolios = JSON.parse(cachedPfs); renderStudentPortfoliosFiltered(); const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(window.calculateStats(cachedPortfolios)); statsContainer.classList.remove('hidden');}
+                } else {
+                    initTeacherDashboard();
+                    const cachedSts = localStorage.getItem('eduport-cached-students');
+                    if (cachedSts) { cachedStudents = JSON.parse(cachedSts); renderStudentList(cachedStudents); }
+                }
+                hideLoading(); 
+            }
+            
+            // 🌟 백그라운드 서버 동기화 (Stale-While-Revalidate)
+            try {
+                // 타임아웃 10초 설정 (수면 모드 방어)
+                const fetchProfile = supabase.from('profiles').select('*').eq('id', currentUser.id).limit(1);
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
+                
+                let { data: profileData, error } = await Promise.race([fetchProfile, timeout]);
+                let profile = profileData && profileData.length > 0 ? profileData[0] : null;
+
+                // 서버 데이터 유실 시 자가 치유(Auto-Healing) 발동
+                if (error || !profile) {
+                    console.warn("프로필 유실 탐지. 자가 치유 및 자동 복구를 실행합니다.");
+                    const meta = currentUser.user_metadata || {};
+                    const fallbackProfile = { id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
+                    
+                    const { data: inserted, error: insertError } = await supabase.from('profiles').insert([fallbackProfile]).select().limit(1);
+                    profile = (!insertError && inserted && inserted.length > 0) ? inserted[0] : fallbackProfile;
+                }
+
+                currentUserProfile = profile;
+                localStorage.setItem('eduport-cached-profile', JSON.stringify(profile));
+
+                // 캐시가 없었던 신규 유저라면 화면 개방
+                if (!hasCache) {
+                    isAppReady = true;
+                    if (profile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
+                    hideLoading();
+                }
+            } catch (e) {
+                console.error("서버 접속 지연. 오프라인 모드 상태를 유지합니다.", e.message);
+                if (!hasCache) {
+                    showToast("서버 응답이 지연되어 게스트 모드로 진입합니다.", "info");
+                    isAppReady = true;
+                    const meta = currentUser.user_metadata || {};
+                    currentUserProfile = { id: currentUser.id, name: meta.name || currentUser.email.split('@')[0], email: currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
+                    if (currentUserProfile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
+                    hideLoading();
+                } else {
+                    showToast("네트워크 지연으로 오프라인 데이터를 표시 중입니다.", "info");
+                }
+            } finally { isAuthenticating = false; hideLoading(); }
         });
 
-        // 🌟 무한 로딩 차단 완벽 로그아웃 퓨즈 (서버가 응답 안해도 0.5초 안에 로컬 폭파 및 홈 환원)
+        // 🌟 무결점 로그아웃 퓨즈 (서버 지연 상관없이 0.5초 즉각 탈출)
         document.querySelectorAll('.logoutBtn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
-                e.preventDefault(); showLoading("로그아웃을 처리하고 있습니다...");
-                isAppReady = false; currentUser = null; currentUserProfile = null; forceClearLocalSession();
-                try { await Promise.race([ supabase.auth.signOut(), new Promise(r => setTimeout(r, 500)) ]); } catch(err) {}
+                e.preventDefault(); 
+                showLoading("로그아웃 중...");
+                clearAllData(); // 즉각 메모리 및 캐시 파괴
+                try {
+                    await Promise.race([ supabase.auth.signOut(), new Promise(r => setTimeout(r, 500)) ]);
+                } catch(err) {}
                 switchView('auth'); hideLoading(); showToast("안전하게 로그아웃 되었습니다.", "success");
             });
         });
 
+        // =========================================================================
+        // 🔒 [인증 및 폼 제어 로직]
+        // =========================================================================
         document.getElementById('showSignupBtn').onclick = (e) => { e.preventDefault(); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('signupForm').classList.remove('hidden'); };
         document.getElementById('showLoginBtn').onclick = (e) => { e.preventDefault(); document.getElementById('signupForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); };
         document.getElementById('roleStudentBtn').onclick = () => { document.getElementById('signupRole').value = 'student'; document.getElementById('roleStudentBtn').className = "w-1/2 py-2 bg-white text-blue-600 shadow-sm font-black rounded-lg transition text-xs"; document.getElementById('roleTeacherBtn').className = "w-1/2 py-2 text-slate-500 font-bold rounded-lg transition text-xs hover:text-slate-800"; document.getElementById('studentOnlyFields').classList.remove('hidden'); };
@@ -906,7 +900,8 @@
         });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); const emailField = document.getElementById('loginEmail').value.trim(); const passwordField = document.getElementById('loginPassword').value;
+            e.preventDefault();
+            const emailField = document.getElementById('loginEmail').value.trim(); const passwordField = document.getElementById('loginPassword').value;
             if ((emailField === 'admin' || emailField === 'admin@school.hs.kr') && passwordField === 'tlagkr1!') {
                 showLoading("최고관리자 인증 중...");
                 try {
@@ -928,19 +923,21 @@
             } catch (err) { showToast("통신 실패.", 'error'); hideLoading(); }
         });
 
-
         // =========================================================================
         // 🎓 [학생 전용 엔진]
         // =========================================================================
         function initStudentDashboard() {
             switchView('student');
             document.getElementById('studentNavInfo').innerText = `${currentUserProfile.admission_year || ''}년 입학 | ${currentUserProfile.student_id || ''} | ${currentUserProfile.name}`;
+            
             document.getElementById('pdfExportStudentId').innerText = currentUserProfile.student_id || '-';
             document.getElementById('pdfExportStudentName').innerText = currentUserProfile.name || '-';
             document.getElementById('pfYearInput').value = currentUserProfile.admission_year || new Date().getFullYear();
             document.getElementById('pfGrade').value = currentStudentGrade;
 
-            loadCareerInfo(); loadStudentPortfolios(currentStudentGrade); loadSchoolEventsForStudents();
+            loadCareerInfo();
+            loadStudentPortfolios(currentStudentGrade);
+            loadSchoolEventsForStudents();
 
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
@@ -948,10 +945,11 @@
                     e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
                     currentStudentGrade = parseInt(e.target.dataset.grade);
                     document.getElementById('pdfExportGrade').innerText = currentStudentGrade;
-                    document.getElementById('pfGrade').value = currentStudentGrade;
+                    document.getElementById('pfGrade').value = currentStudentGrade; // 입력 폼 학년도 맞춤
                     loadStudentPortfolios(currentStudentGrade);
                 }
             });
+            
             document.getElementById('syncSheetStudentBtn').onclick = () => syncGoogleSheetEvents();
             document.getElementById('studentSearchInput').addEventListener('input', renderStudentPortfoliosFiltered);
             document.getElementById('studentAreaFilter').addEventListener('change', renderStudentPortfoliosFiltered);
@@ -975,11 +973,12 @@
         }
 
         document.getElementById('saveCareerInfoBtn').addEventListener('click', async () => {
+            showLoading("저장 중...");
             const careerInfo = { career: document.getElementById('pdfInputCareer').value, univ1: document.getElementById('pdfInputUniv1').value, univ2: document.getElementById('pdfInputUniv2').value, univ3: document.getElementById('pdfInputUniv3').value, major1: document.getElementById('pdfInputMajor1').value, major2: document.getElementById('pdfInputMajor2').value, major3: document.getElementById('pdfInputMajor3').value };
             try {
                 await supabase.from('profiles').update({ career_info: JSON.stringify(careerInfo) }).eq('id', currentUser.id);
                 currentUserProfile.career_info = JSON.stringify(careerInfo); localStorage.setItem('eduport-cached-profile', JSON.stringify(currentUserProfile)); showToast("진로 정보 보존 완료.", "success");
-            } catch (err) { showToast("저장 실패", "error"); }
+            } catch (err) { showToast("저장 실패", "error"); } finally { hideLoading(); }
         });
 
         document.getElementById('portfolioForm').addEventListener('submit', async (e) => {
@@ -1108,8 +1107,9 @@
             
             document.getElementById('closeStudentDetailBtn').onclick = () => {
                 document.getElementById('teacherDetailCard').classList.add('hidden');
+                document.getElementById('teacherDetailCard').classList.remove('flex');
                 if (window.innerWidth < 1024) { setMobileActiveTab('list'); tabBtnDetail.disabled = true; tabBtnDetail.innerText = "🔍 분석"; } 
-                else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); }
+                else { document.getElementById('teacherTimelineCard').classList.remove('hidden'); document.getElementById('teacherTimelineCard').classList.add('flex'); }
                 loadGlobalTimelineFeed();
             };
 
@@ -1200,7 +1200,7 @@
             document.querySelectorAll('.student-item').forEach(el => {
                 el.onclick = () => {
                     if (window.innerWidth < 1024) { tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${el.dataset.name} 분석`; setMobileActiveTab('detail'); } 
-                    else { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); }
+                    else { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherTimelineCard').classList.remove('flex'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); }
                     openStudentDetail(el.dataset.uid, el.dataset.name, el.dataset.info);
                 };
             });
@@ -1245,7 +1245,7 @@
         window.showDirectStudentDetail = async (studentUid) => {
             const student = cachedStudents.find(s => s.id === studentUid); if (!student) return;
             if (window.innerWidth < 1024) { tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${student.name} 분석`; setMobileActiveTab('detail'); } 
-            else { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); }
+            else { document.getElementById('teacherTimelineCard').classList.add('hidden'); document.getElementById('teacherTimelineCard').classList.remove('flex'); document.getElementById('teacherDetailCard').classList.remove('hidden'); document.getElementById('teacherDetailCard').classList.add('flex'); }
             openStudentDetail(studentUid, student.name, `학번: ${student.student_id || ''} | ${student.admission_year || ''}년도 입학`);
         };
 
@@ -1356,10 +1356,6 @@
             try { await supabase.from('profiles').delete().eq('id', userId); showToast("삭제되었습니다.", "success"); await loadAllProfilesForAdmin(); } catch(err) { showToast("삭제 거부", "error"); } finally { hideLoading(); }
         };
 
-        // =========================================================================
-        // 🚀 [초기 부팅 시스템 및 단일 Auth 리스너 연결]
-        // =========================================================================
-        // onAuthStateChange 가 부팅을 총괄하도록 통합되었으므로, 별도의 중복 락은 제거되었습니다.
     </script>
 </body>
 </html>

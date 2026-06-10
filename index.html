@@ -46,7 +46,7 @@
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased select-none overflow-x-hidden">
 
     <!-- 전역 통합 로딩 오버레이 -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 z-50 flex flex-col justify-center items-center hidden transition-opacity duration-300">
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 z-50 flex flex-col justify-center items-center hidden transition-opacity duration-300 font-sans">
         <div class="loader mb-5"></div>
         <p id="loadingText" class="text-slate-800 font-extrabold text-sm tracking-tight text-center px-4">시스템을 연결하고 있습니다...</p>
     </div>
@@ -71,7 +71,7 @@
     <!-- ========================================== -->
     <div id="authView" class="min-h-screen flex flex-col lg:flex-row hidden">
         <!-- 왼쪽: 모니터링 보드 -->
-        <div class="lg:w-2/3 bg-slate-900 text-white p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
+        <div class="lg:w-2/3 bg-slate-900 text-white p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden animate-fade-in">
             <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
             <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -161,21 +161,21 @@
     <!-- ========================================== -->
     <!-- [2] 학습자(학생용) 종합 포탈 -->
     <!-- ========================================== -->
-    <div id="studentView" class="hidden min-h-screen pb-16 bg-slate-100">
+    <div id="studentView" class="hidden min-h-screen pb-16 bg-slate-100 font-sans">
         <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
             <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <h1 class="text-2xl font-black text-blue-600 tracking-tighter">EduPort</h1>
                     <div class="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">학적 정보 동기화 중...</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="downloadPdfBtn" type="button" class="bg-slate-900 text-white px-4 sm:px-5 py-2.5 rounded-xl text-xs font-black tracking-wide hover:bg-slate-800 transition shadow-md flex items-center gap-2">
+                    <button id="downloadPdfBtn" type="button" class="bg-slate-900 text-white px-4 sm:px-5 py-2.5 rounded-xl text-xs font-black tracking-wide hover:bg-slate-800 transition shadow-md flex items-center gap-2 min-h-[44px]">
                         🖨️ 포트폴리오 인쇄
                     </button>
-                    <button class="logoutBtn text-slate-400 hover:text-red-600 text-xs font-bold transition px-2">로그아웃</button>
+                    <button class="logoutBtn text-slate-400 hover:text-red-600 text-xs font-bold transition px-2 min-h-[44px]">로그아웃</button>
                 </div>
             </div>
         </nav>
@@ -185,23 +185,23 @@
             <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b border-slate-100 pb-4">
                     <h2 class="font-black text-lg text-slate-900 tracking-tight">🎯 희망 진로 및 진학 목표 (인쇄 시 표지 반영)</h2>
-                    <button id="saveCareerInfoBtn" type="button" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1">
+                    <button id="saveCareerInfoBtn" type="button" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1 min-h-[44px]">
                         💾 내용 저장 및 업데이트
                     </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="md:col-span-3">
                         <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 전공 및 진로 분야</label>
-                        <input type="text" id="pdfInputCareer" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="예: 컴퓨터공학 / 인공지능 소프트웨어 개발자">
+                        <input type="text" id="pdfInputCareer" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" placeholder="예: 컴퓨터공학 / 인공지능 소프트웨어 개발자">
                     </div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (1순위)</label><input type="text" id="pdfInputUniv1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1순위 대학명"></div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (2순위)</label><input type="text" id="pdfInputUniv2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2순위 대학명"></div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (3순위)</label><input type="text" id="pdfInputUniv3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="3순위 대학명"></div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (1순위)</label><input type="text" id="pdfInputMajor1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1순위 학과명"></div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (2순위)</label><input type="text" id="pdfInputMajor2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2순위 학과명"></div>
-                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (3순위)</label><input type="text" id="pdfInputMajor3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="3순위 학과명"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (1순위)</label><input type="text" id="pdfInputUniv1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="1순위 대학명"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (2순위)</label><input type="text" id="pdfInputUniv2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="2순위 대학명"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 대학 (3순위)</label><input type="text" id="pdfInputUniv3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="3순위 대학명"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (1순위)</label><input type="text" id="pdfInputMajor1" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="1순위 학과명"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (2순위)</label><input type="text" id="pdfInputMajor2" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="2순위 학과명"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1 pl-1">희망 학과 (3순위)</label><input type="text" id="pdfInputMajor3" class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none min-h-[44px]" placeholder="3순위 학과명"></div>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-3 font-medium">※ 입력 후 반드시 <span class="text-emerald-600 font-bold">[저장]</span> 버튼을 눌러야 정보가 유지됩니다.</p>
+                <p class="text-[10px] text-slate-400 mt-3 font-medium font-sans">※ 입력 후 반드시 <span class="text-emerald-600 font-bold">[저장]</span> 버튼을 눌러야 정보가 유지됩니다.</p>
             </section>
 
             <!-- [활동 등록 폼] -->
@@ -220,7 +220,7 @@
                         <div class="md:col-span-4 space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-100">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">실행 상태</label>
-                                <select id="pfExecution" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                <select id="pfExecution" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required>
                                     <option value="참여함">✅ 참여함 (탐구 완료)</option>
                                     <option value="계획함">🗓️ 계획함 (진행 예정)</option>
                                 </select>
@@ -229,40 +229,40 @@
                             <div class="grid grid-cols-3 gap-3">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">학년도</label>
-                                    <input type="number" id="pfYearInput" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <input type="number" id="pfYearInput" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">학년</label>
-                                    <select id="pfGrade" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <select id="pfGrade" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required>
                                         <option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">학기</label>
-                                    <select id="pfSemester" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <select id="pfSemester" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required>
                                         <option value="1">1학기</option><option value="2">2학기</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">기록 영역</label>
-                                <select id="pfArea" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                <select id="pfArea" class="w-full p-2.5 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required>
                                     <option value="교과">교과 (과목 세특)</option><option value="자율">창체 - 자율활동</option><option value="동아리">창체 - 동아리활동</option><option value="진로">창체 - 진로활동</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="md:col-span-8 space-y-4">
-                            <div><label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-3 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition" required></div>
-                            <div><label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-3 border border-slate-200 rounded-xl bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" required></div>
-                            <div><label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition"></div>
+                            <div><label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-3 border border-slate-200 rounded-xl bg-white text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required></div>
+                            <div><label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-3 border border-slate-200 rounded-xl bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]" required></div>
+                            <div><label class="block text-xs font-bold text-slate-700 mb-1.5 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition min-h-[44px]"></div>
                             <div><label class="block text-xs font-bold text-blue-700 mb-1.5 pl-1">🧠 자기 성찰 및 평가 <span class="text-red-500">*</span></label><textarea id="pfSelfEval" rows="3" class="w-full p-3 border border-blue-200 rounded-xl bg-blue-50/30 text-sm font-medium leading-relaxed focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition" required></textarea></div>
                         </div>
                     </div>
                     
                     <div class="pt-2 flex justify-end gap-3">
-                        <button type="button" id="cancelEditBtn" class="hidden px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition">수정 취소</button>
-                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black py-3.5 px-8 rounded-xl hover:bg-blue-700 active:scale-[0.98] transition shadow-md shadow-blue-600/20 text-sm">포트폴리오 영구 등록 ➔</button>
+                        <button type="button" id="cancelEditBtn" class="hidden px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition min-h-[44px]">수정 취소</button>
+                        <button type="submit" id="submitPortfolioBtn" class="w-full md:w-auto md:min-w-[240px] bg-blue-600 text-white font-black py-3.5 px-8 rounded-xl hover:bg-blue-700 active:scale-[0.98] transition shadow-md shadow-blue-600/20 text-sm min-h-[44px]">포트폴리오 영구 등록 ➔</button>
                     </div>
                 </form>
             </section>
@@ -286,7 +286,7 @@
                     </div>
                     
                     <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                        <select id="studentAreaFilter" class="px-4 py-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                        <select id="studentAreaFilter" class="px-4 py-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
                             <option value="">전체 영역</option>
                             <option value="교과">교과 활동</option>
                             <option value="자율">자율 활동</option>
@@ -294,7 +294,7 @@
                             <option value="진로">진로 활동</option>
                         </select>
                         <div class="relative w-full sm:w-[250px]">
-                            <input type="text" id="studentSearchInput" class="w-full p-2.5 pl-9 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition" placeholder="내용, 도서명 등 검색">
+                            <input type="text" id="studentSearchInput" class="w-full p-2.5 pl-9 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-white transition min-h-[44px]" placeholder="내용, 도서명 등 검색">
                         </div>
                     </div>
                 </div>
@@ -313,10 +313,10 @@
                     
                     <div class="flex gap-2 w-full md:w-auto">
                         <div class="relative flex-1 md:w-[250px]">
-                            <input type="text" id="studentEventSearch" class="w-full p-2 pl-8 border border-slate-700 bg-slate-800/80 text-xs font-medium text-white rounded-lg outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
-                            <svg class="absolute left-2.5 top-2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <input type="text" id="studentEventSearch" class="w-full p-2 pl-8 border border-slate-700 bg-slate-800/80 text-xs font-medium text-white rounded-lg outline-none focus:border-blue-500 transition placeholder-slate-400 min-h-[44px]" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <svg class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
-                        <button id="syncSheetStudentBtn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1 shrink-0">
+                        <button id="syncSheetStudentBtn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1 shrink-0 min-h-[44px]">
                             🔄 동기화
                         </button>
                     </div>
@@ -330,7 +330,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- [3] 🌟 지도 교사용 관제 센터 -->
+    <!-- [3] 🌟 지도 교사용 관제 센터 (반응형 모바일 탭 & 박스 레이아웃 정렬 완벽화) -->
     <!-- ========================================== -->
     <div id="teacherView" class="hidden h-screen bg-slate-100 flex-col overflow-hidden relative">
         <nav class="bg-slate-900 text-white border-b border-slate-800 z-40 shadow-md no-print shrink-0 h-16">
@@ -344,7 +344,7 @@
             </div>
         </nav>
 
-        <!-- 모바일 전용 고품격 퀵-스위칭 탭 바 -->
+        <!-- 모바일 전용 퀵-스위칭 탭 바 -->
         <div id="mobileTabSelector" class="flex lg:hidden bg-white border-b border-slate-200 shrink-0 h-12 z-30">
             <button id="tabBtnList" class="flex-1 text-xs font-black text-blue-600 border-b-4 border-blue-600 transition-all">👥 학생 명부</button>
             <button id="tabBtnTimeline" class="flex-1 text-xs font-bold text-slate-400 transition-all">📊 실시간 관제</button>
@@ -354,9 +354,9 @@
         <!-- 🌟 [모바일 스크롤 & 구겨짐 현상 완전 박멸] lg 기준 너비 이하 모바일 장비에선 h-screen, lg:h-[calc(...)] 등의 제한을 풀고 스크롤 바를 완벽 보정합니다. -->
         <main class="max-w-7xl mx-auto w-full px-4 py-4 flex flex-col lg:grid lg:grid-cols-12 gap-6 no-print lg:h-[calc(100vh-5rem)] flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
             
-            <!-- [좌측 패널]: 학생 명부 및 행사 일정 -->
-            <div id="teacherListPanel" class="lg:col-span-4 flex flex-col gap-6 h-full min-h-[500px] lg:min-h-0 overflow-visible lg:overflow-hidden shrink-0">
-                <!-- 학생 명부 카드 -->
+            <!-- [좌측 패널] -->
+            <!-- 🌟 모바일에서 '학생 명부'와 '학사 일정' 창 크기를 넉넉하게 렌더링하고, 명부 리스트에 고정적인 터치 스크롤을 부여 -->
+            <div id="teacherListPanel" class="lg:col-span-4 flex flex-col gap-6 h-full min-h-[550px] lg:min-h-0 overflow-visible lg:overflow-hidden shrink-0">
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-0 overflow-hidden">
                     <div class="p-5 pb-3 border-b border-slate-100 shrink-0">
                         <h2 class="font-black text-slate-900 text-base flex justify-between">
@@ -365,30 +365,29 @@
                         </h2>
                     </div>
                     <div class="px-5 space-y-2 mb-2 shrink-0 pt-2">
-                        <input type="text" id="teacherStudentSearch" class="w-full p-2.5 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition" placeholder="실명 또는 학번 검색">
+                        <input type="text" id="teacherStudentSearch" class="w-full p-2.5 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition min-h-[44px]" placeholder="실명 또는 학번 검색">
                         <div class="flex gap-2">
-                            <select id="filterYearSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none"><option value="">입학년도</option></select>
-                            <select id="filterGradeSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                            <select id="filterYearSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]"><option value="">입학년도</option></select>
+                            <select id="filterGradeSelect" class="w-1/2 p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
                                 <option value="">전체 학년</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                             </select>
                         </div>
                     </div>
-                    <!-- 🌟 [모바일 명부 스크롤 유실 에러 보정]: min-h 값을 수립하여 모바일에서도 명부가 다량일 때 손쉽게 스크롤링 되도록 완벽 수정 -->
-                    <ul id="studentListContainer" class="px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[220px] lg:min-h-0">
+                    <!-- 🌟 모바일 명부 전용 스크롤 터치 구조 확보 (min-h 값을 넉넉하게 주어 스크롤 튕김 현상 제거) -->
+                    <ul id="studentListContainer" class="px-5 space-y-2 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-[300px] lg:min-h-0">
                         <li class="text-xs text-slate-400 text-center py-10 font-medium">데이터를 취합하고 있습니다...</li>
                     </ul>
                 </div>
 
-                <div class="bg-slate-900 p-5 rounded-3xl shadow-xl border border-slate-800 flex flex-col shrink-0 h-[220px] relative overflow-hidden">
+                <div class="bg-slate-900 p-5 rounded-3xl shadow-xl border border-slate-800 flex flex-col shrink-0 h-[240px] relative overflow-hidden">
                     <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
                     <div class="relative z-10 flex items-center justify-between mb-3 border-b border-slate-700 pb-2">
                         <h2 class="font-black text-white text-sm">🏫 학사 일정 관리</h2>
                     </div>
                     <div class="flex gap-2 mb-3 relative z-10">
-                        <!-- 🔥 구글 시트 직접 접속 버튼 연결 -->
-                        <button id="editGoogleSheetBtn" class="flex-1 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px] font-bold text-center transition flex items-center justify-center">시트 직접 수정</button>
-                        <button id="openEventModalBtn" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition">수동 등록</button>
-                        <button id="syncSheetTeacherBtn" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold transition">시트 동기화</button>
+                        <button id="editGoogleSheetBtn" class="flex-1 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px] font-bold text-center transition flex items-center justify-center min-h-[44px]">시트 직접 수정</button>
+                        <button id="openEventModalBtn" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition min-h-[44px]">수동 등록</button>
+                        <button id="syncSheetTeacherBtn" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold transition min-h-[44px]">시트 동기화</button>
                     </div>
                     <div id="teacherEventsList" class="flex-1 overflow-y-auto space-y-2 pr-1 no-scrollbar relative z-10">
                         <p class="text-[10px] text-slate-500 text-center py-4">일정이 없습니다.</p>
@@ -406,10 +405,10 @@
                             <p class="text-slate-500 text-[11px] mt-0.5 font-medium">전체 학생의 최신 기록을 모니터링합니다.</p>
                         </div>
                         <div class="flex gap-2 w-full md:w-auto">
-                            <select id="timelineAreaFilter" class="px-3 py-2 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
+                            <select id="timelineAreaFilter" class="px-3 py-2 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
                                 <option value="">전체 영역</option><option value="교과">교과 활동</option><option value="자율">자율 활동</option><option value="동아리">동아리 활동</option><option value="진로">진로 활동</option>
                             </select>
-                            <input type="text" id="timelineSearchInput" class="p-2 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500" placeholder="활동명/이름 검색">
+                            <input type="text" id="timelineSearchInput" class="p-2 border border-slate-200 text-xs font-medium rounded-xl outline-none focus:border-blue-500 min-h-[44px]" placeholder="활동명/이름 검색">
                         </div>
                     </div>
                     <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-6 sm:px-8 space-y-3 no-scrollbar min-h-[250px]">
@@ -419,6 +418,7 @@
 
                 <!-- 🌟 특정 학생 상세 보기 뷰 -->
                 <div id="teacherDetailView" class="bg-slate-50 rounded-3xl shadow-inner border border-slate-200 h-full flex flex-col overflow-hidden hidden lg:absolute lg:inset-0 lg:z-10">
+                    <!-- 🛠️ 상단 고정 헤더: 대칭 보정 레이아웃 -->
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-200 p-5 sm:px-8 bg-white shrink-0 shadow-sm z-20 w-full rounded-t-3xl">
                         <div class="flex flex-col items-center sm:items-start w-full sm:w-auto text-center sm:text-left">
                             <div class="flex items-center justify-center sm:justify-start gap-2">
@@ -428,12 +428,12 @@
                             <p class="text-xs font-bold text-slate-500 mt-1" id="detailStudentInfo"></p>
                         </div>
                         <div class="flex gap-2 shrink-0 w-full sm:w-auto justify-center sm:justify-end">
-                            <button id="teacherDownloadPdfBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5">🖨️ 통합 인쇄</button>
-                            <button id="closeStudentDetailBtn" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm">🔙 복귀</button>
+                            <button id="teacherDownloadPdfBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5 min-h-[44px]">🖨️ 통합 인쇄</button>
+                            <button id="closeStudentDetailBtn" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-sm min-h-[44px]">🔙 복귀</button>
                         </div>
                     </div>
                     <div class="flex-1 overflow-y-auto p-5 sm:p-8 no-scrollbar bg-slate-50 min-h-[250px] w-full">
-                        <!-- 🌟 학년-학기별 누적 통계 섹션 (교사용 추가) -->
+                        <!-- 학년-학기별 누적 통계 섹션 -->
                         <div id="teacherStatsContainer" class="mb-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hidden">
                             <!-- 동적 통계 마운트 공간 -->
                         </div>
@@ -542,7 +542,7 @@
                 <tr><th colspan="1">희망 학과 (1~3)</th><td colspan="3" id="pdfPrintMajor">-</td></tr>
             </table>
         </div>
-        <!-- 🌟 추가: 인쇄본 상단에 통계 요약 테이블 탑재 공간 -->
+        <!-- 🌟 인쇄용 통계 테이블 탑재 -->
         <div id="pdfExportStats" class="mb-4"></div>
         <div id="pdfExportContent"></div>
     </div>
@@ -1351,7 +1351,7 @@
                 document.getElementById('pdfExportStudentId').innerText = teacherSelectedStudentId || '-';
                 document.getElementById('pdfExportStudentName').innerText = teacherSelectedStudentName || '-';
                 
-                // 교사 인쇄 시 학생의 진로 희망 정보를 PDF에 연계
+                // 교사가 인쇄 시 학생의 진로 희망 정보를 PDF에 연계
                 let cInfo = {};
                 try { if(teacherSelectedStudentCareerInfo) cInfo = JSON.parse(teacherSelectedStudentCareerInfo); } catch(e){}
                 document.getElementById('pdfPrintCareer').innerText = cInfo.career || '-'; 

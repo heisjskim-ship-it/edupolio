@@ -55,10 +55,10 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden flex flex-col min-h-screen">
 
-    <!-- 로딩 오버레이 -->
+    <!-- 전역 통합 로딩 오버레이 -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center transition-opacity duration-300">
         <div class="loader mb-5 shadow-lg rounded-full"></div>
-        <p id="loadingText" class="text-slate-800 font-extrabold text-sm tracking-tight text-center px-4 mt-2">시스템에 접속 중입니다...</p>
+        <p id="loadingText" class="text-slate-800 font-extrabold text-sm tracking-tight text-center px-4 mt-2">시스템을 연결하고 있습니다...</p>
     </div>
 
     <!-- 토스트 알림창 -->
@@ -180,7 +180,7 @@
                     <button onclick="window.printStudentPortfolio()" type="button" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-black transition shadow-md flex items-center gap-2 min-h-[44px]">
                         🖨️ 전체 엑셀 표 인쇄
                     </button>
-                    <button class="logoutBtn text-slate-400 hover:text-red-600 text-xs font-bold transition px-2 py-2 min-h-[44px]">로그아웃</button>
+                    <button onclick="window.execLogout()" class="text-slate-400 hover:text-red-600 text-xs font-bold transition px-2 py-2 min-h-[44px]">로그아웃</button>
                 </div>
             </div>
         </nav>
@@ -277,6 +277,7 @@
                         </select>
                         <div class="relative w-full sm:w-[320px]">
                             <input type="text" id="studentSearchInput" class="w-full p-3 pl-11 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-white transition" placeholder="내용, 도서명 등 검색">
+                            <svg class="absolute left-4 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
                 </div>
@@ -292,7 +293,8 @@
                     <h3 class="font-black text-xl text-white flex items-center gap-2">🏫 학교 권장 행사 연동</h3>
                     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                         <div class="relative flex-1 sm:w-[320px]">
-                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-10 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-11 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <svg class="absolute left-4 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         <button onclick="window.syncGoogleSheetEvents()" type="button" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-5 py-3 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 shrink-0 min-h-[44px]">
                             🔄 일정 동기화
@@ -307,7 +309,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- [3] 🌟 지도 교사용 관제 센터 -->
+    <!-- [3] 🌟 지도 교사용 관제 센터 (1600px 와이드 3:3:6 레이아웃 완결판) -->
     <!-- ========================================== -->
     <div id="teacherView" class="hidden h-[100dvh] bg-slate-100 flex-col overflow-hidden relative font-sans">
         <nav class="bg-slate-900 text-white border-b border-slate-800 z-[60] shadow-md shrink-0 h-16 w-full relative no-print">
@@ -316,59 +318,24 @@
                 <div class="flex items-center gap-2 sm:gap-3">
                     <button id="openAdminPanelBtn" class="hidden text-xs bg-red-900/80 hover:bg-red-800 text-red-100 border border-red-800 font-bold px-3 sm:px-4 py-2 rounded-lg transition shadow-sm min-h-[36px]">🛡️ 관리</button>
                     <span id="teacherNavInfo" class="text-[11px] font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-md hidden sm:inline-block"></span>
-                    <button class="logoutBtn text-slate-400 hover:text-red-500 text-sm font-bold transition px-2 py-2 min-h-[36px]">로그아웃</button>
+                    <button onclick="window.execLogout()" class="text-slate-400 hover:text-red-500 text-sm font-bold transition px-2 py-2 min-h-[36px]">로그아웃</button>
                 </div>
             </div>
         </nav>
 
-        <!-- 모바일 전용 탭 바 -->
+        <!-- 모바일 탭 바 -->
         <div id="mobileTabSelector" class="flex lg:hidden bg-white border-b border-slate-200 shrink-0 h-14 z-50 shadow-sm w-full no-print">
-            <button id="tabBtnTimeline" class="flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all min-h-[44px]">🏆 랭킹</button>
+            <button id="tabBtnList" class="flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all min-h-[44px]">👥 명부</button>
             <button id="tabBtnEvents" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]">🏫 일정</button>
-            <button id="tabBtnList" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]">👥 명부</button>
+            <button id="tabBtnTimeline" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]">📊 관제</button>
             <button id="tabBtnDetail" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]" disabled>🔍 분석</button>
         </div>
 
         <main class="max-w-[1600px] mx-auto w-full px-3 sm:px-6 py-4 lg:py-6 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden relative z-10 no-print">
             
+            <!-- [Col 1: 학생 명부 + 일정] 넓이 25% 할당 (lg:col-span-3) -->
             <div id="teacherLeftWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden lg:flex w-full">
-                <!-- 랭킹 현황판 -->
-                <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[380px] lg:min-h-0 overflow-hidden flex">
-                    <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
-                        <h2 class="font-black text-slate-900 text-lg flex justify-between items-center">
-                            <span>🏆 실시간 활동 랭킹</span>
-                        </h2>
-                    </div>
-                    <div class="px-4 sm:px-5 space-y-3 mb-2 shrink-0 pt-3 flex gap-2">
-                        <select id="timelineAreaFilter" class="w-full p-2.5 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none">
-                            <option value="">전체 영역 통합</option><option value="교과">교과만</option><option value="자율">자율만</option><option value="동아리">동아리만</option><option value="진로">진로만</option>
-                        </select>
-                    </div>
-                    <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar bg-slate-50/50 min-h-[250px] lg:min-h-0">
-                        <p class="text-sm text-slate-400 text-center py-20 font-bold">랭킹을 집계하고 있습니다...</p>
-                    </div>
-                </div>
-
-                <!-- 학사 일정 -->
-                <div id="teacherEventsCard" class="bg-slate-900 p-5 rounded-2xl lg:rounded-3xl shadow-xl border border-slate-800 flex-col flex-1 lg:flex-[2] min-h-[280px] lg:min-h-0 relative overflow-hidden hidden lg:flex">
-                    <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
-                    <div class="relative z-10 flex items-center justify-between mb-4 border-b border-slate-700 pb-3 shrink-0">
-                        <h2 class="font-black text-white text-base">🏫 학사 일정 연동</h2>
-                    </div>
-                    <div class="flex gap-2 mb-4 relative z-10 shrink-0">
-                        <button onclick="window.openGoogleSheet()" class="flex-1 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold transition min-h-[44px]">시트 편집</button>
-                        <button onclick="window.openEventModal()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">수동 등록</button>
-                        <button onclick="window.syncGoogleSheetEvents()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">동기화</button>
-                    </div>
-                    <div id="teacherEventsList" class="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar relative z-10 min-h-[120px] lg:min-h-0">
-                        <p class="text-xs text-slate-500 text-center py-4">일정이 없습니다.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 학생 명부 -->
-            <div id="teacherMiddleWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden lg:flex w-full">
-                <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 min-h-[400px] lg:min-h-0 overflow-hidden flex">
+                <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[380px] lg:min-h-0 overflow-hidden flex flex-col">
                     <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
                         <h2 class="font-black text-slate-900 text-lg flex justify-between items-center">
                             <span>👥 학생 명부</span>
@@ -388,10 +355,41 @@
                         <li class="text-sm text-slate-400 text-center py-10 font-medium">로딩 중...</li>
                     </ul>
                 </div>
+
+                <div id="teacherEventsCard" class="bg-slate-900 p-5 rounded-2xl lg:rounded-3xl shadow-xl border border-slate-800 flex-col flex-1 lg:flex-[2] min-h-[280px] lg:min-h-0 relative overflow-hidden hidden lg:flex flex-col">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
+                    <div class="relative z-10 flex items-center justify-between mb-4 border-b border-slate-700 pb-3 shrink-0">
+                        <h2 class="font-black text-white text-base">🏫 학사 일정 연동</h2>
+                    </div>
+                    <div class="flex gap-2 mb-4 relative z-10 shrink-0">
+                        <button onclick="window.openGoogleSheet()" class="flex-1 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold transition min-h-[44px]">시트 편집</button>
+                        <button onclick="window.openEventModal()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">수동 등록</button>
+                        <button onclick="window.syncGoogleSheetEvents()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition min-h-[44px]">동기화</button>
+                    </div>
+                    <div id="teacherEventsList" class="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar relative z-10 min-h-[120px] lg:min-h-0">
+                        <p class="text-xs text-slate-500 text-center py-4">일정이 없습니다.</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- 상세 분석 모드 -->
+            <!-- [Col 2: 타임라인] 넓이 25% 할당 (lg:col-span-3) -->
+            <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-1 lg:col-span-3 min-h-[400px] lg:min-h-0 overflow-hidden hidden lg:flex flex-col w-full">
+                <div class="border-b border-slate-100 p-5 pb-3 shrink-0">
+                    <h2 class="font-black text-slate-900 text-lg mb-3">📊 실시간 관제 랭킹</h2>
+                    <div class="flex flex-col gap-2 w-full">
+                        <select id="timelineAreaFilter" class="w-full p-3 border border-slate-200 text-xs font-bold text-slate-600 rounded-xl bg-slate-50 outline-none min-h-[44px]">
+                            <option value="">영역 통합 (전체)</option><option value="교과">교과만</option><option value="자율">자율만</option><option value="동아리">동아리만</option><option value="진로">진로만</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="globalTimelineFeed" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar bg-slate-50/50 min-h-[250px] lg:min-h-0">
+                    <p class="text-sm text-slate-400 text-center py-20 font-bold">랭킹을 집계 중입니다...</p>
+                </div>
+            </div>
+
+            <!-- [Col 3: 상세 분석 모드] 넓이 50%의 광활한 캔버스 (lg:col-span-6) -->
             <div id="teacherRightWrapper" class="lg:col-span-6 h-full min-h-0 flex flex-col flex-1 w-full relative hidden lg:flex">
+                
                 <div id="teacherDetailPlaceholder" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 h-full flex flex-col justify-center items-center p-8 text-center shrink-0 w-full">
                     <div class="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-4xl shadow-inner mb-5 animate-pulse">🔍</div>
                     <h3 class="font-black text-slate-800 text-xl">학생별 포트폴리오 엑셀 뷰어</h3>
@@ -505,27 +503,13 @@
         </div>
     </div>
 
-    <!-- 🖨️ 인쇄 전용 템플릿 영역 -->
-    <div id="pdfExportContainer" class="print:block">
-        <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #1e293b; padding-bottom: 10px;">
-            <h1 style="font-size: 24px; font-weight: 900; color: #0f172a; letter-spacing: 4px; margin: 0 0 15px 0;">학생 진로 포트폴리오 종합 보고서</h1>
-            <table class="pdf-header-table">
-                <tr><th style="width: 20%;">학 번</th><td id="pdfExportStudentId" style="width: 30%; font-weight: bold; font-size: 11pt;">-</td><th style="width: 20%;">성 명</th><td id="pdfExportStudentName" style="width: 30%; font-weight: bold; font-size: 11pt;">-</td></tr>
-                <tr><th colspan="1">희망 전공/분야</th><td colspan="3" id="pdfPrintCareer" style="font-weight: bold; font-size: 11pt;">-</td></tr>
-                <tr><th colspan="1">희망 대학 (1~3)</th><td colspan="3" id="pdfPrintCollege" style="font-size: 11pt;">-</td></tr>
-                <tr><th colspan="1">희망 학과 (1~3)</th><td colspan="3" id="pdfPrintMajor" style="font-size: 11pt;">-</td></tr>
-            </table>
-        </div>
-        <div id="pdfExportStats" class="mb-6"></div>
-        <div id="pdfExportContent"></div>
-    </div>
-
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
         // =========================================================================
-        // 🌟 1. 글로벌 스크립트 파이프라인
+        // 🌟 1. 글로벌 스크립트 파이프라인 (인쇄 에러 및 폼 동작 방어)
         // =========================================================================
+        
         window.generatePdfHtml = (portfolios) => {
             let pdfHtml = `
                 <table class="pdf-table excel-pdf-table">
@@ -647,11 +631,14 @@
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // 🌟 앱 구동 메모리 변수군
         window.currentUser = null; window.currentUserProfile = null; window.currentStudentGrade = 1; window.selectedStudentUid = null;
         window.cachedStudents = []; window.cachedPortfolios = []; window.teacherCachedPortfolios = []; 
         window.teacherSelectedStudentName = ''; window.teacherSelectedStudentId = ''; window.teacherSelectedStudentCareerInfo = null; 
         window.cachedEventsData = []; window.cachedAllUsersForAdmin = []; window.cachedTimelineData = [];
         window.editingPortfolioId = null; 
+        window.isAuthenticating = false; // 로그인 중복 방어
+        window.isBooted = false; // 무한 로딩 방어 플래그
 
         // UI 헬퍼
         let loadingTimeout;
@@ -692,8 +679,9 @@
         }
 
         // =========================================================================
-        // 🌟 무한 로딩 차단 전용 퓨즈
+        // 🌟 [무한 로딩 및 꼬임 버그 박멸] 정석적인 동기식 인증 초기화
         // =========================================================================
+        
         window.forceClearLocalSession = function() {
             localStorage.removeItem('eduport-cached-profile'); localStorage.removeItem('eduport-cached-portfolios'); localStorage.removeItem('eduport-cached-students');
             const keysToRemove = [];
@@ -703,18 +691,22 @@
             window.teacherCachedPortfolios = []; window.cachedEventsData = []; window.cachedTimelineData = []; window.selectedStudentUid = null;
         };
 
+        // 🌟 로그아웃 개선: 무한 로딩 타임아웃 퓨즈 적용 완료
         window.execLogout = async function() {
             window.showLoading("로그아웃 중...");
-            window.forceClearLocalSession();
             try { 
-                // 🌟 무한 로딩 방지 퓨즈: 0.5초 안에 응답 없으면 강제로 다음 단계 진행
                 await Promise.race([ 
                     supabase.auth.signOut(), 
-                    new Promise(r => setTimeout(r, 500)) 
+                    new Promise(r => setTimeout(r, 800)) 
                 ]); 
-            } catch(err) {}
-            // 계정 꼬임 방지를 위해 앱 환경(브라우저)을 완전히 새로고침!
-            window.location.reload();
+            } catch(err) {
+                console.warn("서버 로그아웃 지연 무시 완료");
+            } finally {
+                window.forceClearLocalSession();
+                switchView('auth'); 
+                window.hideLoading(); 
+                window.showToast("안전하게 로그아웃 되었습니다.", "success");
+            }
         };
 
         function switchView(viewName) {
@@ -730,6 +722,7 @@
             }
         }
 
+        // 제로 레이턴시 렌더링 (Offline First)
         function bootFromCache(cachedProfileStr) {
             window.currentUserProfile = JSON.parse(cachedProfileStr);
             if (window.currentUserProfile.role === 'student') {
@@ -744,6 +737,7 @@
             window.hideLoading();
         }
 
+        // Supabase 인증 일원화 모듈
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_OUT' || !session) { 
                 window.forceClearLocalSession(); switchView('auth'); window.hideLoading(); return; 
@@ -751,6 +745,7 @@
 
             if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
                 window.currentUser = session.user;
+                
                 const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
                 let hasCache = false;
 
@@ -762,13 +757,24 @@
                 else { window.showLoading("초기 시스템을 구성하고 있습니다..."); }
 
                 try {
-                    const { data: profileData } = await supabase.from('profiles').select('*').eq('id', window.currentUser.id);
+                    // 백그라운드 무중단 동기화 시도 (최대 6초)
+                    const fetchProfile = supabase.from('profiles').select('*').eq('id', window.currentUser.id).limit(1);
+                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+                    
+                    let profileData;
+                    try {
+                        const res = await Promise.race([fetchProfile, timeout]);
+                        profileData = res.data;
+                    } catch(err) {
+                        throw err; 
+                    }
+
                     let profile = profileData && profileData.length > 0 ? profileData[0] : null;
 
                     if (!profile) {
                         const meta = window.currentUser.user_metadata || {};
                         const fallbackProfile = { id: window.currentUser.id, name: meta.name || window.currentUser.email.split('@')[0], email: window.currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
-                        const { data: inserted } = await supabase.from('profiles').insert([fallbackProfile]).select();
+                        const { data: inserted } = await supabase.from('profiles').insert([fallbackProfile]).select().limit(1);
                         profile = (inserted && inserted.length > 0) ? inserted[0] : fallbackProfile;
                     }
 
@@ -780,8 +786,9 @@
                         window.hideLoading();
                     }
                 } catch (e) {
+                    console.warn("프로필 동기화 지연:", e);
                     if (!hasCache) {
-                        window.showToast("네트워크 지연. 캐시를 활용해 오프라인으로 엽니다.", "info");
+                        window.showToast("네트워크가 지연되어 오프라인 모드로 진입합니다.", "info");
                         const meta = window.currentUser.user_metadata || {};
                         window.currentUserProfile = { id: window.currentUser.id, name: meta.name || window.currentUser.email.split('@')[0], email: window.currentUser.email, role: meta.role || 'student', admission_year: meta.admission_year ? parseInt(meta.admission_year) : null, student_id: meta.student_id || null };
                         if (window.currentUserProfile.role === 'student') initStudentDashboard(); else initTeacherDashboard();
@@ -791,112 +798,8 @@
             }
         });
 
-        setInterval(async () => { try { await supabase.from('school_events').select('id').limit(1); } catch (e) {} }, 1000 * 60 * 3);
-
-        window.loadHomeLiveBoard = async () => {
-            const feedContainer = document.getElementById('homeTimelineFeed'); const eventContainer = document.getElementById('homeEventsList');
-            try {
-                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(6);
-                if (error) throw error; let finalData = data || [];
-                if (finalData.length === 0) { feedContainer.innerHTML = '<p class="text-sm text-slate-500 text-center py-10 font-bold">최근 업데이트된 진로 기록이 없습니다.</p>'; } 
-                else {
-                    let html = '';
-                    finalData.forEach(item => {
-                        const updateDate = item.updated_at ? new Date(item.updated_at) : new Date(item.created_at || new Date());
-                        const formatUpdate = `${String(updateDate.getMonth()+1).padStart(2, '0')}/${String(updateDate.getDate()).padStart(2, '0')}`;
-                        const maskedName = '학습자(보안됨)';
-                        html += `<div class="p-4 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-2 transition hover:bg-slate-800/60"><div class="flex items-center justify-between text-xs"><span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span><span class="text-slate-500 font-medium">${formatUpdate}</span></div><h4 class="text-sm font-bold text-slate-200 truncate">${item.activity_name}</h4><p class="text-xs text-slate-400 truncate">${formatContentSummary(item.content)}</p><div class="text-[10px] text-slate-500 flex justify-between pt-2 border-t border-slate-800/50 font-medium"><span>작성자: ${maskedName}</span><span class="text-emerald-400">실시간 연동 성공 ✓</span></div></div>`;
-                    });
-                    feedContainer.innerHTML = html;
-                }
-            } catch (err) { feedContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-10 font-medium">데이터 지연: ${err.message}</p>`; }
-
-            try {
-                const response = await fetch(GOOGLE_SHEET_CSV_URL); if (!response.ok) throw new Error("Google sync issue");
-                const csvData = await response.text(); const rows = csvData.split('\n').slice(1);
-                let html = ''; let successCount = 0;
-                for (let i = 0; i < rows.length; i++) {
-                    const row = rows[i].trim(); if (!row) continue; const cols = row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()); if (cols.length < 2) continue;
-                    const eventName = cols[1], recordArea = cols[2], startMonth = cols[3], mainContent = cols[6] || '세부내용 참조';
-                    html += `<div class="p-4 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-1.5"><div class="flex items-center justify-between mb-1"><h4 class="text-sm font-bold text-white truncate max-w-[160px]">[${recordArea}] ${eventName}</h4><span class="text-xs bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2 py-0.5 rounded">${startMonth||'3'}월</span></div><p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">${mainContent}</p></div>`;
-                    successCount++; if (successCount >= 5) break; 
-                }
-                eventContainer.innerHTML = html || '<p class="text-sm text-slate-500 text-center py-10 font-bold">일정이 없습니다.</p>';
-            } catch (err) { eventContainer.innerHTML = '<p class="text-sm text-slate-500 text-center py-10">네트워크 연동 대기 중...</p>'; }
-        };
-
         // =========================================================================
-        // 📱 [모바일 탭 바 제어 엔진]
-        // =========================================================================
-        const tabBtnList = document.getElementById('tabBtnList'); const tabBtnEvents = document.getElementById('tabBtnEvents');
-        const tabBtnTimeline = document.getElementById('tabBtnTimeline'); const tabBtnDetail = document.getElementById('tabBtnDetail');
-
-        window.setMobileActiveTab = function(tab) {
-            if (window.innerWidth >= 1024) return;
-            const inactiveClass = "flex-1 text-sm font-bold text-slate-400 transition-all py-3 border-b-4 border-transparent";
-            const activeClass = "flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all bg-blue-50/30 py-3";
-            
-            tabBtnList.className = inactiveClass; tabBtnEvents.className = inactiveClass; tabBtnTimeline.className = inactiveClass; tabBtnDetail.className = inactiveClass;
-            
-            const wLeft = document.getElementById('teacherLeftWrapper'); const wMid = document.getElementById('teacherMiddleWrapper'); const wRight = document.getElementById('teacherRightWrapper');
-            const cList = document.getElementById('teacherListCard'); const cEvents = document.getElementById('teacherEventsCard');
-            const cTime = document.getElementById('teacherTimelineCard'); const cDetail = document.getElementById('teacherDetailCard'); const cPlaceholder = document.getElementById('teacherDetailPlaceholder');
-            
-            wLeft.classList.add('hidden', 'lg:hidden'); wLeft.classList.remove('flex', 'lg:flex');
-            wMid.classList.add('hidden', 'lg:hidden'); wMid.classList.remove('flex', 'lg:flex');
-            wRight.classList.add('hidden', 'lg:hidden'); wRight.classList.remove('flex', 'lg:flex');
-            cList.classList.add('hidden', 'lg:hidden'); cList.classList.remove('flex', 'lg:flex');
-            cEvents.classList.add('hidden', 'lg:hidden'); cEvents.classList.remove('flex', 'lg:flex');
-            cTime.classList.add('hidden', 'lg:hidden'); cTime.classList.remove('flex', 'lg:flex');
-            cDetail.classList.add('hidden', 'lg:hidden'); cDetail.classList.remove('flex', 'lg:flex');
-            cPlaceholder.classList.add('hidden', 'lg:hidden'); cPlaceholder.classList.remove('flex', 'lg:flex');
-
-            if (tab === 'timeline') { 
-                tabBtnTimeline.className = activeClass; wLeft.classList.remove('hidden', 'lg:hidden'); wLeft.classList.add('flex', 'lg:flex'); cTime.classList.remove('hidden', 'lg:hidden'); cTime.classList.add('flex', 'lg:flex'); 
-            } else if (tab === 'events') { 
-                tabBtnEvents.className = activeClass; wLeft.classList.remove('hidden', 'lg:hidden'); wLeft.classList.add('flex', 'lg:flex'); cEvents.classList.remove('hidden', 'lg:hidden'); cEvents.classList.add('flex', 'lg:flex'); 
-            } else if (tab === 'list') { 
-                tabBtnList.className = activeClass; wMid.classList.remove('hidden', 'lg:hidden'); wMid.classList.add('flex', 'lg:flex'); cList.classList.remove('hidden', 'lg:hidden'); cList.classList.add('flex', 'lg:flex'); 
-            } else if (tab === 'detail') { 
-                tabBtnDetail.className = activeClass; wRight.classList.remove('hidden', 'lg:hidden'); wRight.classList.add('flex', 'lg:flex'); cDetail.classList.remove('hidden', 'lg:hidden'); cDetail.classList.add('flex', 'lg:flex'); 
-            }
-        }
-
-        window.setDesktopView = function() {
-            const wLeft = document.getElementById('teacherLeftWrapper'); const wMid = document.getElementById('teacherMiddleWrapper'); const wRight = document.getElementById('teacherRightWrapper');
-            const cList = document.getElementById('teacherListCard'); const cEvents = document.getElementById('teacherEventsCard');
-            const cTime = document.getElementById('teacherTimelineCard'); const cDetail = document.getElementById('teacherDetailCard'); const cPlaceholder = document.getElementById('teacherDetailPlaceholder');
-
-            wLeft.classList.remove('hidden', 'lg:hidden'); wLeft.classList.add('flex', 'lg:flex');
-            wMid.classList.remove('hidden', 'lg:hidden'); wMid.classList.add('flex', 'lg:flex');
-            wRight.classList.remove('hidden', 'lg:hidden'); wRight.classList.add('flex', 'lg:flex');
-            
-            cList.classList.remove('hidden', 'lg:hidden'); cList.classList.add('flex', 'lg:flex');
-            cEvents.classList.remove('hidden', 'lg:hidden'); cEvents.classList.add('flex', 'lg:flex');
-            cTime.classList.remove('hidden', 'lg:hidden'); cTime.classList.add('flex', 'lg:flex');
-            
-            if (window.selectedStudentUid) {
-                cPlaceholder.classList.add('hidden', 'lg:hidden'); cPlaceholder.classList.remove('flex', 'lg:flex');
-                cDetail.classList.remove('hidden', 'lg:hidden'); cDetail.classList.add('flex', 'lg:flex');
-            } else {
-                cDetail.classList.add('hidden', 'lg:hidden'); cDetail.classList.remove('flex', 'lg:flex');
-                cPlaceholder.classList.remove('hidden', 'lg:hidden'); cPlaceholder.classList.add('flex', 'lg:flex');
-            }
-        }
-
-        tabBtnList.addEventListener('click', () => window.setMobileActiveTab('list')); tabBtnEvents.addEventListener('click', () => window.setMobileActiveTab('events'));
-        tabBtnTimeline.addEventListener('click', () => window.setMobileActiveTab('timeline')); tabBtnDetail.addEventListener('click', () => { if (window.selectedStudentUid) window.setMobileActiveTab('detail'); });
-
-        window.addEventListener('resize', () => {
-            if (!document.getElementById('teacherView').classList.contains('hidden')) {
-                if (window.innerWidth >= 1024) { window.setDesktopView(); } 
-                else { if(window.selectedStudentUid) window.setMobileActiveTab('detail'); else window.setMobileActiveTab('list'); }
-            }
-        });
-
-
-        // =========================================================================
-        // 🔒 [로그인 & 회원가입 폼]
+        // 🔒 [로그인 & 회원가입 폼 제어 로직]
         // =========================================================================
         window.showSignup = function(e) { e.preventDefault(); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('signupForm').classList.remove('hidden'); };
         window.showLogin = function(e) { e.preventDefault(); document.getElementById('signupForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); };
@@ -1082,12 +985,12 @@
             window.showToast("✨ 행사 정보가 입력창에 자동으로 채워졌습니다!", "success"); window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
+        // 🌟 명시적 인쇄 호출 (DOM 안전 렌더링 후 프린트)
         window.printStudentPortfolio = async () => {
             window.showLoading("전체 포트폴리오를 구성하고 있습니다...");
             try {
                 let dataToPrint = window.cachedPortfolios;
                 try {
-                    // No Join
                     const { data: pfs } = await supabase.from('portfolios').select('*').eq('student_uid', window.currentUser.id).order('grade', { ascending: true }).order('semester', { ascending: true }).order('updated_at', { ascending: false });
                     const { data: fbs } = await supabase.from('feedbacks').select('*');
                     if (pfs) dataToPrint = pfs.map(p => { const fb = (fbs||[]).find(f => f.portfolio_id === p.id); return {...p, feedbacks: fb ? [fb] : [] }; });
@@ -1203,7 +1106,6 @@
                 years.forEach(y => { yearSelect.innerHTML += `<option value="${y}">${y}학년도</option>`; });
                 renderStudentList(window.cachedStudents);
                 
-                // 명부가 로드되면 피드를 즉시 갱신
                 if (window.applyTimelineFilters) window.applyTimelineFilters();
             } catch (e) { console.warn("명부 지연: 캐시 유지"); } finally { window.hideLoading(); }
         }
@@ -1242,7 +1144,6 @@
             renderStudentList(filtered);
         }
 
-        // 🌟 타임라인 랭킹 현황판 로직
         async function loadGlobalTimelineFeed() {
             const feedContainer = document.getElementById('globalTimelineFeed');
             try {

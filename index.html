@@ -708,7 +708,8 @@
         }
 
         function blindName(name) {
-            if (!name || name.length < 2) return name[0] + '*';
+            if (!name || name.length === 0) return '익명';
+            if (name.length === 1) return name + '*';
             return name[0] + '*'.repeat(name.length - 1);
         }
 
@@ -1012,7 +1013,7 @@
             e.preventDefault(); window.showLoading("가입 처리 중...");
             try {
                 const { error } = await supabase.auth.signUp({ email: document.getElementById('signupEmail').value, password: document.getElementById('signupPassword').value, options: { data: { name: document.getElementById('signupName').value, role: document.getElementById('signupRole').value, admission_year: document.getElementById('signupRole').value === 'student' ? parseInt(document.getElementById('signupYear').value) : null, student_id: document.getElementById('signupRole').value === 'student' ? document.getElementById('signupStudentId').value : null } } });
-                if (error) window.showToast(`가입 거부: ${error.message}`, 'error'); else { window.showToast("회원가입 완료!", 'success'); document.getElementById('showLoginBtn').click(); }
+                if (error) window.showToast(`가입 거부: ${error.message}`, 'error'); else { window.showToast("회원가입 완료! 로그인해주세요.", 'success'); window.showLogin({ preventDefault: () => {} }); }
             } catch (err) { window.showToast("통신 실패.", 'error'); } finally { window.hideLoading(); }
         });
 
@@ -1229,12 +1230,14 @@
             loadStudentList(); loadGlobalTimelineFeed(); loadTeacherEvents();
 
             document.getElementById('teacherStudentSearch').addEventListener('input', applyTeacherFilters); document.getElementById('filterGradeSelect').addEventListener('change', applyTeacherFilters); document.getElementById('filterYearSelect').addEventListener('change', applyTeacherFilters);
-            document.getElementById('timelineAreaFilter').addEventListener('change', applyTimelineFilters);
+            document.getElementById('timelineAreaFilter').addEventListener('change', window.applyTimelineFilters);
 
             const isAdmin = window.currentUserProfile.role === 'admin' || (window.currentUserProfile.role === 'teacher' && window.currentUserProfile.email === 'admin@school.hs.kr');
             if (isAdmin) document.getElementById('openAdminPanelBtn').classList.remove('hidden'); else document.getElementById('openAdminPanelBtn').classList.add('hidden');
             document.getElementById('openAdminPanelBtn').onclick = () => { document.getElementById('adminPanelModal').classList.remove('hidden'); loadAllProfilesForAdmin(); };
             document.getElementById('closeAdminPanelBtn').onclick = () => { document.getElementById('adminPanelModal').classList.add('hidden'); };
+            const closeEditBtn = document.getElementById('closeAdminEditModalBtn');
+            if (closeEditBtn) closeEditBtn.onclick = () => { document.getElementById('adminEditModal').classList.add('hidden'); };
             document.getElementById('adminUserSearch').addEventListener('input', applyAdminFilters); document.getElementById('adminRoleFilter').addEventListener('change', applyAdminFilters);
         }
 

@@ -307,7 +307,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- [3] 🌟 지도 교사용 관제 센터 (1600px 와이드 & 3단 분할 3:3:6 뷰) -->
+    <!-- [3] 🌟 지도 교사용 관제 센터 -->
     <!-- ========================================== -->
     <div id="teacherView" class="hidden h-[100dvh] bg-slate-100 flex-col overflow-hidden relative font-sans">
         <nav class="bg-slate-900 text-white border-b border-slate-800 z-[60] shadow-md shrink-0 h-16 w-full relative no-print">
@@ -321,7 +321,7 @@
             </div>
         </nav>
 
-        <!-- 모바일 전용 탭 바 (lg: 1024px 이상에서는 자동 숨김) -->
+        <!-- 모바일 전용 탭 바 -->
         <div id="mobileTabSelector" class="flex lg:hidden bg-white border-b border-slate-200 shrink-0 h-14 z-50 shadow-sm w-full no-print">
             <button id="tabBtnTimeline" class="flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all min-h-[44px]">🏆 랭킹</button>
             <button id="tabBtnEvents" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]">🏫 일정</button>
@@ -331,10 +331,8 @@
 
         <main class="max-w-[1600px] mx-auto w-full px-3 sm:px-6 py-4 lg:py-6 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden relative z-10 no-print">
             
-            <!-- 🌟 [Col 1: 타임라인 랭킹 + 일정] 넓이 25% 할당 (lg:col-span-3) -->
             <div id="teacherLeftWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden lg:flex w-full">
-                
-                <!-- 🌟 [랭킹 현황판] -->
+                <!-- 랭킹 현황판 -->
                 <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[380px] lg:min-h-0 overflow-hidden flex">
                     <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
                         <h2 class="font-black text-slate-900 text-lg flex justify-between items-center">
@@ -368,7 +366,7 @@
                 </div>
             </div>
 
-            <!-- 🌟 [Col 2: 학생 명부] 넓이 25% 할당 (lg:col-span-3) -->
+            <!-- 학생 명부 -->
             <div id="teacherMiddleWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden lg:flex w-full">
                 <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 min-h-[400px] lg:min-h-0 overflow-hidden flex">
                     <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
@@ -392,13 +390,12 @@
                 </div>
             </div>
 
-            <!-- 🌟 [Col 3: 상세 분석 모드] 넓이 50%의 광활한 캔버스 (lg:col-span-6) -->
+            <!-- 상세 분석 모드 -->
             <div id="teacherRightWrapper" class="lg:col-span-6 h-full min-h-0 flex flex-col flex-1 w-full relative hidden lg:flex">
-                
                 <div id="teacherDetailPlaceholder" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 h-full flex flex-col justify-center items-center p-8 text-center shrink-0 w-full">
                     <div class="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-4xl shadow-inner mb-5 animate-pulse">🔍</div>
                     <h3 class="font-black text-slate-800 text-xl">학생별 포트폴리오 엑셀 뷰어</h3>
-                    <p class="text-slate-400 text-sm mt-3 leading-relaxed">좌측 학생 명부에서 분석할 학생을 클릭해 주세요.<br>3개년 전체 탐구 활동 리포트, 학년별 누적 수치 통계표,<br>선생님 전용 피드백 수록 공간이 <strong>엑셀 표 형식으로 50%의 넓은 화면에 로드됩니다.</strong></p>
+                    <p class="text-slate-400 text-sm mt-3 leading-relaxed">좌측 학생 명부에서 분석할 학생을 클릭해 주세요.<br>3개년 전체 탐구 활동 리포트, 학년별 누적 수치 통계표,<br>선생님 전용 피드백 수록 공간이 <strong>엑셀 표 형식으로 로드됩니다.</strong></p>
                 </div>
 
                 <div id="teacherDetailCard" class="bg-slate-50 rounded-2xl lg:rounded-3xl shadow-inner border border-slate-200 h-full flex-col overflow-hidden hidden w-full">
@@ -411,11 +408,10 @@
                             <p class="text-sm font-bold text-slate-500 mt-1.5 truncate w-full" id="detailStudentInfo"></p>
                         </div>
                         <div class="flex gap-2 shrink-0 mt-3 sm:mt-0 w-full sm:w-auto justify-center sm:justify-end">
-                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-3 rounded-xl transition shadow-md flex items-center gap-2 min-h-[44px]">🖨️ 엑셀 뷰어 인쇄</button>
+                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-3 rounded-xl transition shadow-md flex items-center gap-2 min-h-[44px]">🖨️ 전체 엑셀 표 인쇄</button>
                             <button onclick="window.closeStudentDetail()" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-bold px-5 py-3 rounded-xl transition shadow-sm min-h-[44px]">🔙 닫기</button>
                         </div>
                     </div>
-                    <!-- 🌟 엑셀 테이블 뷰 영역 -->
                     <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 no-scrollbar bg-slate-50 w-full min-h-[300px] lg:min-h-0">
                         <div id="teacherStatsContainer" class="mb-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hidden"></div>
                         <div id="teacherPortfolioList" class="flex flex-col gap-6"></div>
@@ -528,9 +524,8 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
         // =========================================================================
-        // 🌟 1. 글로벌 스크립트 파이프라인 (인쇄 에러 및 참조 참조 방어)
+        // 🌟 1. 글로벌 스크립트 파이프라인
         // =========================================================================
-        
         window.generatePdfHtml = (portfolios) => {
             let pdfHtml = `
                 <table class="pdf-table excel-pdf-table">
@@ -652,7 +647,6 @@
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 🌟 앱 메모리
         window.currentUser = null; window.currentUserProfile = null; window.currentStudentGrade = 1; window.selectedStudentUid = null;
         window.cachedStudents = []; window.cachedPortfolios = []; window.teacherCachedPortfolios = []; 
         window.teacherSelectedStudentName = ''; window.teacherSelectedStudentId = ''; window.teacherSelectedStudentCareerInfo = null; 
@@ -698,9 +692,8 @@
         }
 
         // =========================================================================
-        // 🌟 [무한 로딩 및 꼬임 버그 박멸] 정석적인 동기식 인증 초기화
+        // 🌟 무한 로딩 차단 전용 퓨즈
         // =========================================================================
-        
         window.forceClearLocalSession = function() {
             localStorage.removeItem('eduport-cached-profile'); localStorage.removeItem('eduport-cached-portfolios'); localStorage.removeItem('eduport-cached-students');
             const keysToRemove = [];
@@ -713,12 +706,16 @@
         window.execLogout = async function() {
             window.showLoading("로그아웃 중...");
             window.forceClearLocalSession();
-            try { await supabase.auth.signOut(); } catch(err) {}
+            try { 
+                // 🌟 무한 로딩 방지 퓨즈: 0.5초 안에 응답 없으면 강제로 다음 단계 진행
+                await Promise.race([ 
+                    supabase.auth.signOut(), 
+                    new Promise(r => setTimeout(r, 500)) 
+                ]); 
+            } catch(err) {}
             // 계정 꼬임 방지를 위해 앱 환경(브라우저)을 완전히 새로고침!
             window.location.reload();
         };
-        // html의 모든 요소에 이벤트 할당
-        document.querySelectorAll('.logoutBtn').forEach(btn => { btn.onclick = window.execLogout; });
 
         function switchView(viewName) {
             document.getElementById('authView').classList.add('hidden'); document.getElementById('studentView').classList.add('hidden'); document.getElementById('teacherView').classList.add('hidden'); document.getElementById('adminPanelModal').classList.add('hidden');
@@ -733,7 +730,6 @@
             }
         }
 
-        // 제로 레이턴시 렌더링
         function bootFromCache(cachedProfileStr) {
             window.currentUserProfile = JSON.parse(cachedProfileStr);
             if (window.currentUserProfile.role === 'student') {
@@ -748,7 +744,6 @@
             window.hideLoading();
         }
 
-        // Supabase 인증 일원화 모듈
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_OUT' || !session) { 
                 window.forceClearLocalSession(); switchView('auth'); window.hideLoading(); return; 
@@ -756,7 +751,6 @@
 
             if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
                 window.currentUser = session.user;
-                
                 const cachedProfileStr = localStorage.getItem('eduport-cached-profile');
                 let hasCache = false;
 
@@ -802,8 +796,7 @@
         window.loadHomeLiveBoard = async () => {
             const feedContainer = document.getElementById('homeTimelineFeed'); const eventContainer = document.getElementById('homeEventsList');
             try {
-                // RLS 방지용 No-Join 단일 테이블 조회
-                const { data, error } = await supabase.from('portfolios').select('*').order('updated_at', { ascending: false }).limit(6);
+                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(6);
                 if (error) throw error; let finalData = data || [];
                 if (finalData.length === 0) { feedContainer.innerHTML = '<p class="text-sm text-slate-500 text-center py-10 font-bold">최근 업데이트된 진로 기록이 없습니다.</p>'; } 
                 else {
@@ -833,7 +826,7 @@
         };
 
         // =========================================================================
-        // 📱 [모바일 탭 바 토글 제어 엔진]
+        // 📱 [모바일 탭 바 제어 엔진]
         // =========================================================================
         const tabBtnList = document.getElementById('tabBtnList'); const tabBtnEvents = document.getElementById('tabBtnEvents');
         const tabBtnTimeline = document.getElementById('tabBtnTimeline'); const tabBtnDetail = document.getElementById('tabBtnDetail');
@@ -903,7 +896,7 @@
 
 
         // =========================================================================
-        // 🔒 [로그인 & 회원가입 폼 제어 로직]
+        // 🔒 [로그인 & 회원가입 폼]
         // =========================================================================
         window.showSignup = function(e) { e.preventDefault(); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('signupForm').classList.remove('hidden'); };
         window.showLogin = function(e) { e.preventDefault(); document.getElementById('signupForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); };
@@ -952,8 +945,8 @@
 
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
-                    document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
-                    e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
+                    document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
+                    e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
                     window.currentStudentGrade = parseInt(e.target.dataset.grade); document.getElementById('pfGrade').value = window.currentStudentGrade; loadStudentPortfolios(window.currentStudentGrade);
                 }
             });
@@ -994,7 +987,6 @@
         async function loadStudentPortfolios(grade) {
             const container = document.getElementById('portfolioList'); container.innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 font-bold">이력을 동기화하고 있습니다...</p></div>';
             try {
-                // No Join 아키텍처
                 const { data: pfs, error: pfErr } = await supabase.from('portfolios').select('*').eq('student_uid', window.currentUser.id).order('updated_at', { ascending: false });
                 if (pfErr) throw pfErr;
                 const { data: fbs } = await supabase.from('feedbacks').select('*');
@@ -1211,7 +1203,7 @@
                 years.forEach(y => { yearSelect.innerHTML += `<option value="${y}">${y}학년도</option>`; });
                 renderStudentList(window.cachedStudents);
                 
-                // 명부가 로드되면 피드를 즉시 갱신 (로컬 조인)
+                // 명부가 로드되면 피드를 즉시 갱신
                 if (window.applyTimelineFilters) window.applyTimelineFilters();
             } catch (e) { console.warn("명부 지연: 캐시 유지"); } finally { window.hideLoading(); }
         }
@@ -1250,11 +1242,10 @@
             renderStudentList(filtered);
         }
 
-        // 🌟 타임라인 조인 에러 원천 차단 + [누적 활동 랭킹 시스템 적용]
+        // 🌟 타임라인 랭킹 현황판 로직
         async function loadGlobalTimelineFeed() {
             const feedContainer = document.getElementById('globalTimelineFeed');
             try {
-                // 더 많은 기록을 가져와 랭킹을 집계합니다.
                 const { data, error } = await supabase.from('portfolios').select('student_uid, area, updated_at').order('updated_at', { ascending: false }).limit(500);
                 if (error) throw error; window.cachedTimelineData = data || []; window.applyTimelineFilters(); 
             } catch (err) { feedContainer.innerHTML = `<p class="text-red-500 text-sm font-bold text-center py-10">랭킹 업데이트 지연</p>`; }
@@ -1267,29 +1258,23 @@
             let filtered = window.cachedTimelineData;
             if (areaFilter) filtered = filtered.filter(item => item.area === areaFilter);
 
-            // 학생별 활동 횟수 및 최신 업데이트 일자 집계
             const counts = {}; const lastUpdates = {};
             filtered.forEach(item => {
                 const uid = item.student_uid;
                 counts[uid] = (counts[uid] || 0) + 1;
-                if (!lastUpdates[uid] || new Date(item.updated_at) > new Date(lastUpdates[uid])) {
-                    lastUpdates[uid] = item.updated_at;
-                }
+                if (!lastUpdates[uid] || new Date(item.updated_at) > new Date(lastUpdates[uid])) { lastUpdates[uid] = item.updated_at; }
             });
 
-            // 랭킹 배열 변환 및 로컬 명단과 이름 매핑
             let ranking = Object.keys(counts).map(uid => {
                 const stu = window.cachedStudents.find(s => s.id === uid);
                 return { uid, st_name: stu ? stu.name : '알수없음', st_id: stu ? stu.student_id : '-', count: counts[uid], last_update: lastUpdates[uid] };
             }).filter(item => item.st_name !== '알수없음');
 
-            // 횟수 순(내림차순) 정렬 -> 횟수가 같으면 최근 업데이트 순 정렬
             ranking.sort((a, b) => b.count - a.count || new Date(b.last_update) - new Date(a.last_update));
 
             if (ranking.length === 0) { feedContainer.innerHTML = '<p class="text-slate-400 text-sm text-center py-20 font-bold">집계된 기록이 없습니다.</p>'; return; }
             
             let html = '';
-            // 상위 50명까지만 렌더링
             ranking.slice(0, 50).forEach((item, index) => {
                 const rankNum = index + 1;
                 let rankBadge = `<span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-black shadow-inner shrink-0">${rankNum}</span>`;

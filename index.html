@@ -23,18 +23,33 @@
         
         #pdfExportContainer { display: none; }
 
+        /* 엑셀 스타일 테이블 뷰 (리스트용) */
+        .excel-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; background-color: white; }
+        .excel-table th, .excel-table td { border-bottom: 1px solid #cbd5e1; border-right: 1px solid #cbd5e1; padding: 12px; vertical-align: top; }
+        .excel-table th:last-child, .excel-table td:last-child { border-right: none; }
+        .excel-table th { background-color: #fbbf24; color: #1e293b; font-weight: 900; text-align: center; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid #b45309; font-size: 13px; letter-spacing: -0.5px; }
+        .excel-table tbody tr:last-child td { border-bottom: none; }
+        .excel-table tbody tr:hover { background-color: #f8fafc; }
+
         /* 🖨️ 인쇄 스타일 */
         @media print { 
             body * { visibility: hidden; }
             #pdfExportContainer, #pdfExportContainer * { visibility: visible; }
             #pdfExportContainer { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background-color: white; color: black; font-family: 'Malgun Gothic', dotum, sans-serif; padding: 10mm; }
+            
             .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; page-break-inside: avoid; }
             .pdf-table th, .pdf-table td { border: 1px solid #94a3b8; padding: 8px 10px; font-size: 10.5pt; line-height: 1.5; text-align: left; vertical-align: middle; word-break: keep-all; }
             .pdf-table th { background-color: #f8fafc !important; font-weight: bold; text-align: center; white-space: nowrap; width: 14%; color: #1e293b; }
             .pdf-table td { color: #0f172a; }
+            
             .pdf-header-table { width: 100%; margin: 0 auto 20px auto; border-collapse: collapse; border: 2px solid #1e293b; }
             .pdf-header-table th, .pdf-header-table td { border: 1px solid #1e293b; padding: 6px 8px; font-size: 10.5pt; text-align: center; }
             .pdf-header-table th { background-color: #e2e8f0 !important; font-weight: bold; }
+            
+            /* PDF용 엑셀 테이블 오버라이드 */
+            .excel-pdf-table th { background-color: #fbbf24 !important; color: #000; border: 1px solid #000; }
+            .excel-pdf-table td { border: 1px solid #000; vertical-align: top; }
+            
             .page-break { page-break-before: always; }
         }
     </style>
@@ -52,7 +67,7 @@
 
     <!-- 확인 모달 -->
     <div id="confirmModal" class="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4 hidden backdrop-blur-sm">
-        <div class="bg-white p-7 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-100">
+        <div class="bg-white p-7 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-100 transform transition-all">
             <h3 class="text-lg font-black text-slate-900 mb-2" id="confirmTitle">확인</h3>
             <p id="confirmModalMessage" class="text-sm text-slate-500 mb-6 leading-relaxed"></p>
             <div class="flex gap-3">
@@ -96,7 +111,7 @@
                             <h3 class="font-bold text-sm text-white flex items-center gap-2">🏫 학교 행사 리스트</h3>
                         </div>
                         <div id="homeEventsList" class="flex-1 overflow-y-auto pr-2 no-scrollbar space-y-3">
-                            <p class="text-xs text-slate-500 text-center py-10">권장 일정을 파악하고 있습니다...</p>
+                            <p class="text-xs text-slate-500 text-center py-10 font-bold">학교 권장 일정을 파악하고 있습니다...</p>
                         </div>
                     </div>
                 </div>
@@ -152,19 +167,19 @@
     <!-- ========================================== -->
     <!-- [2] 학습자(학생용) 종합 포탈 -->
     <!-- ========================================== -->
-    <div id="studentView" class="flex-1 flex-col hidden bg-slate-100 pb-16">
+    <div id="studentView" class="flex-1 flex-col hidden bg-slate-100 pb-16 font-sans">
         <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print w-full">
             <div class="max-w-[1600px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <h1 class="text-xl sm:text-2xl font-black text-blue-600 tracking-tighter">EduPort</h1>
                     <div class="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">학적 정보 확인 중...</span>
+                        <span id="studentNavInfo" class="text-xs font-bold text-slate-700 tracking-wide">정보 확인 중...</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <button onclick="window.printStudentPortfolio()" type="button" class="bg-slate-900 text-white px-4 sm:px-5 py-2.5 rounded-xl text-xs font-black transition shadow-md flex items-center gap-2 min-h-[44px]">
-                        🖨️ 포트폴리오 인쇄
+                    <button onclick="window.printStudentPortfolio()" type="button" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-black transition shadow-md flex items-center gap-2 min-h-[44px]">
+                        🖨️ 전체 엑셀 표 인쇄
                     </button>
                     <button class="logoutBtn text-slate-400 hover:text-red-600 text-xs font-bold transition px-2 py-2 min-h-[44px]">로그아웃</button>
                 </div>
@@ -203,39 +218,39 @@
                 <form id="portfolioForm" class="space-y-6">
                     <input type="hidden" id="pfEditId" value="">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-                        <div class="lg:col-span-4 space-y-5 bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-100">
+                        <div class="lg:col-span-3 space-y-5 bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-100">
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">실행 상태</label>
-                                <select id="pfExecution" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold outline-none" required>
+                                <select id="pfExecution" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500" required>
                                     <option value="참여함">✅ 참여함 (탐구 완료)</option><option value="계획함">🗓️ 계획함 (진행 예정)</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-3 gap-3">
-                                <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">학년도</label><input type="number" id="pfYearInput" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold text-center outline-none" required></div>
+                                <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">학년도</label><input type="number" id="pfYearInput" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold text-center outline-none focus:ring-2 focus:ring-blue-500" required></div>
                                 <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">학년</label>
-                                    <select id="pfGrade" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold text-center outline-none" required>
+                                    <select id="pfGrade" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold text-center outline-none focus:ring-2 focus:ring-blue-500" required>
                                         <option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
                                     </select>
                                 </div>
                                 <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">학기</label>
-                                    <select id="pfSemester" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold text-center outline-none" required>
+                                    <select id="pfSemester" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold text-center outline-none focus:ring-2 focus:ring-blue-500" required>
                                         <option value="1">1학기</option><option value="2">2학기</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2 pl-1">기록 영역</label>
-                                <select id="pfArea" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black outline-none" required>
+                                <select id="pfArea" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-blue-700 text-sm font-black outline-none focus:ring-2 focus:ring-blue-500" required>
                                     <option value="교과">교과 (과목 세특)</option><option value="자율">창체 - 자율활동</option><option value="동아리">창체 - 동아리활동</option><option value="진로">창체 - 진로활동</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-8 space-y-5">
-                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold outline-none" required></div>
-                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-medium outline-none" required></div>
-                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:bg-white outline-none"></div>
-                            <div><label class="block text-sm font-bold text-blue-700 mb-2 pl-1">🧠 자기 성찰 및 평가 <span class="text-red-500">*</span></label><textarea id="pfSelfEval" rows="4" class="w-full p-3 sm:p-4 border border-blue-200 rounded-xl bg-blue-50/30 text-sm font-medium leading-relaxed focus:bg-white outline-none" required></textarea></div>
+                        <div class="lg:col-span-9 space-y-5">
+                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">과목명 / 동아리명 / 행사명 <span class="text-red-500">*</span></label><input type="text" id="pfActivityName" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500" required></div>
+                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">활동 내용 요약 (한 줄 정리) <span class="text-red-500">*</span></label><input type="text" id="pfSimpleContent" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-white text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500" required></div>
+                            <div><label class="block text-sm font-bold text-slate-700 mb-2 pl-1">📚 연계 독서 기록 (선택)</label><input type="text" id="pfReading" class="w-full p-3 sm:p-4 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium focus:bg-white outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-sm font-bold text-blue-700 mb-2 pl-1">🧠 자기 성찰 및 평가 <span class="text-red-500">*</span></label><textarea id="pfSelfEval" rows="4" class="w-full p-3 sm:p-4 border border-blue-200 rounded-xl bg-blue-50/30 text-sm font-medium leading-relaxed focus:bg-white outline-none focus:ring-2 focus:ring-blue-500" required></textarea></div>
                         </div>
                     </div>
                     <div class="pt-4 flex flex-col sm:flex-row justify-end gap-3">
@@ -249,23 +264,26 @@
 
             <section class="space-y-5 no-print">
                 <div class="flex items-center justify-between mb-2 pl-2">
-                    <h3 class="font-black text-xl text-slate-800 tracking-tight">📑 내 포트폴리오 관리</h3>
+                    <h3 class="font-black text-xl text-slate-800 tracking-tight">📑 등록된 포트폴리오 (엑셀 표 형식)</h3>
                 </div>
                 <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row gap-4 justify-between items-center">
                     <div class="flex overflow-x-auto whitespace-nowrap w-full lg:w-auto no-scrollbar gap-2 p-1 bg-slate-50 rounded-xl border border-slate-100">
-                        <button class="grade-tab active-tab px-6 sm:px-8 py-2.5 sm:py-3 text-center font-black text-sm text-blue-600 bg-white rounded-lg shadow-sm transition min-h-[44px]" data-grade="1">1학년</button>
-                        <button class="grade-tab px-6 sm:px-8 py-2.5 sm:py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition min-h-[44px]" data-grade="2">2학년</button>
-                        <button class="grade-tab px-6 sm:px-8 py-2.5 sm:py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition min-h-[44px]" data-grade="3">3학년</button>
+                        <button class="grade-tab active-tab px-6 sm:px-8 py-2.5 sm:py-3 text-center font-black text-sm text-blue-600 bg-white rounded-lg shadow-sm transition" data-grade="1">1학년</button>
+                        <button class="grade-tab px-6 sm:px-8 py-2.5 sm:py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="2">2학년</button>
+                        <button class="grade-tab px-6 sm:px-8 py-2.5 sm:py-3 text-center font-bold text-sm text-slate-500 hover:text-slate-800 rounded-lg transition" data-grade="3">3학년</button>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                        <select id="studentAreaFilter" class="px-5 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                        <select id="studentAreaFilter" class="px-5 py-3 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">영역 전체</option><option value="교과">교과 활동</option><option value="자율">자율 활동</option><option value="동아리">동아리 활동</option><option value="진로">진로 활동</option>
                         </select>
                         <div class="relative w-full sm:w-[320px]">
-                            <input type="text" id="studentSearchInput" class="w-full p-3 pl-11 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-white transition min-h-[44px]" placeholder="내용, 도서명 등 검색">
+                            <input type="text" id="studentSearchInput" class="w-full p-3 pl-11 border border-slate-200 text-sm font-medium rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-white transition" placeholder="내용, 도서명 등 검색">
+                            <svg class="absolute left-4 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
                 </div>
+                
+                <!-- 🌟 엑셀 테이블 뷰 컨테이너 -->
                 <div id="portfolioList" class="flex flex-col gap-4">
                     <div class="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm"><p class="text-slate-400 text-sm font-bold">기록을 불러오는 중입니다...</p></div>
                 </div>
@@ -277,7 +295,8 @@
                     <h3 class="font-black text-xl text-white flex items-center gap-2">🏫 학교 권장 행사 연동</h3>
                     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                         <div class="relative flex-1 sm:w-[320px]">
-                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-10 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none placeholder-slate-400 min-h-[44px]" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <input type="text" id="studentEventSearch" class="w-full p-3 pl-11 border border-slate-700 bg-slate-800/80 text-sm font-medium text-white rounded-xl outline-none focus:border-blue-500 transition placeholder-slate-400" placeholder="행사명 검색 (클릭 시 자동 기입)">
+                            <svg class="absolute left-4 top-3.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         <button onclick="window.syncGoogleSheetEvents()" type="button" class="text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-5 py-3 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 shrink-0 min-h-[44px]">
                             🔄 일정 동기화
@@ -311,13 +330,11 @@
             <button id="tabBtnList" class="flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all min-h-[44px]">👥 명부</button>
             <button id="tabBtnEvents" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]">🏫 일정</button>
             <button id="tabBtnTimeline" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]">📊 관제</button>
-            <button id="tabBtnDetail" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]" disabled>🔍 분석</button>
+            <button id="tabBtnDetail" class="flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]" disabled>🔍 엑셀 뷰</button>
         </div>
 
-        <!-- 메인 프레임: 와이드 1600px, 3:3:6 구조 지원 -->
         <main class="max-w-[1600px] mx-auto w-full px-3 sm:px-6 py-4 lg:py-6 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden relative z-10 no-print">
             
-            <!-- [Col 1: 학생 명부 + 일정] 넓이 25% 할당 (lg:col-span-3) -->
             <div id="teacherLeftWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden lg:flex w-full">
                 <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[380px] lg:min-h-0 overflow-hidden flex">
                     <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
@@ -356,7 +373,6 @@
                 </div>
             </div>
 
-            <!-- [Col 2: 타임라인] 넓이 25% 할당 (lg:col-span-3) -->
             <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-1 lg:col-span-3 min-h-[400px] lg:min-h-0 overflow-hidden hidden lg:flex flex-col w-full">
                 <div class="border-b border-slate-100 p-5 pb-3 shrink-0">
                     <h2 class="font-black text-slate-900 text-lg mb-3">📊 실시간 관제 피드</h2>
@@ -372,13 +388,11 @@
                 </div>
             </div>
 
-            <!-- [Col 3: 상세 분석 모드] 넓이 50%의 광활한 캔버스 (lg:col-span-6) -->
             <div id="teacherRightWrapper" class="lg:col-span-6 h-full min-h-0 flex flex-col flex-1 w-full relative hidden lg:flex">
-                
                 <div id="teacherDetailPlaceholder" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 h-full flex flex-col justify-center items-center p-8 text-center shrink-0 w-full">
                     <div class="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-4xl shadow-inner mb-5 animate-pulse">🔍</div>
-                    <h3 class="font-black text-slate-800 text-xl">학생별 포트폴리오 정밀 분석기</h3>
-                    <p class="text-slate-400 text-sm mt-3 leading-relaxed">좌측 학생 명부에서 분석할 학생을 클릭해 주세요.<br>3개년 전체 탐구 활동 리포트, 학년별 누적 수치 통계표,<br>선생님 전용 피드백 수록 공간이 <strong>여기에 와이드하게 펼쳐집니다.</strong></p>
+                    <h3 class="font-black text-slate-800 text-xl">학생별 포트폴리오 엑셀 뷰어</h3>
+                    <p class="text-slate-400 text-sm mt-3 leading-relaxed">좌측 학생 명부에서 분석할 학생을 클릭해 주세요.<br>3개년 전체 탐구 활동 리포트, 학년별 누적 수치 통계표,<br>선생님 전용 피드백 수록 공간이 <strong>엑셀 표 형식으로 로드됩니다.</strong></p>
                 </div>
 
                 <div id="teacherDetailCard" class="bg-slate-50 rounded-2xl lg:rounded-3xl shadow-inner border border-slate-200 h-full flex-col overflow-hidden hidden w-full">
@@ -386,15 +400,16 @@
                         <div class="flex flex-col items-center sm:items-start w-full sm:w-auto text-center sm:text-left flex-1 min-w-0">
                             <div class="flex items-center justify-center sm:justify-start gap-3 w-full">
                                 <h2 class="text-xl lg:text-2xl font-black text-slate-900 tracking-tight truncate" id="detailStudentName">로딩 중</h2>
-                                <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded-md shadow-sm shrink-0">분석 뷰어</span>
+                                <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded-md shadow-sm shrink-0">엑셀 분석 뷰어</span>
                             </div>
                             <p class="text-sm font-bold text-slate-500 mt-1.5 truncate w-full" id="detailStudentInfo"></p>
                         </div>
                         <div class="flex gap-2 shrink-0 mt-3 sm:mt-0 w-full sm:w-auto justify-center sm:justify-end">
-                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-3 rounded-xl transition shadow-md flex items-center gap-2 min-h-[44px]">🖨️ 통합 인쇄</button>
+                            <button onclick="window.printTeacherPortfolio()" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-3 rounded-xl transition shadow-md flex items-center gap-2 min-h-[44px]">🖨️ 전체 엑셀 표 인쇄</button>
                             <button onclick="window.closeStudentDetail()" type="button" class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-bold px-5 py-3 rounded-xl transition shadow-sm min-h-[44px]">🔙 닫기</button>
                         </div>
                     </div>
+                    <!-- 🌟 엑셀 테이블 뷰 영역 -->
                     <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 no-scrollbar bg-slate-50 w-full min-h-[300px] lg:min-h-0">
                         <div id="teacherStatsContainer" class="mb-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hidden"></div>
                         <div id="teacherPortfolioList" class="flex flex-col gap-6"></div>
@@ -488,7 +503,7 @@
         </div>
     </div>
 
-    <!-- 🖨️ 보고서 출력을 위한 네이티브 인쇄 템플릿 영역 -->
+    <!-- 🖨️ 인쇄 전용 템플릿 영역 -->
     <div id="pdfExportContainer" class="print:block">
         <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #1e293b; padding-bottom: 10px;">
             <h1 style="font-size: 24px; font-weight: 900; color: #0f172a; letter-spacing: 4px; margin: 0 0 15px 0;">학생 진로 포트폴리오 종합 보고서</h1>
@@ -507,26 +522,45 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm'
 
         // =========================================================================
-        // 🌟 1. 글로벌 스크립트 파이프라인 (인쇄 에러 및 참조 참조 방어)
+        // 🌟 전역 함수 선언 공간
         // =========================================================================
         
         window.generatePdfHtml = (portfolios) => {
-            let pdfHtml = '';
+            let pdfHtml = `
+                <table class="pdf-table excel-pdf-table">
+                    <thead>
+                        <tr>
+                            <th style="width:8%;">실행</th>
+                            <th style="width:12%;">학년-학기</th>
+                            <th style="width:10%;">영역</th>
+                            <th style="width:18%;">활동명</th>
+                            <th style="width:34%;">탐구 및 성찰 내용</th>
+                            <th style="width:18%;">교사 피드백</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
             portfolios.forEach((item) => {
                 let execution = '참여함', year = '', simpleContent = item.content, reading = '';
                 try { const parsed = JSON.parse(item.content); execution = parsed.execution || '참여함'; year = parsed.year || ''; simpleContent = parsed.simple_content || ''; reading = parsed.reading || ''; } catch (e) { simpleContent = item.content; }
-                const fb = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : (item.feedbacks ? item.feedbacks.feedback_content : '');
+                const fb = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : '';
 
                 pdfHtml += `
-                    <table class="pdf-table">
-                        <tr><th>영 역</th><td style="width:20%; font-weight:bold;">${item.area}</td><th>기 간</th><td style="width:20%; font-weight:bold;">${year ? year+'학년도 ' : ''}${item.semester}학기</td><th>상 태</th><td style="width:20%; font-weight:bold; color: #475569;">${execution}</td></tr>
-                        <tr><th>활 동 명</th><td colspan="5" style="font-size:11.5pt; font-weight:900; color: #0f172a;">${item.activity_name}</td></tr>
-                        <tr><th>주 요 내 용</th><td colspan="5">${simpleContent}</td></tr>
-                        ${reading ? `<tr><th>연 계 독 서</th><td colspan="5" style="font-weight:bold; color:#1d4ed8;">${reading}</td></tr>` : ''}
-                        <tr><th>자 기 평 가</th><td colspan="5" style="white-space:pre-wrap;">${item.self_evaluation}</td></tr>
-                        ${fb ? `<tr><th>교사 피드백</th><td colspan="5" style="white-space:pre-wrap; color:#1e40af; background-color:#f8fafc;">${fb}</td></tr>` : ''}
-                    </table>`;
+                    <tr>
+                        <td style="text-align:center; font-weight:bold; color: ${execution==='참여함'?'#2563eb':'#e11d48'};">${execution}</td>
+                        <td style="text-align:center;">${item.grade}학년 ${item.semester}학기</td>
+                        <td style="text-align:center; font-weight:bold;">${item.area}</td>
+                        <td style="font-weight:900;">${item.activity_name}</td>
+                        <td>
+                            <div style="margin-bottom: 6px;"><strong>[요약]</strong> ${simpleContent}</div>
+                            ${reading ? `<div style="margin-bottom: 6px; color: #1d4ed8;"><strong>[독서]</strong> ${reading}</div>` : ''}
+                            <div><strong>[성찰]</strong><br><span style="white-space:pre-wrap;">${item.self_evaluation}</span></div>
+                        </td>
+                        <td style="white-space:pre-wrap; background-color:#f8fafc; font-size:9.5pt;">${fb}</td>
+                    </tr>
+                `;
             });
+            pdfHtml += `</tbody></table>`;
             return pdfHtml;
         };
 
@@ -774,7 +808,7 @@
                     });
                     feedContainer.innerHTML = html;
                 }
-            } catch (err) { feedContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-10 font-medium">데이터 지연: ${err.message}</p>`; }
+            } catch (err) { feedContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-10 font-medium">데이터 지연</p>`; }
 
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL); if (!response.ok) throw new Error("Google sync issue");
@@ -791,7 +825,7 @@
         };
 
         // =========================================================================
-        // 📱 [데스크톱 및 모바일 뷰 제어 엔진] (클래스 꼬임 방어 100%)
+        // 📱 [모바일 탭 바 토글 제어 엔진]
         // =========================================================================
         const tabBtnList = document.getElementById('tabBtnList'); const tabBtnEvents = document.getElementById('tabBtnEvents');
         const tabBtnTimeline = document.getElementById('tabBtnTimeline'); const tabBtnDetail = document.getElementById('tabBtnDetail');
@@ -916,8 +950,8 @@
 
             document.querySelectorAll('.grade-tab').forEach(tab => {
                 tab.onclick = (e) => {
-                    document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
-                    e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
+                    document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition");
+                    e.target.className = "grade-tab active-tab flex-1 min-w-[120px] py-3 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
                     window.currentStudentGrade = parseInt(e.target.dataset.grade); document.getElementById('pfGrade').value = window.currentStudentGrade; loadStudentPortfolios(window.currentStudentGrade);
                 }
             });
@@ -946,7 +980,7 @@
             try {
                 if (window.editingPortfolioId) { await supabase.from('portfolios').update(data).eq('id', window.editingPortfolioId); window.showToast("수정 완료!", 'success'); } 
                 else { await supabase.from('portfolios').insert([data]); window.showToast("등록 완료!", 'success'); }
-                window.currentStudentGrade = inputGrade; document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3.5 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition"); document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3.5 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
+                window.currentStudentGrade = inputGrade; document.querySelectorAll('.grade-tab').forEach(t => t.className = "grade-tab flex-1 min-w-[120px] py-3 text-center font-bold text-sm text-slate-400 hover:text-slate-700 transition"); document.querySelector(`.grade-tab[data-grade="${inputGrade}"]`).className = "grade-tab active-tab flex-1 min-w-[120px] py-3 text-center font-black text-sm text-blue-600 border-b-2 border-blue-600 transition";
                 window.cancelEditPortfolio(); await loadStudentPortfolios(window.currentStudentGrade); 
             } catch (err) { window.showToast("오류 발생", 'error'); } finally { window.hideLoading(); }
         });
@@ -955,47 +989,70 @@
             window.editingPortfolioId = null; document.getElementById('portfolioForm').reset(); document.getElementById('pfYearInput').value = window.currentUserProfile.admission_year || new Date().getFullYear(); document.getElementById('pfGrade').value = window.currentStudentGrade; document.getElementById('portfolioFormTitle').innerText = '✍️ 학업 및 진로 탐구 활동 등록'; document.getElementById('submitPortfolioBtn').innerText = '포트폴리오 영구 등록 ➔'; document.getElementById('cancelEditBtn').classList.add('hidden');
         };
 
+        // 엑셀 표 스타일 렌더링 헬퍼 (학생 화면 전용)
+        function renderStudentPortfoliosFiltered() {
+            const container = document.getElementById('portfolioList'); const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim(); const areaFilter = document.getElementById('studentAreaFilter').value;
+            let filtered = window.cachedPortfolios.filter(item => item.grade === window.currentStudentGrade);
+            if (areaFilter) { if (areaFilter === "교과") filtered = filtered.filter(item => item.area === "교과"); else filtered = filtered.filter(item => item.area === areaFilter); }
+            if (keyword) { filtered = filtered.filter(item => { let text = (item.activity_name || '') + ' ' + (item.self_evaluation || ''); try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || '') + ' ' + (p.reading || ''); } catch(e) { text += ' ' + (item.content || ''); } return text.toLowerCase().includes(keyword); }); }
+            
+            if (filtered.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 text-sm font-bold">내역이 없습니다.</p></div>'; return; }
+            
+            let html = `
+            <div class="overflow-x-auto rounded-2xl border border-slate-300 shadow-sm">
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">실행</th>
+                            <th style="width: 10%;">학년-학기</th>
+                            <th style="width: 10%;">기록 영역</th>
+                            <th style="width: 20%;">행사명/동아리명</th>
+                            <th style="width: 42%;">탐구 내용 요약 및 성찰 (독서)</th>
+                            <th style="width: 10%;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filtered.forEach(item => {
+                let execution = '참여함', year = '', simpleContent = item.content, reading = ''; try { const parsed = JSON.parse(item.content); execution = parsed.execution || '참여함'; year = parsed.year || ''; simpleContent = parsed.simple_content || ''; reading = parsed.reading || ''; } catch (e) { simpleContent = item.content; }
+                const areaColor = item.area === '교과' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'; 
+                const fbText = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : (item.feedbacks ? item.feedbacks.feedback_content : null);
+                
+                html += `
+                    <tr class="group transition-colors">
+                        <td class="text-center font-black ${execution === '참여함' ? 'text-blue-600' : 'text-rose-500'}">${execution}</td>
+                        <td class="text-center font-bold text-slate-600">${item.grade}학년 ${item.semester}학기</td>
+                        <td class="text-center"><span class="px-3 py-1 text-xs font-bold rounded-full ${areaColor}">${item.area}</span></td>
+                        <td class="font-black text-slate-800 whitespace-normal break-keep">${item.activity_name}</td>
+                        <td class="whitespace-normal min-w-[320px]">
+                            <div class="text-sm text-slate-700 font-medium mb-1"><span class="font-bold text-slate-400 mr-1">요약:</span>${simpleContent}</div>
+                            ${reading ? `<div class="text-sm text-blue-700 font-medium mb-1"><span class="font-bold text-blue-400 mr-1">독서:</span>${reading}</div>` : ''}
+                            <div class="text-sm text-slate-800 mt-2 leading-relaxed"><span class="font-bold text-slate-400 block mb-1">성찰:</span><span class="whitespace-pre-wrap">${item.self_evaluation}</span></div>
+                            ${fbText ? `<div class="mt-3 text-xs text-indigo-700 bg-indigo-50/80 px-3 py-2.5 rounded-lg font-medium"><strong class="mr-1">교사 피드백:</strong>${fbText}</div>` : ''}
+                        </td>
+                        <td class="text-center space-y-2">
+                            <button onclick="window.editActivity('${item.id}')" class="block w-full text-xs bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-600 px-3 py-2 rounded-lg shadow-sm font-bold transition">수정</button>
+                            <button onclick="window.deleteActivity('${item.id}')" class="block w-full text-xs bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600 px-3 py-2 rounded-lg shadow-sm font-bold transition">삭제</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+
         async function loadStudentPortfolios(grade) {
             const container = document.getElementById('portfolioList'); container.innerHTML = '<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 font-bold">이력을 동기화하고 있습니다...</p></div>';
             try {
-                const { data: pfs, error: pfErr } = await supabase.from('portfolios').select('*').eq('student_uid', window.currentUser.id).order('updated_at', { ascending: false });
-                if (pfErr) throw pfErr;
-                
-                const { data: fbs } = await supabase.from('feedbacks').select('*');
-                const merged = (pfs || []).map(p => { const fb = (fbs||[]).find(f => f.portfolio_id === p.id); return { ...p, feedbacks: fb ? [fb] : [] }; });
-                
-                window.cachedPortfolios = merged; localStorage.setItem('eduport-cached-portfolios', JSON.stringify(window.cachedPortfolios));
+                const { data, error } = await supabase.from('portfolios').select('*, feedbacks(feedback_content)').eq('student_uid', window.currentUser.id).order('updated_at', { ascending: false });
+                if (error) throw error; window.cachedPortfolios = data || []; localStorage.setItem('eduport-cached-portfolios', JSON.stringify(window.cachedPortfolios));
                 const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(window.calculateStats(window.cachedPortfolios)); statsContainer.classList.remove('hidden'); renderStudentPortfoliosFiltered();
             } catch (err) { 
                 container.innerHTML = `<div class="text-center py-20 bg-white rounded-3xl border border-slate-200"><p class="text-xs text-slate-400 font-bold">오프라인 모드로 기록을 표시합니다.</p></div>`; 
                 const cachedPfs = localStorage.getItem('eduport-cached-portfolios');
                 if (cachedPfs) { window.cachedPortfolios = JSON.parse(cachedPfs); const statsContainer = document.getElementById('studentStatsSection'); statsContainer.innerHTML = window.renderStatsHTML(window.calculateStats(window.cachedPortfolios)); statsContainer.classList.remove('hidden'); renderStudentPortfoliosFiltered(); }
             }
-        }
-
-        function renderStudentPortfoliosFiltered() {
-            const container = document.getElementById('portfolioList'); const keyword = document.getElementById('studentSearchInput').value.toLowerCase().trim(); const areaFilter = document.getElementById('studentAreaFilter').value;
-            let filtered = window.cachedPortfolios.filter(item => item.grade === window.currentStudentGrade);
-            if (areaFilter) { if (areaFilter === "교과") filtered = filtered.filter(item => item.area === "교과"); else filtered = filtered.filter(item => item.area === areaFilter); }
-            if (keyword) { filtered = filtered.filter(item => { let text = (item.activity_name || '') + ' ' + (item.self_evaluation || ''); try { const p = JSON.parse(item.content); text += ' ' + (p.simple_content || '') + ' ' + (p.reading || ''); } catch(e) { text += ' ' + (item.content || ''); } return text.toLowerCase().includes(keyword); }); }
-            if (filtered.length === 0) { container.innerHTML = '<div class="text-center py-16 bg-white rounded-3xl border border-slate-200"><p class="text-slate-400 text-sm font-bold">내역이 없습니다.</p></div>'; return; }
-            let html = '';
-            filtered.forEach(item => {
-                let execution = '참여함', year = '', simpleContent = item.content, reading = ''; try { const parsed = JSON.parse(item.content); execution = parsed.execution || '참여함'; year = parsed.year || ''; simpleContent = parsed.simple_content || ''; reading = parsed.reading || ''; } catch (e) { simpleContent = item.content; }
-                const areaColor = item.area === '교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'; const fbText = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : (item.feedbacks ? item.feedbacks.feedback_content : null);
-                html += `<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm relative group flex flex-col hover:border-blue-300 transition">
-                            <div class="absolute top-4 right-4 flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity no-print">
-                                <button onclick="window.editActivity('${item.id}')" class="text-xs bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-600 px-3 py-1.5 rounded font-bold transition">수정</button>
-                                <button onclick="window.deleteActivity('${item.id}')" class="text-xs bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600 px-3 py-1.5 rounded font-bold transition">삭제</button>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2 pr-20 mb-3"><span class="px-2 py-1 ${areaColor} border rounded text-xs font-bold">${item.area}</span><span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">${year ? year+'년 ' : ''}${item.semester}학기 / ${execution}</span><h3 class="text-base font-black text-slate-900 ml-1 truncate">${item.activity_name}</h3></div>
-                            <div class="text-sm text-slate-600 leading-relaxed font-medium mb-1.5"><span class="font-bold text-slate-400">요약:</span> ${simpleContent}</div>
-                            ${reading ? `<div class="text-sm text-blue-700 leading-relaxed font-medium mb-1.5"><span class="font-bold text-blue-400">독서:</span> ${reading}</div>` : ''}
-                            <div class="text-sm text-slate-700 leading-relaxed mt-2"><span class="font-bold text-slate-400">성찰:</span> <span class="whitespace-pre-wrap">${item.self_evaluation}</span></div>
-                            ${fbText ? `<div class="mt-4 text-xs text-indigo-700 bg-indigo-50 px-4 py-3 rounded-xl font-medium"><strong class="mr-1">교사피드백:</strong>${fbText}</div>` : ''}
-                        </div>`;
-            });
-            container.innerHTML = html;
         }
 
         window.editActivity = (id) => {
@@ -1253,31 +1310,45 @@
                 window.teacherCachedPortfolios = mergedData || []; 
                 const stats = window.calculateStats(window.teacherCachedPortfolios); const teacherStatsContainer = document.getElementById('teacherStatsContainer'); teacherStatsContainer.innerHTML = window.renderStatsHTML(stats); teacherStatsContainer.classList.remove('hidden');
                 
-                let html = '';
+                // 🌟 엑셀 테이블 뷰 형식으로 랜더링
+                let html = `
+                    <div class="overflow-x-auto rounded-2xl border border-slate-300 shadow-sm bg-white">
+                        <table class="excel-table w-full text-sm text-left">
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%;">실행</th>
+                                    <th style="width: 10%;">학년-학기</th>
+                                    <th style="width: 10%;">영역</th>
+                                    <th style="width: 17%;">활동명</th>
+                                    <th style="width: 35%;">탐구 내용 (요약/독서/성찰)</th>
+                                    <th style="width: 20%;">선생님 피드백 입력</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
                 mergedData.forEach(item => {
                     const fb = (item.feedbacks && item.feedbacks.length > 0) ? item.feedbacks[0].feedback_content : '';
                     let execution = '참여함', year = '', simpleContent = item.content, reading = '';
-                    try { const p = JSON.parse(item.content); execution = p.execution || '참여함'; year = p.year || ''; simpleContent = p.simple_content || ''; reading = p.reading || ''; } catch (e) {}
-                    const areaColor = item.area === '교과' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                    try { const p = JSON.parse(item.content); execution = p.execution || '참여함'; year = p.year || ''; simpleContent = p.simple_content || ''; reading = p.reading || ''; } catch (e) { simpleContent = item.content; }
+                    const areaColor = item.area === '교과' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200';
                     html += `
-                        <div class="bg-white border border-slate-200 rounded-3xl p-6 lg:p-8 shadow-sm mb-6 flex flex-col gap-4">
-                            <div class="flex flex-wrap items-center gap-3 pr-2">
-                                <span class="px-3 py-1.5 ${areaColor} border rounded-lg text-xs font-bold">${item.grade}학년 ${item.area}</span>
-                                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">${item.semester}학기 / ${execution}</span>
-                                <h3 class="text-lg font-black text-slate-900 ml-1 w-full mt-2 sm:mt-0 sm:w-auto">${item.activity_name}</h3>
-                            </div>
-                            <div class="grid grid-cols-1 gap-3 text-sm text-slate-600 bg-slate-50 p-5 rounded-2xl border border-slate-100 mt-2">
-                                <div class="flex items-start gap-3"><span class="font-bold text-slate-400 min-w-[40px]">요약:</span> <span class="font-medium">${simpleContent}</span></div>
-                                ${reading ? `<div class="flex items-start gap-3"><span class="font-bold text-blue-400 min-w-[40px]">독서:</span> <span class="font-bold text-blue-700">${reading}</span></div>` : ''}
-                                <div class="flex items-start gap-3"><span class="font-bold text-slate-400 min-w-[40px]">성찰:</span> <span class="font-medium whitespace-pre-wrap leading-relaxed text-slate-800">${item.self_evaluation}</span></div>
-                            </div>
-                            <div class="pt-4">
-                                <label class="block text-xs font-black text-blue-600 mb-2">💬 교사 피드백 조언</label>
-                                <textarea id="fb_${item.id}" class="w-full p-4 border border-slate-200 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition leading-relaxed" rows="3" placeholder="피드백 작성...">${fb || ''}</textarea>
-                                <div class="flex justify-end mt-3"><button type="button" onclick="window.saveFeedback('${item.id}')" class="bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold px-8 py-3.5 rounded-xl transition shadow-md">저장 및 전송 ➔</button></div>
-                            </div>
-                        </div>`;
+                        <tr class="group transition-colors">
+                            <td class="text-center font-black ${execution === '참여함' ? 'text-blue-600' : 'text-rose-500'}">${execution}</td>
+                            <td class="text-center font-bold text-slate-600">${item.grade}학년 ${item.semester}학기</td>
+                            <td class="text-center"><span class="px-3 py-1 text-xs font-bold rounded-full ${areaColor}">${item.area}</span></td>
+                            <td class="font-black text-slate-800 whitespace-normal break-keep">${item.activity_name}</td>
+                            <td class="whitespace-normal min-w-[300px]">
+                                <div class="text-sm text-slate-700 font-medium mb-1"><span class="font-bold text-slate-400 mr-1">요약:</span>${simpleContent}</div>
+                                ${reading ? `<div class="text-sm text-blue-700 font-medium mb-1"><span class="font-bold text-blue-400 mr-1">독서:</span>${reading}</div>` : ''}
+                                <div class="text-sm text-slate-800 mt-2 leading-relaxed"><span class="font-bold text-slate-400 block mb-1">성찰:</span><span class="whitespace-pre-wrap">${item.self_evaluation}</span></div>
+                            </td>
+                            <td class="align-top min-w-[200px]">
+                                <textarea id="fb_${item.id}" class="w-full p-3 border border-slate-300 text-xs rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 focus:bg-white transition leading-relaxed min-h-[100px]" placeholder="피드백 작성...">${fb || ''}</textarea>
+                                <div class="flex justify-end mt-2"><button type="button" onclick="window.saveFeedback('${item.id}')" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl transition shadow-md w-full">저장 및 반영</button></div>
+                            </td>
+                        </tr>`;
                 });
+                html += `</tbody></table></div>`;
                 container.innerHTML = html;
             } catch (err) { container.innerHTML = `<div class="text-center py-16 bg-white rounded-3xl border border-red-200"><p class="text-sm text-red-500 font-bold">오류 발생: 연결이 불안정합니다.</p></div>`; }
         };

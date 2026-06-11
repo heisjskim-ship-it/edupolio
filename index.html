@@ -334,8 +334,8 @@
         <main class="max-w-[1600px] mx-auto w-full px-3 sm:px-6 py-4 lg:py-6 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden relative z-10 no-print">
             
             <!-- [Col 1: 학생 명부 + 일정] 넓이 25% 할당 (lg:col-span-3) -->
-            <div id="teacherLeftWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden lg:flex w-full">
-                <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[380px] lg:min-h-0 overflow-hidden flex flex-col">
+            <div id="teacherLeftWrapper" class="lg:col-span-3 flex flex-col gap-4 lg:gap-5 h-full min-h-0 shrink-0 hidden w-full">
+                <div id="teacherListCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-col flex-1 lg:flex-[3] min-h-[380px] lg:min-h-0 overflow-hidden flex">
                     <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 shrink-0">
                         <h2 class="font-black text-slate-900 text-lg flex justify-between items-center">
                             <span>👥 학생 명부</span>
@@ -356,7 +356,7 @@
                     </ul>
                 </div>
 
-                <div id="teacherEventsCard" class="bg-slate-900 p-5 rounded-2xl lg:rounded-3xl shadow-xl border border-slate-800 flex-col flex-1 lg:flex-[2] min-h-[280px] lg:min-h-0 relative overflow-hidden hidden lg:flex flex-col">
+                <div id="teacherEventsCard" class="bg-slate-900 p-5 rounded-2xl lg:rounded-3xl shadow-xl border border-slate-800 flex-col flex-1 lg:flex-[2] min-h-[280px] lg:min-h-0 relative overflow-hidden hidden flex-col">
                     <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]"></div>
                     <div class="relative z-10 flex items-center justify-between mb-4 border-b border-slate-700 pb-3 shrink-0">
                         <h2 class="font-black text-white text-base">🏫 학사 일정 연동</h2>
@@ -373,7 +373,7 @@
             </div>
 
             <!-- [Col 2: 타임라인] 넓이 25% 할당 (lg:col-span-3) -->
-            <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-1 lg:col-span-3 min-h-[400px] lg:min-h-0 overflow-hidden hidden lg:flex flex-col w-full">
+            <div id="teacherTimelineCard" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 flex-1 lg:col-span-3 min-h-[400px] lg:min-h-0 overflow-hidden hidden flex-col w-full">
                 <div class="border-b border-slate-100 p-5 pb-3 shrink-0">
                     <h2 class="font-black text-slate-900 text-lg mb-3">📊 실시간 관제 랭킹</h2>
                     <div class="flex flex-col gap-2 w-full">
@@ -388,7 +388,7 @@
             </div>
 
             <!-- [Col 3: 상세 분석 모드] 넓이 50%의 광활한 캔버스 (lg:col-span-6) -->
-            <div id="teacherRightWrapper" class="lg:col-span-6 h-full min-h-0 flex flex-col flex-1 w-full relative hidden lg:flex">
+            <div id="teacherRightWrapper" class="lg:col-span-6 h-full min-h-0 flex flex-col flex-1 w-full relative hidden">
                 
                 <div id="teacherDetailPlaceholder" class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 h-full flex flex-col justify-center items-center p-8 text-center shrink-0 w-full">
                     <div class="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-4xl shadow-inner mb-5 animate-pulse">🔍</div>
@@ -678,6 +678,11 @@
             try { const parsed = JSON.parse(contentStr); return `[${parsed.execution || '참여함'}] ${parsed.simple_content || ''}`; } catch(e) { return contentStr; }
         }
 
+        function blindName(name) {
+            if (!name || name.length < 2) return name[0] + '*';
+            return name[0] + '*'.repeat(name.length - 1);
+        }
+
         // =========================================================================
         // 🌟 [무한 로딩 및 꼬임 버그 박멸] 정석적인 동기식 인증 초기화
         // =========================================================================
@@ -712,15 +717,177 @@
         function switchView(viewName) {
             document.getElementById('authView').classList.add('hidden'); document.getElementById('studentView').classList.add('hidden'); document.getElementById('teacherView').classList.add('hidden'); document.getElementById('adminPanelModal').classList.add('hidden');
             if (viewName === 'auth') { 
-                document.getElementById('authView').classList.remove('hidden'); window.loadHomeLiveBoard(); 
+                document.getElementById('authView').classList.remove('hidden');
+                window.loadHomeLiveBoard();
             }
-            else if (viewName === 'student') document.getElementById('studentView').classList.remove('hidden');
+            else if (viewName === 'student') {
+                document.getElementById('studentView').classList.remove('hidden');
+                document.getElementById('studentView').classList.add('flex');
+            }
             else if (viewName === 'teacher') { 
                 const tv = document.getElementById('teacherView'); tv.classList.remove('hidden'); tv.classList.add('flex');
                 if (window.innerWidth < 1024) { window.setMobileActiveTab('list'); } 
                 else { window.setDesktopView(); }
             }
         }
+
+        // =========================================================================
+        // 🏠 [홈 화면 라이브보드 로더 - window 노출 필수]
+        // =========================================================================
+        window.loadHomeLiveBoard = async () => {
+            const feedContainer = document.getElementById('homeTimelineFeed');
+            const eventContainer = document.getElementById('homeEventsList');
+            if (!feedContainer) return;
+            try {
+                const { data, error } = await supabase.from('portfolios').select('*, profiles(name, student_id)').order('updated_at', { ascending: false }).limit(6);
+                if (error) throw error;
+                const finalData = data || [];
+                if (finalData.length === 0) {
+                    feedContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10 font-bold">최근 업데이트된 기록이 없습니다.</p>';
+                } else {
+                    let html = '';
+                    finalData.forEach(item => {
+                        const updateDate = new Date(item.updated_at || item.created_at || new Date());
+                        const formatUpdate = `${String(updateDate.getMonth()+1).padStart(2,'0')}/${String(updateDate.getDate()).padStart(2,'0')}`;
+                        const maskedName = blindName(item.profiles?.name || '학생');
+                        const summary = formatContentSummary(item.content);
+                        html += `<div class="p-4 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-2 hover:bg-slate-800/60 transition">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-blue-300 font-bold bg-blue-950/40 border border-blue-900/50 px-2 py-0.5 rounded">${item.grade}학년 / ${item.area}</span>
+                                <span class="text-slate-500 font-medium">${formatUpdate}</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-200 truncate">${item.activity_name}</h4>
+                            <div class="text-[10px] text-slate-500 flex justify-between pt-1 border-t border-slate-800/50 font-medium">
+                                <span>작성자: ${maskedName}</span><span class="text-emerald-400">실시간 연동 ✓</span>
+                            </div>
+                        </div>`;
+                    });
+                    feedContainer.innerHTML = html;
+                }
+            } catch(err) {
+                if (feedContainer) feedContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">데이터 지연</p>';
+            }
+
+            if (!eventContainer) return;
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                if (!response.ok) throw new Error('network');
+                const csvData = await response.text(); const rows = csvData.split('\n').slice(1);
+                let html = ''; let count = 0;
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i].trim(); if (!row) continue;
+                    const cols = row.split(',').map(c => c.replace(/^"|"$/g,'').trim()); if (cols.length < 2) continue;
+                    const eventName = cols[1], recordArea = cols[2], startMonth = cols[3], mainContent = cols[6] || '세부내용 참조';
+                    html += `<div class="p-4 border border-slate-700/50 bg-slate-900/40 rounded-xl space-y-2">
+                        <div class="flex items-center justify-between mb-1">
+                            <h4 class="text-sm font-bold text-white truncate max-w-[160px]">[${recordArea}] ${eventName}</h4>
+                            <span class="text-xs bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2 py-0.5 rounded">${startMonth||'3'}월</span>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed line-clamp-2">${mainContent}</p>
+                    </div>`;
+                    count++; if (count >= 5) break;
+                }
+                eventContainer.innerHTML = html || '<p class="text-xs text-slate-500 text-center py-10 font-bold">일정이 없습니다.</p>';
+            } catch(err) {
+                if (eventContainer) eventContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-10">네트워크 연동 대기 중...</p>';
+            }
+        };
+
+        // =========================================================================
+        // 🖥️ [PC 데스크탑 뷰 레이아웃 제어 - window 노출 필수]
+        // =========================================================================
+        window.setDesktopView = function() {
+            const wLeft = document.getElementById('teacherLeftWrapper');
+            const wRight = document.getElementById('teacherRightWrapper');
+            const cPlaceholder = document.getElementById('teacherDetailPlaceholder');
+            const cDetail = document.getElementById('teacherDetailCard');
+
+            if (wLeft) { wLeft.classList.remove('hidden'); wLeft.classList.add('flex'); }
+            if (wRight) { wRight.classList.remove('hidden'); wRight.classList.add('flex'); }
+
+            if (window.selectedStudentUid) {
+                if (cPlaceholder) cPlaceholder.classList.add('hidden');
+                if (cDetail) { cDetail.classList.remove('hidden'); cDetail.classList.add('flex'); }
+            } else {
+                if (cPlaceholder) cPlaceholder.classList.remove('hidden');
+                if (cDetail) { cDetail.classList.add('hidden'); cDetail.classList.remove('flex'); }
+            }
+        };
+
+        // =========================================================================
+        // 📱 [모바일 탭 바 토글 - window 노출 필수]
+        // =========================================================================
+        window.setMobileActiveTab = function(tab) {
+            if (window.innerWidth >= 1024) return;
+            const inactive = "flex-1 text-sm font-bold text-slate-400 border-b-4 border-transparent transition-all min-h-[44px]";
+            const active   = "flex-1 text-sm font-black text-blue-600 border-b-4 border-blue-600 transition-all bg-blue-50/40 min-h-[44px]";
+
+            const tabBtnList = document.getElementById('tabBtnList');
+            const tabBtnEvents = document.getElementById('tabBtnEvents');
+            const tabBtnTimeline = document.getElementById('tabBtnTimeline');
+            const tabBtnDetail = document.getElementById('tabBtnDetail');
+
+            if (tabBtnList) tabBtnList.className = inactive;
+            if (tabBtnEvents) tabBtnEvents.className = inactive;
+            if (tabBtnTimeline) tabBtnTimeline.className = inactive;
+            if (tabBtnDetail) tabBtnDetail.className = inactive;
+
+            const wLeft = document.getElementById('teacherLeftWrapper');
+            const wRight = document.getElementById('teacherRightWrapper');
+            const cList = document.getElementById('teacherListCard');
+            const cEvents = document.getElementById('teacherEventsCard');
+            const cTimeline = document.getElementById('teacherTimelineCard');
+            const cPlaceholder = document.getElementById('teacherDetailPlaceholder');
+            const cDetail = document.getElementById('teacherDetailCard');
+
+            // 전체 숨김 초기화
+            [wLeft, wRight, cList, cEvents, cTimeline].forEach(el => {
+                if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+            });
+            if (cPlaceholder) cPlaceholder.classList.add('hidden');
+            if (cDetail) { cDetail.classList.add('hidden'); cDetail.classList.remove('flex'); }
+
+            if (tab === 'list') {
+                if (tabBtnList) tabBtnList.className = active;
+                if (wLeft) { wLeft.classList.remove('hidden'); wLeft.classList.add('flex'); }
+                if (cList) { cList.classList.remove('hidden'); cList.classList.add('flex'); }
+            } else if (tab === 'events') {
+                if (tabBtnEvents) tabBtnEvents.className = active;
+                if (wLeft) { wLeft.classList.remove('hidden'); wLeft.classList.add('flex'); }
+                if (cEvents) { cEvents.classList.remove('hidden'); cEvents.classList.add('flex'); }
+            } else if (tab === 'timeline') {
+                if (tabBtnTimeline) tabBtnTimeline.className = active;
+                if (wRight) { wRight.classList.remove('hidden'); wRight.classList.add('flex'); }
+                if (cTimeline) { cTimeline.classList.remove('hidden'); cTimeline.classList.add('flex'); }
+            } else if (tab === 'detail') {
+                if (tabBtnDetail) tabBtnDetail.className = active;
+                if (wRight) { wRight.classList.remove('hidden'); wRight.classList.add('flex'); }
+                if (cDetail) { cDetail.classList.remove('hidden'); cDetail.classList.add('flex'); }
+            }
+        };
+
+        // 탭 버튼 이벤트 연결 (DOM ready 후 처리)
+        (function wireTabButtons() {
+            const tabBtnList = document.getElementById('tabBtnList');
+            const tabBtnEvents = document.getElementById('tabBtnEvents');
+            const tabBtnTimeline = document.getElementById('tabBtnTimeline');
+            const tabBtnDetail = document.getElementById('tabBtnDetail');
+            if (tabBtnList) tabBtnList.addEventListener('click', () => window.setMobileActiveTab('list'));
+            if (tabBtnEvents) tabBtnEvents.addEventListener('click', () => window.setMobileActiveTab('events'));
+            if (tabBtnTimeline) tabBtnTimeline.addEventListener('click', () => window.setMobileActiveTab('timeline'));
+            if (tabBtnDetail) tabBtnDetail.addEventListener('click', () => { if (window.selectedStudentUid) window.setMobileActiveTab('detail'); });
+        })();
+
+        // 화면 크기 변경 시 레이아웃 재적용
+        window.addEventListener('resize', () => {
+            if (!document.getElementById('teacherView').classList.contains('flex')) return;
+            if (window.innerWidth >= 1024) {
+                window.setDesktopView();
+            } else {
+                if (!window.selectedStudentUid) window.setMobileActiveTab('list');
+                else window.setMobileActiveTab('detail');
+            }
+        });
 
         // 제로 레이턴시 렌더링 (Offline First)
         function bootFromCache(cachedProfileStr) {
@@ -1039,7 +1206,9 @@
         window.closeStudentDetail = () => {
             window.selectedStudentUid = null;
             if (window.innerWidth < 1024) { 
-                window.setMobileActiveTab('list'); tabBtnDetail.disabled = true; tabBtnDetail.innerText = "🔍 분석"; 
+                window.setMobileActiveTab('list');
+                const tabBtnDetail = document.getElementById('tabBtnDetail');
+                if (tabBtnDetail) { tabBtnDetail.disabled = true; tabBtnDetail.innerText = "🔍 분석"; }
             } else { 
                 window.setDesktopView();
             }
@@ -1125,8 +1294,10 @@
             document.querySelectorAll('.student-item').forEach(el => {
                 el.onclick = () => {
                     window.selectedStudentUid = el.dataset.uid;
-                    if (window.innerWidth < 1024) { 
-                        window.setMobileActiveTab('detail'); tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${el.dataset.name} 분석`; 
+                    if (window.innerWidth < 1024) {
+                        const tabBtnDetail = document.getElementById('tabBtnDetail');
+                        if (tabBtnDetail) { tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${el.dataset.name} 분석`; }
+                        window.setMobileActiveTab('detail');
                     } else { 
                         window.setDesktopView();
                     }
@@ -1202,8 +1373,11 @@
         window.showDirectStudentDetail = async (studentUid) => {
             const student = window.cachedStudents.find(s => s.id === studentUid); if (!student) return;
             window.selectedStudentUid = studentUid;
-            if (window.innerWidth < 1024) { window.setMobileActiveTab('detail'); tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${student.name} 분석`; } 
-            else { window.setDesktopView(); }
+            if (window.innerWidth < 1024) {
+                const tabBtnDetail = document.getElementById('tabBtnDetail');
+                if (tabBtnDetail) { tabBtnDetail.disabled = false; tabBtnDetail.innerText = `🔍 ${student.name} 분석`; }
+                window.setMobileActiveTab('detail');
+            } else { window.setDesktopView(); }
             window.openStudentDetail(studentUid, student.name, `학번: ${student.student_id || ''} | ${student.admission_year || ''}년도 입학`);
         };
 
